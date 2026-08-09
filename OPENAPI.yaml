@@ -1,0 +1,220 @@
+openapi: 3.1.0
+info:
+  title: TroteBox API
+  version: 0.3.5
+  description: API original TroteBox para autenticação, catálogo, carteira, chamadas, pagamentos, telefonia e webhooks.
+servers:
+  - url: https://api.seudominio.com/api/v1
+security:
+  - bearerAuth: []
+paths:
+  /health:
+    get:
+      security: []
+      responses:
+        '200': { description: Serviço disponível }
+  /auth/dev-login:
+    post:
+      security: []
+      description: Somente desenvolvimento; indisponível em produção.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, displayName]
+              properties:
+                email: { type: string, format: email }
+                displayName: { type: string, minLength: 2, maxLength: 80 }
+      responses:
+        '200': { description: Token e usuário }
+  /auth/request-code:
+    post:
+      security: []
+      description: Solicita OTP passwordless com resposta não enumerável.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, displayName]
+              properties:
+                email: { type: string, format: email }
+                displayName: { type: string, minLength: 2, maxLength: 80 }
+      responses:
+        '202': { description: Solicitação aceita }
+        '429': { description: Limite de solicitações atingido }
+  /auth/verify-code:
+    post:
+      security: []
+      description: Valida OTP e emite JWT de curta duração.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, code]
+              properties:
+                email: { type: string, format: email }
+                code: { type: string, pattern: '^\d{6}$' }
+      responses:
+        '200': { description: Token e usuário }
+        '401': { description: Código inválido ou expirado }
+  /auth/session:
+    get:
+      description: Retorna o usuário da sessão web HttpOnly ou do bearer token nativo.
+      responses:
+        '200': { description: Usuário autenticado }
+        '401': { description: Sessão ausente, inválida ou expirada }
+  /auth/logout:
+    post:
+      description: Encerra a sessão e expira o cookie web.
+      responses:
+        '200': { description: Sessão encerrada }
+  /catalog:
+    get:
+      security: []
+      responses:
+        '200': { description: Roteiros ativos e pacotes de crédito }
+  /wallet:
+    get:
+      responses:
+        '200': { description: Saldo, reservas e lançamentos recentes }
+  /calls:
+    get:
+      responses:
+        '200': { description: Chamadas do usuário autenticado }
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCall'
+      responses:
+        '200': { description: Chamada idempotente existente }
+        '201': { description: Chamada criada e créditos reservados }
+        '402': { description: Créditos insuficientes }
+  /calls/{id}:
+    get:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Detalhes da chamada pertencente ao usuário }
+        '404': { description: Chamada não encontrada }
+  /payments/stripe/checkout:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [packCode, idempotencyKey]
+              properties:
+                packCode: { type: string }
+                idempotencyKey: { type: string, format: uuid }
+      responses:
+        '200': { description: URL do Stripe Checkout }
+  /payments/mercadopago/pix:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [packCode, payerEmail, idempotencyKey]
+              properties:
+                packCode: { type: string }
+                payerEmail: { type: string, format: email }
+                payerDocument: { type: string }
+                idempotencyKey: { type: string, format: uuid }
+      responses:
+        '200': { description: Código Pix e metadados do pagamento }
+  /webhooks/stripe:
+    post:
+      security: []
+      responses:
+        '200': { description: Evento validado e processado }
+  /webhooks/mercadopago:
+    post:
+      security: []
+      responses:
+        '200': { description: Evento validado e processado }
+  /webhooks/twilio/status:
+    post:
+      security: []
+      responses:
+        '200': { description: Status da chamada processado }
+  /webhooks/vonage/status:
+    post:
+      security: []
+      responses:
+        '200': { description: Status da chamada processado }
+  /webhooks/twilio/recording:
+    post:
+      security: []
+      description: Callback assinado de processamento da gravação Twilio.
+      responses:
+        '200': { description: Metadados da gravação processados }
+  /webhooks/vonage/recording:
+    post:
+      security: []
+      description: Callback assinado da ação NCCO de gravação Vonage.
+      responses:
+        '200': { description: Metadados da gravação processados }
+  /telephony/twilio/answer/{id}:
+    post:
+      security: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: TwiML assinado para reprodução do roteiro }
+  /telephony/vonage/answer/{id}:
+    post:
+      security: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: NCCO assinado para reprodução do roteiro }
+  /cron/reconcile:
+    get:
+      security:
+        - cronBearer: []
+      responses:
+        '200': { description: Chamadas presas reconciliadas }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    cronBearer:
+      type: http
+      scheme: bearer
+  schemas:
+    CreateCall:
+      type: object
+      required: [scriptId, recipientPhone, consentConfirmed, idempotencyKey]
+      properties:
+        scriptId: { type: string }
+        recipientPhone:
+          type: string
+          pattern: '^\+[1-9]\d{7,14}$'
+        recipientLabel: { type: string, maxLength: 80 }
+        consentConfirmed: { type: boolean, const: true }
+        recordingConsentConfirmed: { type: boolean, default: false }
+        idempotencyKey: { type: string, format: uuid }

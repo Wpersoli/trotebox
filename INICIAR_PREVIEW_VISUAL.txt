@@ -1,0 +1,16 @@
+TROTEBOX — PREVIEW VISUAL SEM BANCO / API
+
+No Windows PowerShell:
+
+cd "C:\Projetos\trote-box"
+npm install
+npm run preview:web
+
+Abra:
+http://127.0.0.1:3000
+
+Login demonstrativo:
+demo@trotebox.local
+
+O preview usa dados locais simulados. Não realiza chamadas, pagamentos nem gravações.
+Para parar: Ctrl+C.

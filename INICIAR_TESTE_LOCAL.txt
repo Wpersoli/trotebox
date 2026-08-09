@@ -1,0 +1,25 @@
+TROTEBOX 0.3.5 — TESTE LOCAL COMPLETO (WINDOWS POWERSHELL)
+
+PARA APENAS VISUALIZAR, use INICIAR_PREVIEW_VISUAL.txt.
+
+Stack completa com banco:
+
+1. Abra o PowerShell na pasta do projeto:
+cd "C:\Projetos\trote-box"
+
+2. Libere scripts somente nesta janela:
+Set-ExecutionPolicy -Scope Process Bypass -Force
+
+3. Escolha Docker ou Supabase e execute setup-local.ps1.
+
+4. Inicie frontend + API:
+.\scripts\start-local.ps1
+
+5. Em outro PowerShell:
+cd "C:\Projetos\trote-box"
+npm run smoke:local
+
+6. Acesse:
+http://localhost:3000
+
+Supabase: consulte SUPABASE_LOCAL.md.

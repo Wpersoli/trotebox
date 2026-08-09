@@ -1,0 +1,59 @@
+name: quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: trotebox_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d trotebox_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trotebox_test?schema=public
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/trotebox_test?schema=public
+      JWT_SECRET: ci-only-secret-with-more-than-32-characters
+      DATA_ENCRYPTION_KEY: ci-only-data-key-with-more-than-32-characters
+      HASH_PEPPER: ci-only-hash-pepper-with-more-than-32-characters
+      AUTH_CODE_PEPPER: ci-only-auth-code-pepper-with-more-than-32-chars
+      CRON_SECRET: ci-only-cron-secret-1234567890
+      PUBLIC_WEB_URL: http://localhost:3000
+      PUBLIC_API_URL: http://localhost:3001
+      ALLOWED_ORIGINS: http://localhost:3000
+      TELEPHONY_PROVIDER: mock
+      ENABLE_DEV_AUTH: true
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:3001/api/v1
+      NEXT_PUBLIC_ENABLE_DEV_LOGIN: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        shell: bash
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install --no-audit --no-fund
+          fi
+      - run: npm run db:generate
+      - run: npm run db:deploy
+      - run: npm run quality:full

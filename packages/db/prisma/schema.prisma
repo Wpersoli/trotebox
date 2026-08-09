@@ -1,0 +1,319 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum CallStatus {
+  VALIDATING
+  CREDIT_RESERVED
+  QUEUED
+  DIALING
+  RINGING
+  ANSWERED
+  RECORDING_PROCESSING
+  COMPLETED
+  FAILED
+  CANCELED
+  REFUNDED
+  EXPIRED
+}
+
+enum PaymentProvider {
+  STRIPE
+  MERCADOPAGO
+  MANUAL
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELED
+  REFUNDED
+  CHARGEBACK
+}
+
+enum LedgerType {
+  PURCHASE
+  CALL_RESERVE
+  CALL_RELEASE
+  CALL_CAPTURE
+  ADJUSTMENT
+  REFUND
+  CHARGEBACK
+}
+
+enum WebhookProvider {
+  STRIPE
+  MERCADOPAGO
+  TWILIO
+  VONAGE
+}
+
+
+model AuthCode {
+  id          String    @id @default(cuid())
+  email       String
+  displayName String
+  codeHash    String
+  attempts    Int       @default(0)
+  expiresAt   DateTime
+  consumedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([email, createdAt])
+  @@index([expiresAt])
+}
+
+model User {
+  id             String        @id @default(cuid())
+  email          String        @unique
+  displayName    String
+  status         UserStatus    @default(ACTIVE)
+  phoneVerified  Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  wallet         WalletAccount?
+  calls          CallOrder[]
+  payments       Payment[]
+  consents       Consent[]
+  auditLogs      AuditLog[]
+}
+
+model Consent {
+  id              String   @id @default(cuid())
+  userId          String
+  type            String
+  version         String
+  acceptedAt      DateTime @default(now())
+  ipHash          String?
+  userAgentHash   String?
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+}
+
+model WalletAccount {
+  id               String        @id @default(cuid())
+  userId           String        @unique
+  balanceCredits   Int           @default(0)
+  reservedCredits  Int           @default(0)
+  version          Int           @default(0)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries          LedgerEntry[]
+}
+
+model LedgerEntry {
+  id             String      @id @default(cuid())
+  walletId       String
+  type           LedgerType
+  amountCredits  Int
+  balanceAfter   Int
+  reservedAfter  Int
+  referenceType  String
+  referenceId    String
+  description    String
+  metadata       Json?
+  createdAt      DateTime    @default(now())
+  wallet         WalletAccount @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@unique([type, referenceType, referenceId])
+  @@index([walletId, createdAt])
+}
+
+model Script {
+  id               String      @id @default(cuid())
+  slug             String      @unique
+  title            String
+  category         String
+  description      String
+  body             String
+  voiceLocale      String      @default("pt-BR")
+  voiceName        String?
+  creditCost       Int
+  durationSeconds  Int
+  accent           String      @default("violet")
+  active           Boolean     @default(true)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  calls            CallOrder[]
+}
+
+model CreditPack {
+  id              String    @id @default(cuid())
+  code            String    @unique
+  name            String
+  credits         Int
+  priceCents      Int
+  currency        String    @default("BRL")
+  stripePriceId   String?
+  active          Boolean   @default(true)
+  sortOrder       Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  payments        Payment[]
+}
+
+model Payment {
+  id                   String          @id @default(cuid())
+  userId               String
+  creditPackId         String
+  provider             PaymentProvider
+  status               PaymentStatus   @default(PENDING)
+  amountCents          Int
+  currency             String          @default("BRL")
+  credits              Int
+  idempotencyKey       String          @unique
+  providerPaymentId    String?         @unique
+  providerCheckoutId   String?         @unique
+  rawStatus            String?
+  metadata             Json?
+  approvedAt           DateTime?
+  refundedAt           DateTime?
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+  user                 User            @relation(fields: [userId], references: [id], onDelete: Restrict)
+  creditPack           CreditPack      @relation(fields: [creditPackId], references: [id], onDelete: Restrict)
+
+  @@index([userId, createdAt])
+}
+
+model CallOrder {
+  id                         String       @id @default(cuid())
+  userId                     String
+  scriptId                   String
+  status                     CallStatus   @default(VALIDATING)
+  recipientPhoneEncrypted    String
+  recipientPhoneHash         String
+  recipientLabel             String?
+  consentConfirmedAt         DateTime
+  recordingConsentAt         DateTime?
+  creditCost                 Int
+  reservedCredits            Int          @default(0)
+  telephonyProvider          String
+  providerCallId             String?      @unique
+  providerConversationId     String?      @unique
+  voiceAssetUrl              String?
+  idempotencyKey             String       @unique
+  failureCode                String?
+  failureMessage             String?
+  answeredAt                 DateTime?
+  completedAt                DateTime?
+  createdAt                  DateTime     @default(now())
+  updatedAt                  DateTime     @updatedAt
+  user                       User         @relation(fields: [userId], references: [id], onDelete: Restrict)
+  script                     Script       @relation(fields: [scriptId], references: [id], onDelete: Restrict)
+  events                     CallEvent[]
+  recording                  Recording?
+
+  @@index([userId, createdAt])
+  @@index([recipientPhoneHash, createdAt])
+  @@index([status, createdAt])
+}
+
+model CallEvent {
+  id              String      @id @default(cuid())
+  callId          String
+  providerEventId String?
+  status          CallStatus
+  payload         Json?
+  createdAt       DateTime    @default(now())
+  call            CallOrder   @relation(fields: [callId], references: [id], onDelete: Cascade)
+
+  @@unique([callId, providerEventId])
+  @@index([callId, createdAt])
+}
+
+model Recording {
+  id                           String    @id @default(cuid())
+  callId                       String    @unique
+  provider                     String
+  status                       String    @default("PENDING")
+  providerRecordingId          String?   @unique
+  providerDownloadUrlEncrypted String?
+  storageKey                   String?
+  durationSeconds              Int?
+  contentType                  String?
+  sha256                       String?
+  expiresAt                    DateTime?
+  deletedAt                    DateTime?
+  createdAt                    DateTime  @default(now())
+  call                         CallOrder @relation(fields: [callId], references: [id], onDelete: Cascade)
+}
+
+model Suppression {
+  id                 String    @id @default(cuid())
+  recipientPhoneHash String    @unique
+  reason             String
+  source             String
+  expiresAt          DateTime?
+  createdAt          DateTime  @default(now())
+}
+
+model WebhookEvent {
+  id              String           @id @default(cuid())
+  provider        WebhookProvider
+  externalEventId String
+  signatureValid  Boolean
+  payloadHash     String
+  payload         Json?
+  processedAt     DateTime?
+  errorMessage    String?
+  createdAt       DateTime         @default(now())
+
+  @@unique([provider, externalEventId])
+  @@index([provider, processedAt])
+}
+
+model IdempotencyRecord {
+  id              String    @id @default(cuid())
+  scope           String
+  key             String
+  userId          String?
+  requestHash     String
+  responseStatus  Int?
+  responseBody    Json?
+  expiresAt       DateTime
+  createdAt       DateTime  @default(now())
+
+  @@unique([scope, key])
+  @@index([expiresAt])
+}
+
+model RateLimitEvent {
+  id          String    @id @default(cuid())
+  bucket      String
+  subjectHash String
+  createdAt   DateTime  @default(now())
+
+  @@index([bucket, subjectHash, createdAt])
+}
+
+model AuditLog {
+  id          String    @id @default(cuid())
+  userId      String?
+  actorType   String
+  action      String
+  targetType  String
+  targetId    String?
+  ipHash      String?
+  metadata    Json?
+  createdAt   DateTime  @default(now())
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([targetType, targetId])
+}

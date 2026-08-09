@@ -1,0 +1,49 @@
+{
+  "name": "trotebox-platform",
+  "version": "0.3.5",
+  "private": true,
+  "description": "Plataforma original de trotes de comédia com frontend responsivo, créditos, telefonia programável e clientes web/mobile.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22 <23",
+    "npm": ">=10"
+  },
+  "scripts": {
+    "dev": "node scripts/dev-all.mjs",
+    "build": "npm run build:web",
+    "lint": "npm run lint -w @trotebox/contracts && npm run lint -w @trotebox/db && npm run lint -w @trotebox/api && npm run lint -w @trotebox/web",
+    "typecheck": "npm run typecheck -w @trotebox/contracts && npm run typecheck -w @trotebox/db && npm run typecheck -w @trotebox/api && npm run typecheck -w @trotebox/web",
+    "test": "npm run test -w @trotebox/contracts && npm run test -w @trotebox/db && npm run test -w @trotebox/api && npm run test -w @trotebox/web",
+    "quality": "npm run validate:repo && npm run test:domain && npm run lint && npm run typecheck && npm run test && npm run build:web",
+    "validate:repo": "node scripts/validate-project.mjs",
+    "db:generate": "npm run db:generate -w @trotebox/db",
+    "db:migrate": "npm run db:migrate -w @trotebox/db",
+    "db:seed": "npm run db:seed -w @trotebox/db",
+    "mobile:sync": "npm run mobile:sync -w @trotebox/web",
+    "mobile:android": "npm run mobile:android -w @trotebox/web",
+    "mobile:ios": "npm run mobile:ios -w @trotebox/web",
+    "inventory": "node scripts/generate-inventory.mjs",
+    "preflight": "node scripts/preflight.mjs",
+    "setup:local": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/setup-local.ps1",
+    "validate:local": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/validate-local.ps1",
+    "smoke:local": "node scripts/smoke-local.mjs",
+    "db:deploy": "npm run db:deploy -w @trotebox/db",
+    "test:domain": "node --no-warnings --experimental-strip-types scripts/domain-tests.mjs",
+    "preview:web": "node scripts/preview-web.mjs",
+    "build:web": "npm run build -w @trotebox/web",
+    "build:all": "npm run build -w @trotebox/contracts && npm run build -w @trotebox/db && npm run build -w @trotebox/api && npm run build -w @trotebox/web",
+    "quality:full": "npm run validate:repo && npm run test:domain && npm run lint && npm run typecheck && npm run test && npm run build:all"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.0",
+    "eslint": "9.30.0",
+    "eslint-config-next": "16.3.0",
+    "typescript": "5.8.3",
+    "vitest": "3.2.7"
+  },
+  "license": "UNLICENSED",
+  "packageManager": "npm@10.9.2"
+}
