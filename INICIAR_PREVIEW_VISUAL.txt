@@ -3,7 +3,7 @@ TROTEBOX — PREVIEW VISUAL SEM BANCO / API
 No Windows PowerShell:
 
 cd "C:\Projetos\trote-box"
-npm install
+npm ci
 npm run preview:web
 
 Abra:

@@ -1,162 +1,166 @@
-# Mapa integral de arquivos
+# Mapa de arquivos — TroteBox
 
-Inventário da versão **0.3.5**. Os hashes definitivos são gerados em `SOURCE_MANIFEST.csv` e `CHECKSUMS.sha256`.
+Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches e artefatos de build são excluídos.
 
-| Arquivo | Bytes | Finalidade |
+| Caminho | Bytes | SHA-256 |
 |---|---:|---|
-| `.env.example` | 1803 | Arquivo de projeto. |
-| `.github/workflows/quality.yml` | 1801 | Configuração, contrato ou banco. |
-| `.gitignore` | 164 | Arquivo de projeto. |
-| `.npmrc` | 75 | Arquivo de projeto. |
-| `.nvmrc` | 3 | Arquivo de projeto. |
-| `ARCHITECTURE.md` | 1934 | Documentação técnica/operacional. |
-| `BRAND_CUSTOMIZATION.md` | 1489 | Documentação técnica/operacional. |
-| `CHANGELOG.md` | 1999 | Documentação técnica/operacional. |
-| `COMMERCE_CHANNELS.md` | 1421 | Documentação técnica/operacional. |
-| `CUSTOM_TTS.md` | 1206 | Documentação técnica/operacional. |
-| `DEPENDENCY_POLICY.md` | 1442 | Documentação técnica/operacional. |
-| `DEPLOY.md` | 2056 | Documentação técnica/operacional. |
-| `DEV_PREVIEW.md` | 859 | Documentação técnica/operacional. |
-| `GIT_FIRST_COMMIT.md` | 1301 | Documentação técnica/operacional. |
-| `IMPLEMENTATION_STATUS.md` | 1883 | Documentação técnica/operacional. |
-| `INICIAR_PREVIEW_VISUAL.txt` | 309 | Documentação técnica/operacional. |
-| `INICIAR_TESTE_LOCAL.txt` | 561 | Documentação técnica/operacional. |
-| `LEGAL-CLEAN-ROOM.md` | 780 | Documentação técnica/operacional. |
-| `LICENSE-PROPRIETARY.md` | 431 | Documentação técnica/operacional. |
-| `LOCAL_TEST.md` | 1197 | Documentação técnica/operacional. |
-| `MEDIA_PIPELINE.md` | 2022 | Documentação técnica/operacional. |
-| `OPENAPI.yaml` | 6769 | Configuração, contrato ou banco. |
-| `README.md` | 3520 | Documentação técnica/operacional. |
-| `REBRAND_0.3.1.md` | 955 | Documentação técnica/operacional. |
-| `RELEASE_NOTES_0.3.5.md` | 639 | Documentação técnica/operacional. |
-| `SECURITY.md` | 1996 | Documentação técnica/operacional. |
-| `SUPABASE_LOCAL.md` | 1176 | Documentação técnica/operacional. |
-| `THIRD_PARTY.md` | 1116 | Documentação técnica/operacional. |
-| `THREAT_MODEL.md` | 1171 | Documentação técnica/operacional. |
-| `VALIDATION_REPORT.md` | 2486 | Documentação técnica/operacional. |
-| `WINDOWS_QUALITY.md` | 1190 | Documentação técnica/operacional. |
-| `apps/api/.env.example` | 1398 | Arquivo de projeto. |
-| `apps/api/next-env.d.ts` | 81 | Código TypeScript/React. |
-| `apps/api/next.config.ts` | 280 | Código TypeScript/React. |
-| `apps/api/package.json` | 681 | Manifesto npm/workspace. |
-| `apps/api/src/app/api/v1/auth/dev-login/route.ts` | 1378 | Código TypeScript/React. |
-| `apps/api/src/app/api/v1/auth/logout/route.ts` | 243 | Código TypeScript/React. |
-| `apps/api/src/app/api/v1/auth/request-code/route.ts` | 665 | Código TypeScript/React. |
-| `apps/api/src/app/api/v1/auth/session/route.ts` | 417 | Código TypeScript/React. |
-| `apps/api/src/app/api/v1/auth/verify-code/route.ts` | 967 | Código TypeScript/React. |
-| `apps/api/src/app/api/v1/calls/[id]/route.ts` | 1487 | Código TypeScript/React. |
-| `apps/api/src/app/api/v1/calls/route.ts` | 1651 | Código TypeScript/React. |
-| `apps/api/src/app/api/v1/catalog/route.ts` | 885 | Código TypeScript/React. |
-| `apps/api/src/app/api/v1/cron/reconcile/route.ts` | 2394 | Código TypeScript/React. |
-| `apps/api/src/app/api/v1/health/route.ts` | 396 | Código TypeScript/React. |
-| `apps/api/src/app/api/v1/payments/mercadopago/pix/route.ts` | 839 | Código TypeScript/React. |
-| `apps/api/src/app/api/v1/payments/stripe/checkout/route.ts` | 846 | Código TypeScript/React. |
-| `apps/api/src/app/api/v1/telephony/twilio/answer/[id]/route.ts` | 1698 | Código TypeScript/React. |
-| `apps/api/src/app/api/v1/telephony/vonage/answer/[id]/route.ts` | 2046 | Código TypeScript/React. |
-| `apps/api/src/app/api/v1/wallet/route.ts` | 906 | Código TypeScript/React. |
-| `apps/api/src/app/api/v1/webhooks/mercadopago/route.ts` | 1899 | Código TypeScript/React. |
-| `apps/api/src/app/api/v1/webhooks/stripe/route.ts` | 3684 | Código TypeScript/React. |
-| `apps/api/src/app/api/v1/webhooks/twilio/recording/route.ts` | 2427 | Código TypeScript/React. |
-| `apps/api/src/app/api/v1/webhooks/twilio/status/route.ts` | 1911 | Código TypeScript/React. |
-| `apps/api/src/app/api/v1/webhooks/vonage/recording/route.ts` | 2284 | Código TypeScript/React. |
-| `apps/api/src/app/api/v1/webhooks/vonage/status/route.ts` | 1924 | Código TypeScript/React. |
-| `apps/api/src/app/layout.tsx` | 154 | Código TypeScript/React. |
-| `apps/api/src/app/page.tsx` | 172 | Código TypeScript/React. |
-| `apps/api/src/proxy.ts` | 1382 | Código TypeScript/React. |
-| `apps/api/src/server/audit.ts` | 753 | Código TypeScript/React. |
-| `apps/api/src/server/auth-code.ts` | 4708 | Código TypeScript/React. |
-| `apps/api/src/server/auth.ts` | 2806 | Código TypeScript/React. |
-| `apps/api/src/server/calls.ts` | 7756 | Código TypeScript/React. |
-| `apps/api/src/server/crypto.ts` | 1412 | Código TypeScript/React. |
-| `apps/api/src/server/env.ts` | 2255 | Código TypeScript/React. |
-| `apps/api/src/server/http.ts` | 1241 | Código TypeScript/React. |
-| `apps/api/src/server/payment-events.ts` | 6301 | Código TypeScript/React. |
-| `apps/api/src/server/payments/mercadopago.ts` | 4498 | Código TypeScript/React. |
-| `apps/api/src/server/payments/stripe.ts` | 3055 | Código TypeScript/React. |
-| `apps/api/src/server/phone-policy-core.ts` | 1608 | Código TypeScript/React. |
-| `apps/api/src/server/phone-policy.test.ts` | 713 | Código TypeScript/React. |
-| `apps/api/src/server/phone-policy.ts` | 418 | Código TypeScript/React. |
-| `apps/api/src/server/provider-signatures.ts` | 1633 | Código TypeScript/React. |
-| `apps/api/src/server/provider-status.ts` | 1050 | Código TypeScript/React. |
-| `apps/api/src/server/rate-limit.ts` | 968 | Código TypeScript/React. |
-| `apps/api/src/server/recordings.ts` | 1637 | Código TypeScript/React. |
-| `apps/api/src/server/telephony/index.ts` | 497 | Código TypeScript/React. |
-| `apps/api/src/server/telephony/mock.ts` | 298 | Código TypeScript/React. |
-| `apps/api/src/server/telephony/twilio.ts` | 1302 | Código TypeScript/React. |
-| `apps/api/src/server/telephony/types.ts` | 373 | Código TypeScript/React. |
-| `apps/api/src/server/telephony/vonage.ts` | 1297 | Código TypeScript/React. |
-| `apps/api/src/server/voice.ts` | 1707 | Código TypeScript/React. |
-| `apps/api/src/server/wallet.ts` | 5875 | Código TypeScript/React. |
-| `apps/api/src/server/webhook-events.ts` | 1208 | Código TypeScript/React. |
-| `apps/api/src/server/xml.ts` | 181 | Código TypeScript/React. |
-| `apps/api/tsconfig.json` | 292 | Configuração, contrato ou banco. |
-| `apps/api/vercel.json` | 106 | Configuração, contrato ou banco. |
-| `apps/web/.env.example` | 279 | Arquivo de projeto. |
-| `apps/web/capacitor.config.ts` | 451 | Código TypeScript/React. |
-| `apps/web/next-env.d.ts` | 81 | Código TypeScript/React. |
-| `apps/web/next.config.ts` | 326 | Código TypeScript/React. |
-| `apps/web/package.json` | 1005 | Manifesto npm/workspace. |
-| `apps/web/public/brand/app-icon-512.png` | 171972 | Ativo visual da marca/interface. |
-| `apps/web/public/brand/apple-touch-icon.png` | 44047 | Ativo visual da marca/interface. |
-| `apps/web/public/brand/icon-16.png` | 844 | Ativo visual da marca/interface. |
-| `apps/web/public/brand/icon-180.png` | 44047 | Ativo visual da marca/interface. |
-| `apps/web/public/brand/icon-192.png` | 48405 | Ativo visual da marca/interface. |
-| `apps/web/public/brand/icon-256.png` | 75075 | Ativo visual da marca/interface. |
-| `apps/web/public/brand/icon-32.png` | 2578 | Ativo visual da marca/interface. |
-| `apps/web/public/brand/icon-48.png` | 4948 | Ativo visual da marca/interface. |
-| `apps/web/public/brand/icon-64.png` | 8093 | Ativo visual da marca/interface. |
-| `apps/web/public/brand/lockup-full.png` | 1911376 | Ativo visual da marca/interface. |
-| `apps/web/public/brand/logo-wordmark.png` | 395832 | Ativo visual da marca/interface. |
-| `apps/web/public/brand/mascot-hero.png` | 1045539 | Ativo visual da marca/interface. |
-| `apps/web/public/brand/trotebox-brand-source.png` | 1940475 | Ativo visual da marca/interface. |
-| `apps/web/public/brand/trotebox-hero.webp` | 167148 | Ativo visual da marca/interface. |
-| `apps/web/public/brand/trotebox-mascot.webp` | 115136 | Ativo visual da marca/interface. |
-| `apps/web/public/brand/trotebox-wordmark.webp` | 57432 | Ativo visual da marca/interface. |
-| `apps/web/public/favicon.png` | 2578 | Ativo visual da marca/interface. |
-| `apps/web/public/icon.svg` | 1047 | Ativo visual da marca/interface. |
-| `apps/web/public/manifest.webmanifest` | 536 | Arquivo de projeto. |
-| `apps/web/src/app/calls/new/page.tsx` | 4853 | Código TypeScript/React. |
-| `apps/web/src/app/calls/page.tsx` | 1683 | Código TypeScript/React. |
-| `apps/web/src/app/catalog/page.tsx` | 1443 | Código TypeScript/React. |
-| `apps/web/src/app/dashboard/page.tsx` | 2428 | Código TypeScript/React. |
-| `apps/web/src/app/globals.css` | 23769 | Arquivo de projeto. |
-| `apps/web/src/app/layout.tsx` | 1173 | Código TypeScript/React. |
-| `apps/web/src/app/login/page.tsx` | 4234 | Código TypeScript/React. |
-| `apps/web/src/app/page.tsx` | 6715 | Código TypeScript/React. |
-| `apps/web/src/app/settings/page.tsx` | 1215 | Código TypeScript/React. |
-| `apps/web/src/app/wallet/page.tsx` | 4216 | Código TypeScript/React. |
-| `apps/web/src/components/AppShell.tsx` | 2603 | Código TypeScript/React. |
-| `apps/web/src/components/AuthProvider.tsx` | 2408 | Código TypeScript/React. |
-| `apps/web/src/components/Brand.tsx` | 823 | Código TypeScript/React. |
-| `apps/web/src/lib/api.ts` | 8405 | Código TypeScript/React. |
-| `apps/web/tsconfig.json` | 292 | Configuração, contrato ou banco. |
-| `apps/web/vercel.json` | 1098 | Configuração, contrato ou banco. |
-| `docker-compose.yml` | 451 | Configuração, contrato ou banco. |
-| `eslint.config.mjs` | 800 | Automação/configuração executável. |
-| `package.json` | 2577 | Manifesto npm/workspace. |
-| `packages/contracts/package.json` | 478 | Manifesto npm/workspace. |
-| `packages/contracts/src/index.test.ts` | 974 | Código TypeScript/React. |
-| `packages/contracts/src/index.ts` | 2929 | Código TypeScript/React. |
-| `packages/contracts/tsconfig.json` | 121 | Configuração, contrato ou banco. |
-| `packages/db/.env.example` | 162 | Arquivo de projeto. |
-| `packages/db/package.json` | 878 | Manifesto npm/workspace. |
-| `packages/db/prisma/migrations/20260805010000_initial/migration.sql` | 12887 | Configuração, contrato ou banco. |
-| `packages/db/prisma/migrations/migration_lock.toml` | 24 | Configuração, contrato ou banco. |
-| `packages/db/prisma/schema.prisma` | 8857 | Configuração, contrato ou banco. |
-| `packages/db/src/client.ts` | 384 | Código TypeScript/React. |
-| `packages/db/src/seed.ts` | 4049 | Código TypeScript/React. |
-| `packages/db/tsconfig.json` | 121 | Configuração, contrato ou banco. |
-| `scripts/dev-all.mjs` | 944 | Automação/configuração executável. |
-| `scripts/domain-tests.mjs` | 1511 | Automação/configuração executável. |
-| `scripts/generate-inventory.mjs` | 2474 | Automação/configuração executável. |
-| `scripts/preflight.mjs` | 1921 | Automação/configuração executável. |
-| `scripts/preview-web.mjs` | 857 | Automação/configuração executável. |
-| `scripts/preview-web.ps1` | 287 | Automação/configuração executável. |
-| `scripts/setup-local.ps1` | 4036 | Automação/configuração executável. |
-| `scripts/smoke-local.mjs` | 2735 | Automação/configuração executável. |
-| `scripts/start-local.ps1` | 122 | Automação/configuração executável. |
-| `scripts/validate-local.ps1` | 326 | Automação/configuração executável. |
-| `scripts/validate-project.mjs` | 6379 | Automação/configuração executável. |
-| `tsconfig.base.json` | 528 | Configuração, contrato ou banco. |
-
-Arquivos listados: **154** (manifests recursivos gerados não entram nesta tabela).
+| `.env.example` | 1803 | `95cf76f0c6c712ae1a2d899f4e53f8f6c390978aa4a27f03b6d56bc71a083baa` |
+| `.gitattributes` | 148 | `4c6dc5c1a2f021628223f24b46a42138cd4dd3781f22f0eddee0ee3558c96bcf` |
+| `.github/workflows/quality.yml` | 1735 | `4019ba1b0ae4e37bc219493dfb1b770463f7fe87c42c9940705a93fb49268de3` |
+| `.gitignore` | 203 | `af5d3e3f3b978c939e01927b2f86a9edc9cb8cdffe97c0312916412f258e3cb5` |
+| `.npmrc` | 75 | `27bc72205631c71b21618ec6f4f8453eb32d019c992afce9b64abe5cedea856c` |
+| `.nvmrc` | 3 | `f14b4987904bcb5814e4459a057ed4d20f58a633152288a761214dcd28780b56` |
+| `apps/api/.env.example` | 1398 | `fd5b13f81aefaf3a0883594f3c08654aa7e323812dcb39c50ec9bb477324487c` |
+| `apps/api/next.config.ts` | 280 | `149accffcbae7a9cc396cc71021fe64bde07684b9392fd689898f7ca264e4e79` |
+| `apps/api/package.json` | 696 | `4b907689aaa2844ffd549da938f72f7b4ddba133b082b9af8e2ae52dadfc6f6c` |
+| `apps/api/src/app/api/v1/auth/dev-login/route.ts` | 1378 | `6b718bd18c0ba32fd639ae4f31eeafc33b85224ae46332f2e49e2530e348b7ee` |
+| `apps/api/src/app/api/v1/auth/logout/route.ts` | 243 | `c3ed0c7337c0339f57ce1d036096f9a369d1e8d6937d823a80a7ff2a2d1b8082` |
+| `apps/api/src/app/api/v1/auth/request-code/route.ts` | 665 | `b77a5b550f443078b888ab4053ced874903cdd39440e8c77a89a38a1e01c708d` |
+| `apps/api/src/app/api/v1/auth/session/route.ts` | 417 | `f6957ad13e2916366d349a8287fa01d3d236c3fedd4fa4006d8215d4109c88d2` |
+| `apps/api/src/app/api/v1/auth/verify-code/route.ts` | 967 | `667d95c2818f6cc86b65bc8aae1acb60d5f56d05b78658b341a2eab973bac9cf` |
+| `apps/api/src/app/api/v1/calls/[id]/route.ts` | 1487 | `10c4b607ca7c24ebc14891333d8b902279f16dc84d937ffaf32879f0b3e8528e` |
+| `apps/api/src/app/api/v1/calls/route.ts` | 1651 | `38ef5c436fdbbf3f46453c84e8d1137b2808f8c7140f1f5cdad68a366c630e88` |
+| `apps/api/src/app/api/v1/catalog/route.ts` | 885 | `22528b50da8ba438339f719215acd3d0964810bfae0b8e535e357b94c8432f12` |
+| `apps/api/src/app/api/v1/cron/reconcile/route.ts` | 2408 | `1458f145908a18a2344fb6725eed75030d7063c2af43da3046cf90d7f5bf80aa` |
+| `apps/api/src/app/api/v1/health/route.ts` | 396 | `72e51437690532dc77d8027daae70e05420918dedc32be837782198d9d7accaa` |
+| `apps/api/src/app/api/v1/payments/mercadopago/pix/route.ts` | 839 | `9822010e449c5362fe8bba24cc85894259374cdb8b4df1887da0394cd8055f48` |
+| `apps/api/src/app/api/v1/payments/stripe/checkout/route.ts` | 846 | `c2ad6218e04b27993eb4bbe789e83a036f603e2f4a7bc5d5d41d7903c7db4b17` |
+| `apps/api/src/app/api/v1/telephony/twilio/answer/[id]/route.ts` | 1698 | `be7f9a9af767b6b36a4f7e09bb38baf86878973bdc6cdac77a94e248d7154e92` |
+| `apps/api/src/app/api/v1/telephony/vonage/answer/[id]/route.ts` | 2072 | `5420b743a6030de43da572ca6a28e7f8a15178d034b74e617e4c7560f126b560` |
+| `apps/api/src/app/api/v1/wallet/route.ts` | 906 | `e2747a9e6336dfba4d1d971b658bba44bde65fe2261f16c307734cf08414eee6` |
+| `apps/api/src/app/api/v1/webhooks/mercadopago/route.ts` | 1899 | `2800bdbd129fb326a08c54d9d049b52339e48ecfd74ae3c3cc788a858d3a46da` |
+| `apps/api/src/app/api/v1/webhooks/stripe/route.ts` | 3684 | `579c2e6f3d62c4c476003ea6c1e27d14347f703e7c668f174fff5fd341d8b19a` |
+| `apps/api/src/app/api/v1/webhooks/twilio/recording/route.ts` | 2465 | `663e0a80677ba005c0df1f2e3cbffbdc2659ef213da99c81b05d7135fdec885b` |
+| `apps/api/src/app/api/v1/webhooks/twilio/status/route.ts` | 1911 | `3836b567b4a5c97165ddc3868f6e47531a2bdae954269610980740c191367e37` |
+| `apps/api/src/app/api/v1/webhooks/vonage/recording/route.ts` | 2326 | `5721ab87a46fbe80031c97575098a399c2c7f442ffd9f5018d08b6f74f51718c` |
+| `apps/api/src/app/api/v1/webhooks/vonage/status/route.ts` | 2060 | `7e2a90e42474b7bca585c6fd96458fe8a54d132d8fe6fe492b3042df4b1d5738` |
+| `apps/api/src/app/layout.tsx` | 154 | `b6409c401754850064f9bb42ca5d3da2ce01a122dd3153fea9268a7af65a87b0` |
+| `apps/api/src/app/page.tsx` | 172 | `d50b7db0da6130b0c6b17da390b4aaeee61ab70a2341cf9b5cbab982e153b54d` |
+| `apps/api/src/proxy.ts` | 1382 | `0257b2465fe499624525ac20edc31da852d34d485bc038e4799cc9d85085298a` |
+| `apps/api/src/server/audit.ts` | 974 | `9647a6e35029a1980fab8bd00928290ee855abcff9f6e3eeea6f46f06a28eaa3` |
+| `apps/api/src/server/auth-code.ts` | 4708 | `a866108c17627beda7273a111eebd5b1d568555272a32799a67794ba9b6aeb32` |
+| `apps/api/src/server/auth.ts` | 2806 | `16cc0c2204dd8d203d89046d4defc5900c9ed5bbec26385941607e5ca4d5f1e4` |
+| `apps/api/src/server/calls.ts` | 7993 | `e3061d6a98d65525a471424a3812113db8db6beca39a8a4774e9dc4fc6aefcce` |
+| `apps/api/src/server/crypto.ts` | 1412 | `3f71dc0928a53cdfdd6d0b6a639948c838da5673c41238e8fc920a86c6b7bfbb` |
+| `apps/api/src/server/env.test.ts` | 1070 | `ab24b23e03c1b6b336f1e577c1858d6e450665d4b88a31964eeb25997bf922fd` |
+| `apps/api/src/server/env.ts` | 2430 | `b6f0ef7b4ec60681bccabc4ed0b38793e48fe1041f7875ce7abc9f04ee25b3ef` |
+| `apps/api/src/server/http.ts` | 1241 | `ced9c88247a8c4265ad1d9628cc3de48c1dd0ba8a56029c9aae55f832f20ec61` |
+| `apps/api/src/server/payment-events.ts` | 6301 | `24fb3142fd604ff818abfcd89d3a3919659f1af73df237346371d94c38f7b608` |
+| `apps/api/src/server/payments/mercadopago.ts` | 4498 | `fb4932283596437fa47db25fd6e36c700a15a4a3783dac3ab603898f21250b21` |
+| `apps/api/src/server/payments/stripe.ts` | 3055 | `89c73413e6aef6ff1da2a1e5021f6f2dc37d87a57cd243aee337e977f0df16b5` |
+| `apps/api/src/server/phone-policy-core.ts` | 1608 | `a79a959b32d9bc6ce21fd990781eb2a5e4448bb080e6244eaef268a49fb1baa1` |
+| `apps/api/src/server/phone-policy.test.ts` | 713 | `198bcdc8128ac47bf4566cb916c19005866a2a92a9c8913b48f23c1069159acc` |
+| `apps/api/src/server/phone-policy.ts` | 418 | `0c8b090f7c8f29aa719fd7abe7831ba74c6d64ad5370703e717b2fe641e3d328` |
+| `apps/api/src/server/provider-signatures.ts` | 1633 | `94828217a2598ef982466b4911577ec5e4bd674805e801b0a95a024c700e5c1b` |
+| `apps/api/src/server/provider-status.ts` | 1050 | `2aa434eb737119261b97168b0629bf184d7ff17a17ffc51140444f79150fe8f5` |
+| `apps/api/src/server/rate-limit.ts` | 968 | `f4c981342687674b54784dcbe5fde1c9d844f021d8078418d99c8e3c438ce3b5` |
+| `apps/api/src/server/recordings.ts` | 1675 | `6cba42018eed02bc99abc587bdbc814ab5da634a7244d829e337d1addaca5c96` |
+| `apps/api/src/server/telephony/index.ts` | 497 | `77d03e6c363bd98f8245448783e9fa63da4b74aa6850e8de349921e2592c800c` |
+| `apps/api/src/server/telephony/mock.ts` | 298 | `6eeaf6b5e12f0c57d507b44957295feab3d678f94dbf387039f899b66452098c` |
+| `apps/api/src/server/telephony/twilio.ts` | 1248 | `a5cb714b0d6da0f1377cbc6330ef9b356e9852a10c43ed1ecce8f93a03329215` |
+| `apps/api/src/server/telephony/types.ts` | 373 | `81df27176b7d152add66be4cef5b5ed03c5800418ee844880128f331aac9d42e` |
+| `apps/api/src/server/telephony/vonage.ts` | 1238 | `e66782f9cf0fa2ef3a8fbd5c21f04e94b2ebceebf0125e203bd5b887e139431d` |
+| `apps/api/src/server/voice.ts` | 1707 | `5935b49e12857d3d40fa013db68c0c3508ab90052379f45766d17e29c2301698` |
+| `apps/api/src/server/wallet.ts` | 5875 | `956e0324fc9b187e00e93b46bbf60e900223f6a64768de4082009e571cb3bf9d` |
+| `apps/api/src/server/webhook-events.ts` | 1336 | `e2e72425fc67111836f2d65f0f1d1a1e018c3dd5a317533fe3aa43dcbd8d06c8` |
+| `apps/api/src/server/xml.ts` | 181 | `1a05134f4828ecbcf0baaa94f008c5d8c847a6cf7497e594a0aefff3cc870691` |
+| `apps/api/tsconfig.json` | 380 | `1a564353bec19c7296e901979f5f38cea3476e588043813d58de185b5472c6e4` |
+| `apps/api/vercel.json` | 106 | `83c04731eebed5a06047feaa410d5cb1e8276c4df00baa3650e0c6d7acc7120b` |
+| `apps/web/.env.example` | 279 | `d210833ea0674acf070d638067a2394a463dae73e0a236107fb11b8ee8fcb998` |
+| `apps/web/capacitor.config.ts` | 451 | `c6717f9a9f61b9ed4ee07baea71272deaa5df6d1776d50696acf0eaf17f5173f` |
+| `apps/web/next.config.ts` | 326 | `69a8309ccaa9b877b62889ab48b723522e978f179e5a62bda983786a52d01015` |
+| `apps/web/package.json` | 1020 | `ea6e39c706a331a8f0ac0b4ab176e39981fd4aae176ba969d4fbff8a516e47e1` |
+| `apps/web/public/brand/app-icon-512.png` | 171972 | `eb7409e442ee8c17b74e46baeba46146e2e2dc84ca3889c8fe77b177b615cfbc` |
+| `apps/web/public/brand/apple-touch-icon.png` | 44047 | `2fa9c2a73b7413591c83e2d62db79f43c46e7fadc70bfa21741bf8911ad686af` |
+| `apps/web/public/brand/icon-16.png` | 844 | `8972844d1f70310ca4f2fc4b35ad3b67d5efbcba091e3f8e974c0499dba151fe` |
+| `apps/web/public/brand/icon-180.png` | 44047 | `2fa9c2a73b7413591c83e2d62db79f43c46e7fadc70bfa21741bf8911ad686af` |
+| `apps/web/public/brand/icon-192.png` | 48405 | `f18183a941ca3152e78a56b4eee4331a7ee4dcfaae6804679bef38529330c807` |
+| `apps/web/public/brand/icon-256.png` | 75075 | `459b6c799a102bcc31bf6f58a8fa46804d441fe95c7552e236de18a1104ccd80` |
+| `apps/web/public/brand/icon-32.png` | 2578 | `7f67454758c00872dfc7647a16a1d10d406372bc77b38c0b602d968b7e2d1ebe` |
+| `apps/web/public/brand/icon-48.png` | 4948 | `b9c03a5eb1cbf8323836ee940a1779d1581cfd4518fee51584ff74e08cdff912` |
+| `apps/web/public/brand/icon-64.png` | 8093 | `628aa4bf668c8f4aa376f385352eb579d0d48c5a186c7ab9ae5e534b8d70c551` |
+| `apps/web/public/brand/lockup-full.png` | 1911376 | `efd4f674492ee30306e10fb40000ba25ee36aff24fbb3ba5f93954994d885875` |
+| `apps/web/public/brand/logo-wordmark.png` | 395832 | `65efca6d21ef6d8dd4b68439a90a8bc9f13b9a42e196009a68d62347305d988d` |
+| `apps/web/public/brand/mascot-hero.png` | 1045539 | `d3b817f02b21eedb353d4e278c3c9f9b534dc641bfabcc3b15c02efaeb8c78a9` |
+| `apps/web/public/brand/trotebox-brand-source.png` | 1940475 | `f4529bb80b10e36574ebe87936c0d8f24329cff4b0a5c3a0312674b3f91beef6` |
+| `apps/web/public/brand/trotebox-hero.webp` | 167148 | `ab9803220afec8331721ebc6f2485d9d62b4e53beb7dd1f1c46c1be4d97a394b` |
+| `apps/web/public/brand/trotebox-mascot.webp` | 115136 | `03896e4587f4c09294f9cd7efc4084f1e75a2f39fc028ee021b69240088ad955` |
+| `apps/web/public/brand/trotebox-wordmark.webp` | 57432 | `98dc00ce52803b2018ea51c909f692e68134480145f4167eeb2bc58ba5b670d6` |
+| `apps/web/public/favicon.png` | 2578 | `7f67454758c00872dfc7647a16a1d10d406372bc77b38c0b602d968b7e2d1ebe` |
+| `apps/web/public/icon.svg` | 1047 | `b1fcec0b642051bda96f4fb2b1339f361b4c665719ba1771422a409da67c5ab5` |
+| `apps/web/public/manifest.webmanifest` | 536 | `abce5feee517096bbe2edddda01630d6cd897d36f8850b18af9c0e97750c4707` |
+| `apps/web/src/app/calls/new/page.tsx` | 4853 | `a15bca65a07b87f65a5d4d413ea2c4f3289c73e4c4302fd9337fd4667b065f8b` |
+| `apps/web/src/app/calls/page.tsx` | 1683 | `5355a4e89718b23a3ddf37280ef9ca38a9b25871283f341918a13b034d560ac6` |
+| `apps/web/src/app/catalog/page.tsx` | 1443 | `4188891ddf22936fc36bacc15b88331555d1a7365260bfffd975d1576de58a12` |
+| `apps/web/src/app/dashboard/page.tsx` | 2428 | `29e313d9bca81a8a9178f7b4e4e8964b2cf8f883bb535aa35b581babf4fb52ae` |
+| `apps/web/src/app/globals.css` | 23769 | `146bb29cf9d768059c01f3439e133a6625e825ca9a0bbbfddcb4769cf995bc8a` |
+| `apps/web/src/app/layout.tsx` | 1173 | `d6d76a87cd92abc5a625e344b9c1498ffa6f3e559a82c460a42006ea5476bd83` |
+| `apps/web/src/app/login/page.tsx` | 4234 | `875cd9f400cbcae307e050e6ae3776e2d297f0d2b7c55c494cacca7c1cab9e5c` |
+| `apps/web/src/app/page.tsx` | 6715 | `f51527d2a79a5efeaf966e62a1d0b1dd9066bc6e77b778fb498c82e633d52645` |
+| `apps/web/src/app/settings/page.tsx` | 1215 | `66a9a386aaea57b07839987700d25279076970c2a8dded572e3c6246af952fd5` |
+| `apps/web/src/app/wallet/page.tsx` | 4216 | `9e4c3590339db0409445f2ec70061408151c912384e9e1dfb3956f652ec3a6da` |
+| `apps/web/src/components/AppShell.tsx` | 2603 | `4981f6d9ebb80a000b65a09caa345444d1665a435076780d10e29e84c4e823c0` |
+| `apps/web/src/components/AuthProvider.tsx` | 2408 | `ed68f26ca40c1116e6e2edea33d3e509f55ae3cb5594e7525cd074dbe31b4ad4` |
+| `apps/web/src/components/Brand.tsx` | 823 | `742aea8346fdc69d978ea5396ecc536d24e3f9bf4ee02877adb6c537683bd23b` |
+| `apps/web/src/lib/api.ts` | 8405 | `56768c2d50c1daad5a982dd5f694957d1820884de05523954c5b1611157ad1a3` |
+| `apps/web/tsconfig.json` | 380 | `1a564353bec19c7296e901979f5f38cea3476e588043813d58de185b5472c6e4` |
+| `apps/web/vercel.json` | 1098 | `a2e5f65c8a85becfb1dd58edde358c9eca8dfff35b7a1213eaff3a0f6c32f3c6` |
+| `ARCHITECTURE.md` | 1934 | `8af33e566d4eec8524737bf44d7b1e0ce2d1e619838e87305439b44cef8e6d8a` |
+| `BRAND_CUSTOMIZATION.md` | 1489 | `dbb880da8dff56a662ecd07f4809a73d86521456b6d3ac1dc1c32e0aa2bef0f1` |
+| `CHANGELOG.md` | 3308 | `036500af33519753c6889cda9b1f5f6e61177b6d55bf7ac21d8698cb6cda6908` |
+| `COMMERCE_CHANNELS.md` | 1421 | `e7683b665acb4c7ed491dbc8f19027427b6a50181d17db9ac4e54d7480396d56` |
+| `CUSTOM_TTS.md` | 1206 | `9d2d22bbb193b016c2733fe21356fd4b3af1cb00b0f70ae21411f2be00a212d4` |
+| `DEPENDENCY_POLICY.md` | 1311 | `0561c0f80277a43490ecb96e236b1bb2ce59cce7f22e0772d4d58091781a30ec` |
+| `DEPLOY.md` | 2046 | `a99d238ae6d79a4725161e00c1442e24e9e00c52882c5c13e5800c960ab77a24` |
+| `DEV_PREVIEW.md` | 859 | `e0514ab9ee0a63af51d18ed24d7a34fea241913d8da70cf6074df893e0d549ea` |
+| `docker-compose.yml` | 451 | `bbc902725e85eeb501846be95eda1e4a7425f666981f44e3dd8806de7ba39032` |
+| `eslint.config.mjs` | 800 | `84d0b0f27febd713986df760069b9dc935bfbf0ee666ab2f87279a34e0dfd405` |
+| `GIT_FIRST_COMMIT.md` | 1345 | `4a6737cc5be0d43c29ddfc9d7f50fae3d49553a092ecba4ec212af528538ba09` |
+| `IMPLEMENTATION_STATUS.md` | 1917 | `f67a42f19f54922ec19d9de527dd5b8c8c7c1afa5c84e30481639b05b0dbbfbb` |
+| `INICIAR_PREVIEW_VISUAL.txt` | 304 | `7600212b8f61fa98ef9e8f510eb5f5ac27e4fd318271d18cd117caba7e299b74` |
+| `INICIAR_TESTE_LOCAL.txt` | 655 | `c5eca2d20eeb6ffc7277ce57c03216135b7bd92fb466e5b34b2386d0f3b1156d` |
+| `LEGAL-CLEAN-ROOM.md` | 780 | `f61a035990a432db73ad3607acb76557b0013bdf55fec98a0629afbbcffeb6c6` |
+| `LICENSE-PROPRIETARY.md` | 431 | `cdcbc75e04fce9ee38f99f8d53a4538188835226e49770cb61ddf91f8e7879b3` |
+| `LOCAL_TEST.md` | 1497 | `52f2fc9cb314ee15a8f8dffe347c995c2046170d42717ec5a7d3e3e0d182b31d` |
+| `MEDIA_PIPELINE.md` | 2022 | `7f26175fa53078dc2a8b067a769bcbe4177d5f094c9c3440ac3da06cd9f3c504` |
+| `OPENAPI.yaml` | 6769 | `7bff88e4d83b9be2cb64c3e4f201679d008cfdf6f90f1c696d3b5045b93bf430` |
+| `package-lock.json` | 356455 | `ae3557b8d62a8fb2e6e58abf64d733b18ec4af5507d9038952e3baa8cecd994b` |
+| `package.json` | 2892 | `a54cde1deea03351119ad4a0a1528d1b8fbec90ff103430e26c6934c86301ed0` |
+| `packages/contracts/package.json` | 478 | `b79d09bd14bb4ecb7136ed54b4cf9f01a75998a28955be150f2edd4707173dbd` |
+| `packages/contracts/src/index.test.ts` | 974 | `3d5bacb6217afb182f641c0ca81881bc970463ce4e83a481c267d7763cbe9e53` |
+| `packages/contracts/src/index.ts` | 2929 | `136692da7ab34f1f0af808a325d198fbcc08ea422aa5c44c402d301ad8ad9465` |
+| `packages/contracts/tsconfig.json` | 121 | `9e388ea60852028037c4fd8a6e0311c02d4ff1703d66e5f9b22276b07dcb82d2` |
+| `packages/db/.env.example` | 162 | `fc670fb787ac285ca3e44660673b7eedb135570ea3b40902696f153fe695d6aa` |
+| `packages/db/package.json` | 878 | `44ef06a94897bda740b96eccc7c0f13a783027e89a89c03a50e5a355ac757817` |
+| `packages/db/prisma/migrations/20260805010000_initial/migration.sql` | 12887 | `afcd99f974c1b7483dc00da74acb1244fe5ab747eca08df22a398103ada3944d` |
+| `packages/db/prisma/migrations/migration_lock.toml` | 24 | `1db17a8d051aa136110736752c5e1f8b7ed92b6ea8e803112fbbe2497047c210` |
+| `packages/db/prisma/schema.prisma` | 8857 | `c01efa50749eeb269df31e89d6c72f4cee971476fbef13bfb9270a8ad1915a23` |
+| `packages/db/src/client.ts` | 384 | `317d0af179109460857c7590e5b76e6b770031250ef4ff8be140ad353fee0dcc` |
+| `packages/db/src/seed.ts` | 4049 | `f31549888e11562f6c4adf6197ba7fd38497b4e60750fe74cd1212449697fef3` |
+| `packages/db/tsconfig.json` | 121 | `9e388ea60852028037c4fd8a6e0311c02d4ff1703d66e5f9b22276b07dcb82d2` |
+| `README.md` | 3721 | `7f01d18062bf0933524010f1848ef99fb4bd2b0a98f4970688280b3602c67568` |
+| `REBRAND_0.3.1.md` | 955 | `6b3ed821a4728b042385a18b2782fa22f47cf2f9578b20204e71d7d40bf66c9f` |
+| `RELEASE_NOTES_0.3.4.md` | 639 | `1768bf5455ad80873d59a3a79e7055cf249e880c15be3fbb74d7597bd186ac76` |
+| `RELEASE_NOTES_0.3.5.md` | 432 | `af4e6d58991193d8e132524bdcbd45c9b114d09f519f6a521c95a1e0f1c3a4e9` |
+| `RELEASE_NOTES_0.3.6.md` | 2105 | `00a25f0543c340baa88abe7072ed5dc6792d696b1ca2a48545ebc4292ff344de` |
+| `scripts/acceptance-local.ps1` | 6125 | `b1000fdff5c03a95f40456b220891256c7388bd98e4578ac9ea856dfbae4d66c` |
+| `scripts/dev-all.mjs` | 944 | `a4a04ba9ca4cfbe4af0921655b3111381a5109558aa725d082b032f0cd329e78` |
+| `scripts/domain-tests.mjs` | 1511 | `94f6816a6b420f6da9191b5eb11ea105e84f9579d0e4a6e43c13872636d32c12` |
+| `scripts/generate-inventory.mjs` | 602 | `ff9ce292a0cd724a013152d9f1231a81359f1c9c27cbeb561d684c38263bb634` |
+| `scripts/inventory-core.mjs` | 3702 | `3812d6ee605b969dda35ab16c5937e700fa49ca777fd7ce691f36979edd0c386` |
+| `scripts/preflight.mjs` | 2638 | `d8c8c4297f0795fb2ab8fe17174d0a48014d4bac2f29ddb2d3902cad523f600c` |
+| `scripts/preview-web.mjs` | 857 | `1fbe78f7e109f8639b8196bd4ec09dfff0e777031746d3f5c2de1eb54779b7b7` |
+| `scripts/preview-web.ps1` | 374 | `e59a783dd75c9a05eff544898310ad19df3f156ec93d7fb4246c3b266e168d07` |
+| `scripts/setup-local.ps1` | 5098 | `fb7d33dda1e43f01d766bacb882fcb170cef06e5bf6d07deb935e0f36247592d` |
+| `scripts/smoke-local.mjs` | 2766 | `7946ab3a4b896b9902e66c47e9546119b5d5e32f9505299d234cc3cb5be60cf2` |
+| `scripts/start-local.ps1` | 396 | `23388de505fcd1dc1987c479067ad12684b2c6d99ce611f6720733031ab9d028` |
+| `scripts/validate-local.ps1` | 720 | `1498f4052e886fd7c4772760660ecfcddf17b98c5baff60de98a414d0a3e8ad1` |
+| `scripts/validate-project.mjs` | 8808 | `0e59f0a8627e1b225283546de041fcb9bc36caacd1b24615f8086370d295c005` |
+| `scripts/verify-inventory.mjs` | 1225 | `36b1fafe00363051aaee4bc9784ebe442e85530b0647dc2b62ee3d8cf64c9512` |
+| `SECURITY.md` | 1996 | `01610621ec723f1710a92da5fd52ddd31eaca17ace4879ce83c57ce511d797b0` |
+| `SUPABASE_LOCAL.md` | 1176 | `1c90f1ddad460b8a3f0a6fc02a86ee0605512df9dff384738775406171c4cfbb` |
+| `THIRD_PARTY.md` | 1116 | `ec171dccdc53fd03fc7528c313923a95c440445e9800ae0f765a01e3c07c7f47` |
+| `THREAT_MODEL.md` | 1171 | `7ad03cf7eb2b6cc256928c3dc765b34c7a8222fded322f3c9980ec7cd353db89` |
+| `tsconfig.base.json` | 528 | `45ae6305153a6a547ac8cfd6a25857dd120e30ebb6b761ab82e964b75be660e7` |
+| `VALIDATION_REPORT.md` | 4035 | `3d006f1111bca534baf25ba4674a4ebe02ab5301b96eed3e9bc264aa47d9f550` |
+| `WINDOWS_QUALITY.md` | 1217 | `0a8e1c9dd89ab17d43f200d68f5f3eb4f9076b9b5cbee3f5e8ec58154f959e63` |

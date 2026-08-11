@@ -18,6 +18,15 @@ function Require-Command([string]$Name) {
   }
 }
 
+function Invoke-Native([string]$Description, [scriptblock]$Command) {
+  & $Command
+  $code = $LASTEXITCODE
+  if ($null -eq $code) { $code = 0 }
+  if ($code -ne 0) {
+    throw "$Description falhou com exit code $code."
+  }
+}
+
 function New-Secret([int]$Bytes = 48) {
   $buffer = New-Object byte[] $Bytes
   $rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
@@ -29,7 +38,12 @@ function Set-EnvValue([string]$Path, [string]$Name, [string]$Value) {
   $content = if (Test-Path $Path) { Get-Content $Path -Raw } else { '' }
   $escapedName = [Regex]::Escape($Name)
   if ($content -match "(?m)^$escapedName=") {
-    $content = [Regex]::Replace($content, "(?m)^$escapedName=.*$", "$Name=$Value")
+    $replacement = "$Name=$Value"
+    $content = [Regex]::Replace(
+      $content,
+      "(?m)^$escapedName=.*$",
+      [System.Text.RegularExpressions.MatchEvaluator]{ param($match) $replacement }
+    )
   } else {
     if ($content.Length -gt 0 -and -not $content.EndsWith("`n")) { $content += "`r`n" }
     $content += "$Name=$Value`r`n"
@@ -55,8 +69,10 @@ function Ensure-Secret([string]$Path, [string]$Name, [int]$Bytes = 48) {
 
 Require-Command node
 Require-Command npm
-$nodeMajor = [int]((node -p "process.versions.node.split('.')[0]").Trim())
-if ($nodeMajor -ne 22) { throw "Use Node.js 22. Versão encontrada: $(node -v)" }
+$nodeVersion = (& node -p "process.versions.node")
+if ($LASTEXITCODE -ne 0) { throw 'Falha ao consultar a versão do Node.js.' }
+$nodeMajor = [int]($nodeVersion.Split('.')[0])
+if ($nodeMajor -ne 22) { throw "Use Node.js 22. Versão encontrada: $nodeVersion" }
 
 $apiEnv = Join-Path $Root 'apps\api\.env.local'
 $webEnv = Join-Path $Root 'apps\web\.env.local'
@@ -82,13 +98,17 @@ Set-EnvValue $webEnv 'NEXT_PUBLIC_COMMERCE_MODE' 'web'
 
 if ($Database -eq 'docker') {
   Require-Command docker
-  docker compose version | Out-Null
-  docker compose up -d
+  Invoke-Native 'docker compose version' { docker compose version | Out-Null }
+  Invoke-Native 'docker compose up' { docker compose up -d }
   $DatabaseUrl = 'postgresql://postgres:postgres@localhost:5432/trotebox?schema=public'
   $DirectUrl = $DatabaseUrl
 } else {
   if ([string]::IsNullOrWhiteSpace($DatabaseUrl) -or [string]::IsNullOrWhiteSpace($DirectUrl)) {
     throw 'Para Supabase, informe -DatabaseUrl e -DirectUrl. Consulte SUPABASE_LOCAL.md.'
+  }
+  foreach ($value in @($DatabaseUrl, $DirectUrl)) {
+    if ($value -notmatch '^postgres(?:ql)?://') { throw 'URL Supabase inválida: use uma connection string PostgreSQL.' }
+    if ($value.Contains('[YOUR-PASSWORD]')) { throw 'URL Supabase ainda contém [YOUR-PASSWORD]. Substitua localmente antes do setup.' }
   }
 }
 
@@ -97,13 +117,16 @@ Set-EnvValue $apiEnv 'DIRECT_URL' $DirectUrl
 Set-EnvValue $dbEnv 'DATABASE_URL' $DatabaseUrl
 Set-EnvValue $dbEnv 'DIRECT_URL' $DirectUrl
 
-if (-not $SkipInstall) { npm install }
-npm run db:generate
-npm run db:deploy
-npm run db:seed
-npm run preflight
-npm run validate:repo
-if (-not $SkipQuality) { npm run quality:full }
+if (-not $SkipInstall) { Invoke-Native 'npm ci' { npm ci } }
+Invoke-Native 'db:generate' { npm run db:generate }
+Invoke-Native 'db:deploy' { npm run db:deploy }
+Invoke-Native 'db:seed' { npm run db:seed }
+Invoke-Native 'preflight' { npm run preflight }
+if ($SkipQuality) {
+  Invoke-Native 'validate:repo' { npm run validate:repo }
+} else {
+  Invoke-Native 'quality:full' { npm run quality:full }
+}
 
 Write-Host ''
 Write-Host 'SETUP LOCAL APROVADO' -ForegroundColor Green

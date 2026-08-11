@@ -1,4 +1,4 @@
-# TroteBox 0.3.5
+# TroteBox 0.3.6
 
 > **Riso na linha. Surpresa na caixa.**
 
@@ -38,7 +38,7 @@ Requer somente Node.js 22 e npm 10+.
 
 ```powershell
 cd "C:\Projetos\trote-box"
-npm install
+npm ci
 npm run preview:web
 ```
 
@@ -116,3 +116,7 @@ O repositório deve permanecer privado durante o desenvolvimento. Consulte `GIT_
 - pagamentos e telefonia são confirmados no backend por eventos assinados/idempotentes.
 
 Consulte `SECURITY.md`, `THREAT_MODEL.md`, `ARCHITECTURE.md` e `DEPLOY.md`.
+
+## Integridade de recovery
+
+Após mudanças versionadas, execute `npm run inventory` e `npm run inventory:verify`. Arquivos `.env*` reais e `next-env.d.ts` são locais/gerados e não entram nos manifests.

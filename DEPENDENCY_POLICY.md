@@ -1,24 +1,24 @@
 # Política de dependências
 
-As versões em `package.json` estão pinadas para impedir atualizações implícitas durante a primeira instalação. O pacote não inclui `package-lock.json` porque o ambiente de geração não conseguiu alcançar o registro npm; gere e versione o lockfile na primeira estação com acesso normal.
+As versões diretas em `package.json` são pinadas e `package-lock.json` é obrigatório. Instalações reproduzíveis usam `npm ci`; `npm install` fica reservado para alterações deliberadas de dependências/lockfile.
 
 ## Processo de admissão
 
-1. executar `npm install` em branch isolada;
-2. versionar `package-lock.json` sem edição manual;
-3. executar `npm audit --omit=dev` e uma segunda fonte de SCA;
+1. alterar dependências em branch isolada;
+2. atualizar e revisar `package-lock.json`;
+3. executar `npm audit --omit=dev`;
 4. conferir proveniência, mantenedor, licença e scripts de instalação;
-5. executar `npm run quality`;
-6. testar Stripe, Mercado Pago, Twilio e Vonage em sandbox;
+5. executar `npm run inventory`, `npm run inventory:verify` e `npm run quality:full`;
+6. testar integrações alteradas em sandbox;
 7. promover somente após revisão do diff e plano de rollback.
 
 ## Atualizações
 
 - patch/minor: atualizar em lote pequeno, nunca automaticamente em produção;
-- major: abrir migração dedicada e ler guias oficiais;
-- SDK financeiro/telefonia: validar payload, tipos, assinatura e idempotência novamente;
-- Prisma: gerar cliente, aplicar migração em banco descartável e testar concorrência do ledger;
+- major: abrir migração dedicada e ler os guias oficiais;
+- SDK financeiro/telefonia: revalidar payload, tipos, assinatura e idempotência;
+- Prisma: gerar cliente, aplicar migration em banco descartável e testar concorrência do ledger;
 - Capacitor: sincronizar Android/iOS e revisar permissões/manifests nativos;
-- Next.js: validar exportação estática, rotas, headers e comportamento do proxy.
+- Next.js: validar typegen, build, rotas, headers e comportamento do proxy.
 
-O arquivo `DEPENDENCY_MANIFEST.csv` contém as versões declaradas por workspace. Um SBOM definitivo deve ser gerado após o lockfile, pois apenas ele revela a árvore transitiva real.
+`DEPENDENCY_MANIFEST.csv` registra dependências diretas declaradas. `package-lock.json` é a fonte de verdade da árvore transitiva instalada.

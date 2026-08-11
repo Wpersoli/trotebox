@@ -3,9 +3,11 @@ import { dirname, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const excludedDirectories = new Set(['node_modules', '.next', '.git', 'out', 'dist', 'coverage', 'android', 'ios']);
+const excludedDirectories = new Set(['node_modules', '.next', '.git', '.vercel', 'out', 'dist', 'coverage', 'android', 'ios']);
 const required = [
   'package.json',
+  'package-lock.json',
+  '.gitignore',
   'apps/web/package.json',
   'apps/web/capacitor.config.ts',
   'apps/web/vercel.json',
@@ -14,7 +16,12 @@ const required = [
   'packages/db/prisma/schema.prisma',
   'packages/db/prisma/migrations/20260805010000_initial/migration.sql',
   'scripts/setup-local.ps1',
+  'scripts/acceptance-local.ps1',
   'scripts/smoke-local.mjs',
+  'scripts/inventory-core.mjs',
+  'scripts/generate-inventory.mjs',
+  'scripts/verify-inventory.mjs',
+  'RELEASE_NOTES_0.3.6.md',
   'LOCAL_TEST.md',
   'SUPABASE_LOCAL.md',
   '.env.example',
@@ -31,7 +38,12 @@ async function walk(directory) {
     if (entry.isDirectory() && excludedDirectories.has(entry.name)) continue;
     const absolute = join(directory, entry.name);
     if (entry.isDirectory()) await walk(absolute);
-    else files.push(absolute);
+    else {
+      const rel = relative(root, absolute).replaceAll('\\', '/');
+      const name = entry.name;
+      const localOnly = (name.startsWith('.env') && name !== '.env.example') || name === 'next-env.d.ts' || name.endsWith('.tsbuildinfo') || name.endsWith('.log');
+      if (!localOnly) files.push(absolute);
+    }
   }
 }
 await walk(root);
@@ -39,13 +51,41 @@ await walk(root);
 const jsonFiles = files.filter((file) => extname(file) === '.json');
 for (const file of jsonFiles) JSON.parse(await readFile(file, 'utf8'));
 
+const rootPackage = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
+const projectVersion = rootPackage.version;
+if (!/^\d+\.\d+\.\d+$/.test(projectVersion)) throw new Error(`Versão raiz inválida: ${projectVersion}`);
+const lock = JSON.parse(await readFile(join(root, 'package-lock.json'), 'utf8'));
+if (lock.version !== projectVersion || lock.packages?.['']?.version !== projectVersion) throw new Error(`package-lock fora da versão ${projectVersion}.`);
+for (const workspace of ['apps/api', 'apps/web', 'packages/contracts', 'packages/db']) {
+  const entry = lock.packages?.[workspace];
+  if (!entry || entry.version !== projectVersion) throw new Error(`package-lock sem workspace alinhado: ${workspace}`);
+  for (const section of ['dependencies', 'devDependencies', 'peerDependencies']) {
+    for (const [name, version] of Object.entries(entry[section] ?? {})) {
+      if (name.startsWith('@trotebox/') && version !== projectVersion) {
+        throw new Error(`package-lock com dependência interna desalinhada: ${workspace}:${name}=${version}`);
+      }
+    }
+  }
+}
+
+const gitignore = await readFile(join(root, '.gitignore'), 'utf8');
+for (const rule of ['node_modules/', '.next/', '.env*', '!**/.env.example', '*.tsbuildinfo', '**/next-env.d.ts']) {
+  if (!gitignore.includes(rule)) throw new Error(`Regra obrigatória ausente em .gitignore: ${rule}`);
+}
+
 const packageFiles = jsonFiles.filter((file) => file.endsWith('package.json'));
 for (const file of packageFiles) {
   const packageJson = JSON.parse(await readFile(file, 'utf8'));
+  if (packageJson.name?.startsWith('@trotebox/') && packageJson.version !== projectVersion) {
+    throw new Error(`Workspace fora da versão ${projectVersion}: ${relative(root, file)}=${packageJson.version}`);
+  }
   for (const section of ['dependencies', 'devDependencies', 'peerDependencies']) {
     for (const [name, version] of Object.entries(packageJson[section] ?? {})) {
       if (typeof version === 'string' && /^[~^]/.test(version)) {
         throw new Error(`Versão não pinada em ${relative(root, file)}: ${name}=${version}`);
+      }
+      if (name.startsWith('@trotebox/') && version !== projectVersion) {
+        throw new Error(`Dependência interna desalinhada em ${relative(root, file)}: ${name}=${version}`);
       }
     }
   }
@@ -99,6 +139,7 @@ for (const file of sourceFiles) {
 }
 
 const openApiText = await readFile(join(root, 'OPENAPI.yaml'), 'utf8');
+if (!openApiText.includes(`version: ${projectVersion}`)) throw new Error(`OPENAPI.yaml fora da versão ${projectVersion}.`);
 const openApiPaths = [...openApiText.matchAll(/^  \/[^:]+:/gm)].length;
 if (openApiPaths !== routeFiles.length) {
   throw new Error(`OpenAPI possui ${openApiPaths} paths, mas a API possui ${routeFiles.length} rotas.`);
@@ -131,7 +172,7 @@ for (const invariant of prismaInvariants) {
 console.log([
   `Estrutura validada: ${required.length} arquivos obrigatórios`,
   `${jsonFiles.length} JSONs`,
-  `${packageFiles.length} packages com versões pinadas`,
+  `${packageFiles.length} packages pinados/alinhados em ${projectVersion}`,
   `${sourceFiles.length} fontes com imports internos resolvidos`,
   `${routeFiles.length} rotas alinhadas ao OpenAPI`,
   `${models} modelos e ${enums} enums Prisma`

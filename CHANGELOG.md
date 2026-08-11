@@ -1,4 +1,17 @@
 # Changelog
+
+- Revisão 0.3.6 R2: `smoke:local` passa `X-Client-Platform: native` no dev login para obter o JWT esperado pelo teste ponta a ponta.
+- Revisão de entrega 0.3.6 R2: corrige fixture `env.test.ts` com `NODE_ENV: test` para o `NodeJS.ProcessEnv` do Next.js 16.
+
+## 0.3.6 — 2026-08-10
+
+- Corrige `CUSTOM_TTS_URL=` vazio no modo de voz do provedor e adiciona testes de regressão.
+- Corrige falsos positivos de sucesso em scripts PowerShell quando `npm`, `node` ou `docker` retornam erro.
+- Faz o preflight validar links dos quatro workspaces npm antes da stack iniciar.
+- Trata `next-env.d.ts` como arquivo gerado pelo Next.js 16 e executa `next typegen` antes do typecheck.
+- Torna inventário/checksums determinísticos e exclui `.env*` reais, `next-env.d.ts`, caches e artefatos.
+- Adiciona `inventory:verify` e alinhamento de versão/lockfile.
+
 ## 0.3.5
 
 - Corrige resolução do alias `@/server/*` no workspace da API com `baseUrl` local.

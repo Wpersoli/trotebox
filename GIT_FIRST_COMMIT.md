@@ -12,13 +12,13 @@ Branch:      main
 
 ```powershell
 cd "C:\Projetos\trote-box"
-npm install
+npm ci
 npm run preview:web
 ```
 
 Confira `http://127.0.0.1:3000` e encerre com `Ctrl+C`.
 
-O `npm install` cria `package-lock.json`. Mantenha o lockfile no repositório.
+O `package-lock.json` já faz parte do repositório; `npm ci` instala exatamente esse baseline sem reescrever o lockfile.
 
 ## 2. Validação obrigatória antes do commit
 
@@ -26,7 +26,7 @@ O `npm install` cria `package-lock.json`. Mantenha o lockfile no repositório.
 npm run quality
 ```
 
-Na versão 0.3.5 esse comando não exige Supabase: executa validação estrutural, testes de domínio, lint dos quatro workspaces, typecheck, testes e o build real do frontend. Só prossiga para o Git se terminar sem `npm error`.
+Na versão 0.3.6 esse comando não exige Supabase: executa validação estrutural, testes de domínio, lint dos quatro workspaces, typecheck, testes e o build real do frontend. Só prossiga para o Git se terminar sem `npm error`.
 
 ## 3. Inicializar e conectar ao GitHub
 
@@ -57,4 +57,4 @@ git log -3 --oneline
 git remote -v
 ```
 
-Não configure Vercel/Supabase antes de aprovar o preview, se o objetivo atual for somente a interface.
+Para recuperação do projeto existente, preserve o repositório Git e mantenha `.env*` reais fora do commit.

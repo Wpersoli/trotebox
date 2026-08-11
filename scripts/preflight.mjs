@@ -8,12 +8,24 @@ if (major !== 22) {
   throw new Error(`Node.js 22 é obrigatório. Versão detectada: ${process.version}`);
 }
 
+const rootPackage = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'));
 const requiredExecutables = process.platform === 'win32'
   ? ['node_modules/.bin/next.cmd', 'node_modules/.bin/eslint.cmd', 'node_modules/.bin/tsc.cmd']
   : ['node_modules/.bin/next', 'node_modules/.bin/eslint', 'node_modules/.bin/tsc'];
 for (const dependencyExecutable of requiredExecutables) {
   if (!existsSync(resolve(root, dependencyExecutable))) {
-    throw new Error(`Dependência npm ausente: ${dependencyExecutable}. Execute npm install antes de iniciar a stack completa.`);
+    throw new Error(`Dependência npm ausente: ${dependencyExecutable}. Execute npm ci antes de iniciar a stack completa.`);
+  }
+}
+
+for (const workspace of ['api', 'web', 'contracts', 'db']) {
+  const packagePath = resolve(root, 'node_modules', '@trotebox', workspace, 'package.json');
+  if (!existsSync(packagePath)) {
+    throw new Error(`Workspace npm ausente/quebrado: @trotebox/${workspace}. Execute npm ci.`);
+  }
+  const workspacePackage = JSON.parse(readFileSync(packagePath, 'utf8'));
+  if (workspacePackage.version !== rootPackage.version) {
+    throw new Error(`Workspace @trotebox/${workspace} fora da versão ${rootPackage.version}. Execute npm ci.`);
   }
 }
 
@@ -34,13 +46,16 @@ const placeholders = [
   'replace-with-at-least-32-random-characters',
   'replace-with-a-distinct-32-character-secret',
   'replace-with-another-distinct-32-character-secret',
-  'replace-with-at-least-16-random-characters'
+  'replace-with-at-least-16-random-characters',
+  '[YOUR-PASSWORD]'
 ];
 for (const placeholder of placeholders) {
-  if (apiEnv.includes(placeholder)) throw new Error(`Segredo placeholder ainda presente: ${placeholder}`);
+  if (apiEnv.includes(placeholder) || dbEnv.includes(placeholder)) {
+    throw new Error(`Placeholder de configuração ainda presente: ${placeholder}`);
+  }
 }
 for (const key of ['DATABASE_URL=', 'DIRECT_URL=']) {
   if (!dbEnv.includes(key)) throw new Error(`Variável ausente em packages/db/.env: ${key.slice(0, -1)}`);
 }
 
-console.log(`Preflight aprovado com Node ${process.version} e ambientes locais presentes.`);
+console.log(`Preflight aprovado com Node ${process.version}, workspaces npm válidos e ambientes locais presentes.`);

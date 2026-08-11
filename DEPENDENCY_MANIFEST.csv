@@ -1,6 +1,6 @@
 workspace,section,name,version
-"@trotebox/api","dependencies","@trotebox/contracts","0.3.5"
-"@trotebox/api","dependencies","@trotebox/db","0.3.5"
+"@trotebox/api","dependencies","@trotebox/contracts","0.3.6"
+"@trotebox/api","dependencies","@trotebox/db","0.3.6"
 "@trotebox/api","dependencies","@vonage/server-sdk","3.24.0"
 "@trotebox/api","dependencies","jose","6.0.0"
 "@trotebox/api","dependencies","next","16.3.0"
@@ -20,7 +20,7 @@ workspace,section,name,version
 "@trotebox/web","dependencies","@capacitor/ios","8.5.0"
 "@trotebox/web","dependencies","@capacitor/splash-screen","8.0.0"
 "@trotebox/web","dependencies","@capacitor/status-bar","8.0.0"
-"@trotebox/web","dependencies","@trotebox/contracts","0.3.5"
+"@trotebox/web","dependencies","@trotebox/contracts","0.3.6"
 "@trotebox/web","dependencies","next","16.3.0"
 "@trotebox/web","dependencies","react","19.2.0"
 "@trotebox/web","dependencies","react-dom","19.2.0"

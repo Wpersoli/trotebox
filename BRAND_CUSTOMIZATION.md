@@ -1,6 +1,6 @@
 # Identidade TroteBox
 
-A versão 0.3.5 consolida **TroteBox** como a identidade utilizada pelo projeto.
+A versão 0.3.6 consolida **TroteBox** como a identidade utilizada pelo projeto.
 
 ## Identidade visual
 

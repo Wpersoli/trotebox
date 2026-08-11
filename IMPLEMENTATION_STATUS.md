@@ -1,4 +1,4 @@
-# Estado da implementação — TroteBox 0.3.5
+# Estado da implementação — TroteBox 0.3.6
 
 ## Implementado
 
@@ -15,7 +15,7 @@
 - TTS por provedor ou API própria;
 - políticas antiabuso, idempotência e concorrência financeira.
 
-## Melhorias da 0.3.5
+## Melhorias da 0.3.6
 
 1. Wordmark e mascote separados para responsividade real.
 2. Pacote completo de ícones PWA/iOS/Android.
@@ -31,8 +31,7 @@
 
 ## Ainda depende de infraestrutura real
 
-- `npm install`, lint/typecheck/build com dependências efetivamente baixadas;
-- banco PostgreSQL/Supabase e migrations reais;
+- banco PostgreSQL/Supabase: conexão, migration inicial e seed já validados no ambiente local; resta validar o smoke final da 0.3.6 após a correção de TTS;
 - Twilio/Vonage sandbox;
 - Stripe/Mercado Pago sandbox;
 - Android Studio/Xcode;

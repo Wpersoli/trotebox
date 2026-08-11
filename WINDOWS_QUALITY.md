@@ -1,12 +1,12 @@
-# Validação no Windows — TroteBox 0.3.5
+# Validação no Windows — TroteBox 0.3.6
 
-A versão 0.3.5 não depende do executável nativo do Turborepo. O código `-1073741515` (`0xC0000135`) observado no Windows indicava falha de carregamento de uma dependência nativa do `turbo.exe`; a orquestração foi removida para evitar esse ponto único de falha.
+A versão 0.3.6 não depende do executável nativo do Turborepo. O código `-1073741515` (`0xC0000135`) observado no Windows indicava falha de carregamento de uma dependência nativa do `turbo.exe`; a orquestração foi removida para evitar esse ponto único de falha.
 
 ## Antes do primeiro push
 
 ```powershell
 cd "C:\Projetos\trote-box"
-npm install
+npm ci
 npm run quality
 ```
 
@@ -27,10 +27,11 @@ npm run quality:full
 
 ## Se existir uma instalação anterior
 
-Após substituir uma versão antiga, `npm install` deve reconciliar o `package-lock.json` e remover dependências que não existem mais no `package.json`. Se houver comportamento anômalo, faça uma instalação limpa:
+Após substituir uma versão antiga, use sempre o lockfile versionado. Para reconstruir os workspaces e dependências de forma limpa:
 
 ```powershell
-Remove-Item node_modules -Recurse -Force
-Remove-Item package-lock.json -Force -ErrorAction SilentlyContinue
-npm install
+Remove-Item node_modules -Recurse -Force -ErrorAction SilentlyContinue
+npm ci
 ```
+
+Não apague `package-lock.json`: ele é parte do baseline reproduzível. O `preflight` também valida se os links `@trotebox/*` foram recriados corretamente.

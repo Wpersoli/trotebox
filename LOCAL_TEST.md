@@ -6,7 +6,7 @@ Não exige Docker, Supabase, Vercel, GitHub ou API.
 
 ```powershell
 cd "C:\Projetos\trote-box"
-npm install
+npm ci
 npm run preview:web
 ```
 
@@ -46,3 +46,13 @@ Consulte `SUPABASE_LOCAL.md` e execute `setup-local.ps1 -Database supabase` some
 ```
 
 Executa preflight, validação estrutural, ESLint, TypeScript, testes e builds. O preflight valida `next`, `eslint` e `tsc` diretamente e não depende mais do executável nativo do Turborepo.
+
+## Acceptance automatizada com Supabase já configurado
+
+```powershell
+cd "C:\Projetos\trote-box"
+Set-ExecutionPolicy -Scope Process Bypass -Force
+.\scripts\acceptance-local.ps1
+```
+
+O script executa qualidade completa, audit, sobe Web/API temporariamente, roda o smoke funcional e encerra os processos.

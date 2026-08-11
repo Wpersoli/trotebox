@@ -27,7 +27,7 @@ assert(health.status === 'ok', 'Health check não retornou status ok.');
 
 const auth = await request('/auth/dev-login', {
   method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+  headers: { 'Content-Type': 'application/json', 'X-Client-Platform': 'native' },
   body: JSON.stringify({ email, displayName: 'Smoke Test' })
 });
 assert(auth.token, 'Token de desenvolvimento ausente.');

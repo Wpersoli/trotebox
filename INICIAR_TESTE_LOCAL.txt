@@ -1,25 +1,17 @@
-TROTEBOX 0.3.5 — TESTE LOCAL COMPLETO (WINDOWS POWERSHELL)
+TROTEBOX 0.3.6 — TESTE LOCAL COMPLETO (WINDOWS POWERSHELL)
 
-PARA APENAS VISUALIZAR, use INICIAR_PREVIEW_VISUAL.txt.
+Com Supabase já configurado em apps/api/.env.local e packages/db/.env:
 
-Stack completa com banco:
-
-1. Abra o PowerShell na pasta do projeto:
+1. Abra um PowerShell:
 cd "C:\Projetos\trote-box"
 
-2. Libere scripts somente nesta janela:
+2. Execute UMA validação completa automatizada:
 Set-ExecutionPolicy -Scope Process Bypass -Force
+.\scripts\acceptance-local.ps1
 
-3. Escolha Docker ou Supabase e execute setup-local.ps1.
+Esse script executa preflight, quality:full, audit de produção, inicia Web/API temporariamente, aguarda as portas 3000/3001, executa smoke:local contra o banco configurado e encerra os servidores.
 
-4. Inicie frontend + API:
-.\scripts\start-local.ps1
+Resultado esperado:
+TROTEBOX 0.3.6 - ACCEPTANCE APROVADA
 
-5. Em outro PowerShell:
-cd "C:\Projetos\trote-box"
-npm run smoke:local
-
-6. Acesse:
-http://localhost:3000
-
-Supabase: consulte SUPABASE_LOCAL.md.
+Para apenas visualizar a interface sem backend, use INICIAR_PREVIEW_VISUAL.txt.

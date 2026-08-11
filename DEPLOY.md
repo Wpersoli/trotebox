@@ -24,7 +24,7 @@ Produção deve usar projeto separado de desenvolvimento.
 - Root Directory: `apps/api`
 - Framework: Next.js
 - Node.js: 22.x
-- Install Command: `cd ../.. && npm install`
+- Install Command: `cd ../.. && npm ci`
 - Build Command: `cd ../.. && npm run db:generate && npm run build -w @trotebox/api`
 
 Variáveis obrigatórias incluem `DATABASE_URL`, `DIRECT_URL` quando aplicável, segredos de autenticação/criptografia, URLs públicas, allowlist CORS e credenciais dos provedores ativados.
@@ -32,7 +32,7 @@ Variáveis obrigatórias incluem `DATABASE_URL`, `DIRECT_URL` quando aplicável,
 ## Vercel — Web
 
 - Root Directory: `apps/web`
-- Install Command: `cd ../.. && npm install`
+- Install Command: `cd ../.. && npm ci`
 - Build Command: `cd ../.. && npm run build -w @trotebox/web`
 - Output Directory: `out`
 
