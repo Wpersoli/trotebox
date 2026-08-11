@@ -65,7 +65,7 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `apps/api/src/server/webhook-events.ts` | 1336 | `e2e72425fc67111836f2d65f0f1d1a1e018c3dd5a317533fe3aa43dcbd8d06c8` |
 | `apps/api/src/server/xml.ts` | 181 | `1a05134f4828ecbcf0baaa94f008c5d8c847a6cf7497e594a0aefff3cc870691` |
 | `apps/api/tsconfig.json` | 380 | `1a564353bec19c7296e901979f5f38cea3476e588043813d58de185b5472c6e4` |
-| `apps/api/vercel.json` | 106 | `83c04731eebed5a06047feaa410d5cb1e8276c4df00baa3650e0c6d7acc7120b` |
+| `apps/api/vercel.json` | 188 | `b74cdf8c60d1a69242f7f82bd520aad8b49e26d35e6476006aed411dbd29dd7a` |
 | `apps/web/.env.example` | 279 | `d210833ea0674acf070d638067a2394a463dae73e0a236107fb11b8ee8fcb998` |
 | `apps/web/capacitor.config.ts` | 451 | `c6717f9a9f61b9ed4ee07baea71272deaa5df6d1776d50696acf0eaf17f5173f` |
 | `apps/web/next.config.ts` | 326 | `69a8309ccaa9b877b62889ab48b723522e978f179e5a62bda983786a52d01015` |
