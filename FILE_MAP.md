@@ -71,7 +71,7 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `apps/api/vercel.json` | 188 | `b74cdf8c60d1a69242f7f82bd520aad8b49e26d35e6476006aed411dbd29dd7a` |
 | `apps/web/.env.example` | 251 | `46d6b4a14de058a4db80fbb75fb9aa372a38858b798a6c2f2c05a6bc6e1b3628` |
 | `apps/web/capacitor.config.ts` | 451 | `c6717f9a9f61b9ed4ee07baea71272deaa5df6d1776d50696acf0eaf17f5173f` |
-| `apps/web/next.config.ts` | 326 | `69a8309ccaa9b877b62889ab48b723522e978f179e5a62bda983786a52d01015` |
+| `apps/web/next.config.ts` | 362 | `58435d978f69e1ae3e240d0827d64673929b91f99485b102111c8c822af6ff60` |
 | `apps/web/package.json` | 1020 | `54d9be95eb54eaf45f8559055e08bc6077105f1d42ced99c909006134c295b80` |
 | `apps/web/public/brand/app-icon-512.png` | 171972 | `eb7409e442ee8c17b74e46baeba46146e2e2dc84ca3889c8fe77b177b615cfbc` |
 | `apps/web/public/brand/apple-touch-icon.png` | 44047 | `2fa9c2a73b7413591c83e2d62db79f43c46e7fadc70bfa21741bf8911ad686af` |
