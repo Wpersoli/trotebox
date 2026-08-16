@@ -17,6 +17,9 @@ export async function approvePaymentByInternalId(
     const payment = await tx.payment.findUnique({ where: { id: paymentId } });
     if (!payment) throw new AppError(404, 'PAYMENT_NOT_FOUND', 'Pagamento não encontrado.');
     if (payment.provider !== settlement.provider) throw new AppError(409, 'PAYMENT_PROVIDER_MISMATCH', 'O provedor não corresponde ao pagamento interno.');
+    if (payment.providerPaymentId && providerPaymentId && payment.providerPaymentId !== providerPaymentId) {
+      throw new AppError(409, 'PAYMENT_PROVIDER_ID_MISMATCH', 'Identificador do pagamento divergente.');
+    }
     if (payment.status === PaymentStatus.REFUNDED || payment.status === PaymentStatus.CHARGEBACK) {
       throw new AppError(409, 'PAYMENT_REVOKED', 'Pagamento já revogado e não pode ser creditado.');
     }
@@ -79,11 +82,20 @@ export async function revokePaymentCredits(providerPaymentId: string, reason: 'R
   }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
 }
 
-export async function updatePaymentFromMercadoPago(payload: Record<string, any>) {
+export async function updatePaymentFromMercadoPago(
+  payload: Record<string, any>,
+  expected?: { internalPaymentId?: string; providerPaymentId?: string }
+) {
   const internalId = String(payload.external_reference ?? '');
   if (!internalId) throw new AppError(400, 'MISSING_EXTERNAL_REFERENCE', 'Pagamento sem referência interna.');
   const status = String(payload.status ?? '');
   const providerId = String(payload.id ?? '');
+  if (expected?.internalPaymentId && internalId !== expected.internalPaymentId) {
+    throw new AppError(409, 'PAYMENT_REFERENCE_MISMATCH', 'Referência interna divergente na conciliação.');
+  }
+  if (expected?.providerPaymentId && providerId && providerId !== expected.providerPaymentId) {
+    throw new AppError(409, 'PAYMENT_PROVIDER_ID_MISMATCH', 'Identificador do pagamento divergente na conciliação.');
+  }
   if (status === 'approved') {
     const amountCents = Math.round(Number(payload.transaction_amount) * 100);
     const currency = String(payload.currency_id ?? '');

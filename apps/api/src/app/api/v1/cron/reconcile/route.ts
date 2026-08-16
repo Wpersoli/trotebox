@@ -1,7 +1,9 @@
-import { CallStatus, Prisma, prisma } from '@trotebox/db';
+import { CallStatus, PaymentProvider, PaymentStatus, Prisma, prisma } from '@trotebox/db';
 import { env } from '@/server/env';
 import { AppError, handleError, ok } from '@/server/http';
 import { releaseCreditsInTransaction } from '@/server/wallet';
+import { getMercadoPagoPayment } from '@/server/payments/mercadopago';
+import { updatePaymentFromMercadoPago } from '@/server/payment-events';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -28,10 +30,34 @@ export async function GET(request: Request) {
       if (reconciled) reconciledCalls += 1;
     }
 
+    const pendingPayments = await prisma.payment.findMany({
+      where: {
+        provider: PaymentProvider.MERCADOPAGO,
+        status: PaymentStatus.PENDING,
+        providerPaymentId: { not: null }
+      },
+      orderBy: { createdAt: 'asc' },
+      take: 10,
+      select: { id: true, providerPaymentId: true }
+    });
+    let reconciledPayments = 0;
+    for (const payment of pendingPayments) {
+      if (!payment.providerPaymentId) continue;
+      try {
+        const providerPayment = await getMercadoPagoPayment(payment.providerPaymentId);
+        await updatePaymentFromMercadoPago(providerPayment, { internalPaymentId: payment.id, providerPaymentId: payment.providerPaymentId });
+        reconciledPayments += 1;
+      } catch {
+        // Mantém PENDING para a próxima rodada; o webhook/consulta do cliente
+        // pode reconciliar antes do próximo cron.
+      }
+    }
+
     await prisma.rateLimitEvent.deleteMany({ where: { createdAt: { lt: new Date(Date.now() - 48 * 60 * 60 * 1000) } } });
     await prisma.idempotencyRecord.deleteMany({ where: { expiresAt: { lt: new Date() } } });
     await prisma.authCode.deleteMany({ where: { expiresAt: { lt: new Date(Date.now() - 24 * 60 * 60 * 1000) } } });
-    return ok({ reconciledCalls });
+    await prisma.$executeRaw`DELETE FROM "Session" WHERE "expiresAt" < NOW() - INTERVAL '24 hours'`;
+    return ok({ reconciledCalls, reconciledPayments });
   } catch (cause) {
     if (cause instanceof Prisma.PrismaClientKnownRequestError && cause.code === 'P2034') {
       return handleError(new AppError(409, 'RECONCILIATION_RETRY', 'Conflito transitório; a próxima execução tentará novamente.'));

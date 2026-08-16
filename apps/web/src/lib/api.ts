@@ -82,9 +82,9 @@ function previewUser(email: string, displayName: string) {
 }
 
 export const api = {
-  requestAuthCode: async (email: string, displayName: string) => isPreviewMode
+  requestAuthCode: async (email: string) => isPreviewMode
     ? { accepted: true, devCode: '123456' }
-    : request<{ accepted: boolean; devCode?: string }>('/auth/request-code', { method: 'POST', body: JSON.stringify({ email, displayName }) }),
+    : request<{ accepted: boolean; devCode?: string }>('/auth/request-code', { method: 'POST', body: JSON.stringify({ email }) }),
 
   verifyAuthCode: async (email: string, code: string) => {
     if (isPreviewMode) {
@@ -122,7 +122,11 @@ export const api = {
     ? { checkoutUrl: `/wallet/?preview=stripe&pack=${encodeURIComponent(packCode)}` }
     : request<{ checkoutUrl: string }>('/payments/stripe/checkout', { method: 'POST', body: JSON.stringify({ packCode, idempotencyKey: crypto.randomUUID() }) }),
 
-  pix: async (packCode: string, payerEmail: string) => isPreviewMode
-    ? { paymentId: 'preview-pix', qrCode: `00020126TROTEBOX-PREVIEW-${packCode}-${payerEmail}`, expiresAt: new Date(Date.now() + 1800000).toISOString() }
-    : request<{ paymentId: string; qrCode: string; qrCodeBase64?: string; expiresAt?: string }>('/payments/mercadopago/pix', { method: 'POST', body: JSON.stringify({ packCode, payerEmail, idempotencyKey: crypto.randomUUID() }) })
+  pix: async (packCode: string) => isPreviewMode
+    ? { internalPaymentId: 'preview-internal-pix', paymentId: 'preview-pix', qrCode: `00020126TROTEBOX-PREVIEW-${packCode}`, expiresAt: new Date(Date.now() + 1800000).toISOString() }
+    : request<{ internalPaymentId: string; paymentId: string; qrCode: string; qrCodeBase64?: string; expiresAt?: string }>('/payments/mercadopago/pix', { method: 'POST', body: JSON.stringify({ packCode, idempotencyKey: crypto.randomUUID() }) }),
+
+  mercadoPagoStatus: async (internalPaymentId: string) => isPreviewMode
+    ? { status: 'PENDING', reconciled: false }
+    : request<{ status: string; reconciled: boolean; approvedAt?: string | null }>(`/payments/mercadopago/${encodeURIComponent(internalPaymentId)}/status`)
 };

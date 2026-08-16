@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: Request) {
   try {
     const input = verifyAuthCodeSchema.parse(await jsonBody(request));
-    const user = await verifyAuthCode(input);
+    const user = await verifyAuthCode(input, request);
     await audit({ request, userId: user.id, action: 'PASSWORDLESS_LOGIN', targetType: 'USER', targetId: user.id });
     const token = await issueToken(user);
     const response = ok({

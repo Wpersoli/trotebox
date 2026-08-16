@@ -1,11 +1,11 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import { Brand } from '@/components/Brand';
+import { HomeAccess } from '@/components/HomeAccess';
 
 export default function HomePage() {
   return (
     <>
-      <header className="hero-nav">
+      <header className="hero-nav home-nav">
         <div className="container hero-nav-inner">
           <Brand priority />
           <nav className="nav-links" aria-label="Navegação da página inicial">
@@ -13,114 +13,84 @@ export default function HomePage() {
             <a href="#seguranca">Segurança</a>
             <a href="#plataformas">Plataformas</a>
           </nav>
-          <Link href="/login/" className="button secondary">Entrar</Link>
+          <a href="#acesso" className="button secondary home-login-button">Entrar</a>
         </div>
       </header>
 
       <main>
-        <section className="landing-hero">
-          <div className="container">
-            <div className="hero-grid">
-              <div className="hero-copy">
-                <span className="eyebrow">Comédia por telefone, do seu jeito</span>
+        <section className="home-access-hero" aria-label="Apresentação e acesso TroteBox">
+          <div className="container home-access-grid">
+            <div className="home-showcase">
+              <div className="home-hero-image-wrap">
                 <Image
-                  src="/brand/logo-wordmark.png"
-                  alt="TroteBox"
-                  width={975}
-                  height={325}
-                  className="hero-wordmark"
-                  sizes="(max-width: 700px) 90vw, (max-width: 1100px) 520px, 570px"
+                  src="/brand/trotebox-hero.webp"
+                  alt="TroteBox — mascote rindo ao telefone, saindo de uma caixa"
+                  width={1500}
+                  height={844}
+                  className="home-hero-image"
+                  sizes="(max-width: 980px) 94vw, 57vw"
                   priority
                 />
-                <p className="hero-slogan">Riso na linha. <strong>Surpresa na caixa.</strong></p>
-                <h1>Abra a caixa.<br/><span>Solte a risada.</span></h1>
-                <p className="hero-description">Escolha um trote, prepare a surpresa e acompanhe tudo em uma experiência simples, responsiva e criada para funcionar na web, Android e iPhone.</p>
-                <div className="hero-actions">
-                  <Link href="/login/" className="button">Abrir a TroteBox</Link>
-                  <a href="#como-funciona" className="button secondary">Ver como funciona</a>
-                </div>
-                <div className="hero-note">
-                  <span>Roteiros originais</span>
-                  <span>Créditos transparentes</span>
-                  <span>Proteções antiabuso</span>
+                <div className="home-hero-copy-overlay">Escolha um trote, prepare a surpresa e acompanhe tudo em uma experiência simples, responsável e criada para funcionar na web, Android e iPhone.</div>
+              </div>
+
+              <div className="home-showcase-actions">
+                <a href="#como-funciona" className="button secondary compact-button">Ver como funciona</a>
+                <div className="home-trust-row" aria-label="Destaques da plataforma">
+                  <span>✓ Roteiros originais</span>
+                  <span>✓ Créditos transparentes</span>
+                  <span>✓ Proteções antiabuso</span>
                 </div>
               </div>
 
-              <div className="hero-mascot-stage" aria-label="Mascote TroteBox saindo de uma caixa e segurando um telefone">
-                <div className="hero-orbit hero-orbit-one" />
-                <div className="hero-orbit hero-orbit-two" />
-                <Image
-                  className="hero-mascot"
-                  src="/brand/mascot-hero.png"
-                  alt="Mascote TroteBox rindo ao telefone"
-                  width={685}
-                  height={845}
-                  sizes="(max-width: 700px) 90vw, (max-width: 1100px) 460px, 540px"
-                  priority
-                />
-                <span className="hero-confetti hero-confetti-a" aria-hidden="true" />
-                <span className="hero-confetti hero-confetti-b" aria-hidden="true" />
-                <span className="hero-confetti hero-confetti-c" aria-hidden="true" />
+              <div id="como-funciona" className="home-step-grid">
+                <article className="home-step-card orange-step"><b>01</b><h2>Escolha o trote</h2><p>Navegue por roteiros autorais com categoria, duração e custo em créditos claramente indicados.</p></article>
+                <article className="home-step-card purple-step"><b>02</b><h2>Prepare a surpresa</h2><p>Revise as regras, confirme o contato autorizado e valide os detalhes antes de iniciar.</p></article>
+                <article className="home-step-card green-step"><b>03</b><h2>Acompanhe o resultado</h2><p>Status, histórico e créditos ficam organizados no seu espaço exclusivo, em qualquer dispositivo.</p></article>
+              </div>
+            </div>
+
+            <div className="home-access-column">
+              <HomeAccess />
+              <div className="home-access-assurance" aria-label="Informações de segurança do acesso">
+                <span><b>OTP</b> de uso único</span>
+                <span>Sessão protegida</span>
+                <span>Saldo controlado no servidor</span>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="como-funciona" className="feature-section">
-          <div className="container">
-            <div className="section-heading">
-              <span className="eyebrow">Riso na linha. Surpresa na caixa.</span>
-              <h2>Três passos. Uma boa história para contar.</h2>
-              <p>A experiência foi desenhada para ser rápida para quem envia, divertida para quem participa e tecnicamente controlada do início ao fim.</p>
-            </div>
-            <div className="feature-grid">
-              <article className="card feature-card orange-card"><div className="feature-icon">01</div><h3>Escolha o trote</h3><p>Navegue por roteiros autorais com categoria, duração e custo em créditos claramente indicados.</p></article>
-              <article className="card feature-card purple-card"><div className="feature-icon">02</div><h3>Prepare a surpresa</h3><p>Informe o contato autorizado, revise as regras e confirme os detalhes antes de iniciar.</p></article>
-              <article className="card feature-card green-card"><div className="feature-icon">03</div><h3>Acompanhe o resultado</h3><p>Status, histórico e créditos ficam organizados em um único painel, em qualquer dispositivo.</p></article>
-            </div>
-          </div>
-        </section>
-
-        <section className="personality-section">
-          <div className="container personality-grid">
+        <section id="seguranca" className="home-info-section">
+          <div className="container home-info-grid">
             <div>
-              <span className="eyebrow">Personalidade TroteBox</span>
-              <h2>Irreverente na medida. Profissional onde importa.</h2>
-            </div>
-            <div className="personality-pills" aria-label="Atributos da marca">
-              <span>Divertida</span><span>Surpreendente</span><span>Fácil</span><span>Colorida</span><span>Segura</span><span>Memorável</span>
-            </div>
-          </div>
-        </section>
-
-        <section id="seguranca" className="feature-section soft-section">
-          <div className="container split-section">
-            <div className="section-heading">
               <span className="eyebrow">Diversão com limites claros</span>
               <h2>O trote é engraçado. A infraestrutura é séria.</h2>
-              <p>Saldo controlado no servidor, webhooks validados, idempotência, bloqueios de emergência, limites de uso e trilha de auditoria fazem parte da arquitetura.</p>
+              <p>Créditos são controlados no servidor, pagamentos dependem de confirmação do provedor e operações sensíveis permanecem fora do navegador.</p>
             </div>
-            <div className="trust-stack">
-              <div><b>01</b><span>Sem alteração de saldo pelo navegador</span></div>
-              <div><b>02</b><span>Telefonia e pagamentos isolados do frontend</span></div>
-              <div><b>03</b><span>Consentimento e controles contra abuso</span></div>
+            <div className="home-info-points">
+              <span><b>01</b> Saldo nunca é alterado diretamente pelo cliente</span>
+              <span><b>02</b> Login sem senha, com código temporário por e-mail</span>
+              <span><b>03</b> Idempotência, auditoria e controles antiabuso</span>
             </div>
           </div>
         </section>
 
-        <section id="plataformas" className="feature-section">
-          <div className="container">
-            <div className="section-heading">
-              <span className="eyebrow">Uma TroteBox em cada tela</span>
-              <h2>PC, Mac, iPhone e Android.</h2>
-              <p>O mesmo frontend responsivo atende navegadores e é preparado para empacotamento nativo com Capacitor, mantendo API, telefonia e pagamentos em camadas separadas.</p>
-            </div>
+        <section id="plataformas" className="home-platform-section">
+          <div className="container home-platform-row">
+            <div><span className="eyebrow">Uma TroteBox em cada tela</span><h2>Web, iPhone e Android.</h2></div>
             <div className="platform-row"><span>Web</span><span>Windows</span><span>macOS</span><span>iOS</span><span>Android</span></div>
           </div>
         </section>
       </main>
 
-      <footer className="footer"><div className="container"><Brand /><p>TroteBox — Riso na linha. Surpresa na caixa.</p><small>Projeto autoral em desenvolvimento. Uso sujeito a termos, consentimentos e regras locais aplicáveis.</small></div></footer>
+      <footer className="footer home-footer">
+        <div className="container">
+          <Brand />
+          <p>TroteBox — Riso na linha. Surpresa na caixa.</p>
+          <small>Projeto autoral em desenvolvimento. Uso sujeito a termos, consentimentos e regras locais aplicáveis.</small>
+        </div>
+      </footer>
     </>
   );
 }

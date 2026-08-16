@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createCallSchema, e164Schema, verifyAuthCodeSchema } from './index';
+import { createCallSchema, e164Schema, mercadoPagoPixSchema, requestAuthCodeSchema, verifyAuthCodeSchema } from './index';
 
 describe('contracts', () => {
   it('accepts a Brazilian E.164 number', () => {
@@ -22,5 +22,20 @@ describe('contracts', () => {
   it('requires a six-digit authentication code', () => {
     expect(verifyAuthCodeSchema.parse({ email: 'user@example.com', code: '123456' }).code).toBe('123456');
     expect(() => verifyAuthCodeSchema.parse({ email: 'user@example.com', code: '123' })).toThrow();
+  });
+
+  it('requests passwordless access using only the email identity', () => {
+    expect(requestAuthCodeSchema.parse({ email: 'User@Example.com' })).toEqual({ email: 'user@example.com' });
+  });
+
+  it('does not accept client-controlled Pix identity or document fields', () => {
+    const parsed = mercadoPagoPixSchema.parse({
+      packCode: 'starter',
+      idempotencyKey: '0f70ff90-1694-49ca-913b-b810668e3b2e',
+      payerEmail: 'attacker@example.com',
+      payerDocument: '12345678901'
+    });
+    expect(parsed).not.toHaveProperty('payerEmail');
+    expect(parsed).not.toHaveProperty('payerDocument');
   });
 });

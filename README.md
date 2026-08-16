@@ -1,4 +1,4 @@
-# TroteBox 0.3.6
+# TroteBox 0.3.7
 
 > **Riso na linha. Surpresa na caixa.**
 
@@ -12,11 +12,11 @@ Monorepo autoral para uma plataforma de experiências de comédia por telefone, 
 - modo **preview visual** sem Supabase, Docker, Vercel ou backend;
 - frontend Next.js 16 com exportação estática para Capacitor 8;
 - API Next.js separada;
-- autenticação web preparada para cookie `HttpOnly`; clientes nativos recebem token apenas quando identificados como `native`;
+- autenticação passwordless por e-mail com OTP de uso único, rate limit e sessão revogável em cookie `HttpOnly`; clientes nativos recebem token apenas quando identificados como `native`;
 - timeout e sanitização de erros no cliente HTTP;
 - PostgreSQL/Supabase + Prisma;
 - ledger transacional de créditos;
-- Stripe Checkout e Pix Mercado Pago;
+- Pix via Mercado Pago no fluxo público; adaptador Stripe preservado no backend para compatibilidade legada;
 - Twilio, Vonage ou provedor mock;
 - OTP/passwordless, idempotência, rate limit, auditoria e política antiabuso.
 
@@ -48,7 +48,7 @@ Abra:
 http://127.0.0.1:3000
 ```
 
-O preview usa dados simulados e permite navegar por landing page, login, dashboard, catálogo, novo trote, histórico, créditos e configurações. Não requer banco ou API.
+O preview usa dados simulados e permite navegar por HOME com OTP simulado, dashboard, catálogo, novo trote, histórico, créditos e configurações. Não requer banco ou API.
 
 ## 2. Stack completa — mais tarde
 

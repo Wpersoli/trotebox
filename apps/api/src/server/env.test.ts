@@ -30,4 +30,9 @@ describe('environment parsing', () => {
     expect(() => parseEnv({ ...baseEnv, CUSTOM_TTS_URL: 'not-a-url' })).toThrow();
   });
 
+  it('uses a short seven-minute OTP TTL by default', () => {
+    const parsed = parseEnv(baseEnv);
+    expect(parsed.AUTH_CODE_TTL_MINUTES).toBe(7);
+  });
+
 });

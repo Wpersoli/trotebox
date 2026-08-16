@@ -7,11 +7,16 @@ import { api, isPreviewMode } from '@/lib/api';
 
 const commerceMode = process.env.NEXT_PUBLIC_COMMERCE_MODE ?? 'web';
 
+type PixState = {
+  internalPaymentId: string;
+  qrCode: string;
+  status: string;
+};
+
 export default function WalletPage() {
   const [wallet, setWallet] = useState<WalletSummary | null>(null);
   const [packs, setPacks] = useState<CreditPackSummary[]>([]);
-  const [email, setEmail] = useState('demo@trotebox.local');
-  const [pix, setPix] = useState<{ qrCode: string } | null>(null);
+  const [pix, setPix] = useState<PixState | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -19,25 +24,48 @@ export default function WalletPage() {
     api.catalog().then((data) => setPacks(data.packs)).catch(() => undefined);
   }, []);
 
-  async function stripe(code: string) {
-    setError('');
-    try {
-      const result = await api.stripeCheckout(code);
-      window.location.href = result.checkoutUrl;
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Falha no Stripe.');
-    }
-  }
+  const pixPaymentId = pix?.internalPaymentId;
+  const pixStatus = pix?.status;
+
+  useEffect(() => {
+    if (!pixPaymentId || isPreviewMode || pixStatus !== 'PENDING') return;
+
+    let active = true;
+    let attempts = 0;
+    const reconcile = async () => {
+      if (!active || attempts >= 24) return;
+      attempts += 1;
+      try {
+        const result = await api.mercadoPagoStatus(pixPaymentId);
+        if (!active) return;
+        setPix((current) => {
+          if (!current || current.internalPaymentId !== pixPaymentId || current.status === result.status) return current;
+          return { ...current, status: result.status };
+        });
+        if (result.status === 'APPROVED') api.wallet().then(setWallet).catch(() => undefined);
+      } catch {
+        // O webhook continua sendo o caminho primário. Uma falha transitória
+        // na consulta ativa não deve apagar o Pix nem induzir nova cobrança.
+      }
+    };
+
+    void reconcile();
+    const timer = window.setInterval(() => void reconcile(), 5000);
+    return () => { active = false; window.clearInterval(timer); };
+  }, [pixPaymentId, pixStatus]);
 
   async function mercadoPago(code: string) {
     setError('');
     try {
-      const result = await api.pix(code, email);
-      setPix({ qrCode: result.qrCode });
+      const result = await api.pix(code);
+      setPix({ internalPaymentId: result.internalPaymentId, qrCode: result.qrCode, status: 'PENDING' });
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Falha no Pix.');
+      setError(cause instanceof Error ? cause.message : 'Falha ao criar o Pix.');
     }
   }
+
+  const pixApproved = pix?.status === 'APPROVED';
+  const pixFailed = pix && ['REJECTED', 'CANCELED', 'REFUNDED', 'CHARGEBACK'].includes(pix.status);
 
   return (
     <AppShell title="Créditos">
@@ -50,16 +78,24 @@ export default function WalletPage() {
 
       {commerceMode === 'web' ? (
         <>
-          <div className="field" style={{ maxWidth: 430, marginBottom: 20 }}>
-            <label htmlFor="payer-email">E-mail do pagador para Pix</label>
-            <input id="payer-email" className="input" type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
-          </div>
           {error && <div className="error-box" style={{ marginBottom: 18 }}>{error}</div>}
           {pix && (
             <div className="card form-panel" style={{ marginBottom: 18 }}>
-              <span className="eyebrow">Pix demonstrativo</span>
-              <p className="muted">Em produção, o saldo será liberado somente após a confirmação assinada do provedor.</p>
-              <textarea className="input" style={{ minHeight: 110, paddingTop: 12 }} readOnly value={pix.qrCode} />
+              <span className="eyebrow">Pix · Mercado Pago</span>
+              <h2 style={{ marginBottom: 8 }}>{pixApproved ? 'Pagamento confirmado' : pixFailed ? 'Pagamento não concluído' : 'Aguardando confirmação'}</h2>
+              <p className="muted">
+                {isPreviewMode
+                  ? 'No preview, o código abaixo é apenas demonstrativo.'
+                  : pixApproved
+                    ? 'O provedor confirmou o pagamento e o saldo foi conciliado no servidor.'
+                    : pixFailed
+                      ? 'Nenhum crédito foi liberado para este pagamento.'
+                      : 'O Pix está vinculado ao seu e-mail autenticado. O saldo só é liberado após confirmação do Mercado Pago; a tela também reconcilia o status caso um webhook atrase.'}
+              </p>
+              {!pixApproved && !pixFailed && <textarea className="input" style={{ minHeight: 110, paddingTop: 12 }} readOnly value={pix.qrCode} />}
+              {!isPreviewMode && !pixApproved && !pixFailed && <div className="status-pill warn" style={{ marginTop: 12 }}>Conferindo pagamento</div>}
+              {pixApproved && <div className="status-pill ok" style={{ marginTop: 12 }}>Créditos liberados</div>}
+              {pixFailed && <div className="status-pill fail" style={{ marginTop: 12 }}>Sem crédito</div>}
             </div>
           )}
           <div className="pack-grid">
@@ -69,9 +105,8 @@ export default function WalletPage() {
                 <span className="eyebrow">{pack.name}</span>
                 <div className="pack-credits">{pack.credits}</div>
                 <div className="pack-price">créditos · {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(pack.priceCents / 100)}</div>
-                <div className="payment-options">
-                  <button className="button secondary" onClick={() => mercadoPago(pack.code)}>Pix</button>
-                  <button className="button" onClick={() => stripe(pack.code)}>{isPreviewMode ? 'Simular cartão' : 'Cartão'}</button>
+                <div className="payment-options payment-options-single">
+                  <button className="button" onClick={() => mercadoPago(pack.code)}>Comprar com Pix · Mercado Pago</button>
                 </div>
               </article>
             ))}

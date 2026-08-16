@@ -12,7 +12,7 @@ const schema = z.object({
   ENABLE_DEV_AUTH: z.string().default('false').transform((v) => v === 'true'),
   AUTH_DELIVERY: z.enum(['console', 'resend']).default('console'),
   AUTH_CODE_PEPPER: z.string().min(32),
-  AUTH_CODE_TTL_MINUTES: z.coerce.number().int().min(3).max(30).default(10),
+  AUTH_CODE_TTL_MINUTES: z.coerce.number().int().min(3).max(10).default(7),
   RESEND_API_KEY: z.string().optional(),
   EMAIL_FROM: z.string().optional(),
   TELEPHONY_PROVIDER: z.enum(['mock', 'twilio', 'vonage']).default('mock'),

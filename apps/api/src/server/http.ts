@@ -15,7 +15,20 @@ export function ok<T>(data: T, status = 200) {
 export function handleError(cause: unknown) {
   const requestId = randomUUID();
   if (cause instanceof AppError) {
-    return NextResponse.json({ error: { code: cause.code, message: cause.message, details: cause.details, requestId } }, { status: cause.status });
+    // Nunca devolva payload bruto de provedores/infra em produção. Alguns
+    // AppError carregam detalhes de upstream úteis apenas em desenvolvimento.
+    const details = process.env.NODE_ENV === 'production' ? undefined : cause.details;
+    if (cause.status >= 500) {
+      console.error({ requestId, code: cause.code, status: cause.status, message: cause.message });
+    }
+    return NextResponse.json({
+      error: {
+        code: cause.code,
+        message: cause.message,
+        ...(details !== undefined ? { details } : {}),
+        requestId
+      }
+    }, { status: cause.status });
   }
   if (cause instanceof ZodError) {
     return NextResponse.json({ error: { code: 'VALIDATION_ERROR', message: 'Dados inválidos.', details: cause.flatten(), requestId } }, { status: 400 });

@@ -10,7 +10,7 @@ function accessToken() {
   return token;
 }
 
-export async function createPix(userId: string, packCode: string, payerEmail: string, payerDocument: string | undefined, idempotencyKey: string) {
+export async function createPix(userId: string, packCode: string, payerEmail: string, idempotencyKey: string) {
   const existing = await prisma.payment.findUnique({ where: { idempotencyKey }, include: { creditPack: true } });
   if (existing && (existing.userId !== userId || existing.creditPack.code !== packCode || existing.provider !== PaymentProvider.MERCADOPAGO)) throw new AppError(409, 'IDEMPOTENCY_CONFLICT', 'Chave idempotente já usada em outra operação.');
   if (existing?.providerPaymentId) {
@@ -38,10 +38,9 @@ export async function createPix(userId: string, packCode: string, payerEmail: st
       payment_method_id: 'pix',
       external_reference: payment.id,
       notification_url: `${env().PUBLIC_API_URL.replace(/\/$/, '')}/api/v1/webhooks/mercadopago`,
-      payer: {
-        email: payerEmail,
-        ...(payerDocument ? { identification: { type: payerDocument.length === 11 ? 'CPF' : 'CNPJ', number: payerDocument } } : {})
-      }
+      // Data minimization: the payment is bound to the authenticated e-mail.
+      // CPF/CNPJ is intentionally not collected by TroteBox in this flow.
+      payer: { email: payerEmail }
     })
   });
   const payload = await response.json() as Record<string, any>;

@@ -51,7 +51,27 @@ NEXT_PUBLIC_COMMERCE_MODE=web
 
 ## Sessão web
 
-A API define cookie `trotebox_session` com `HttpOnly`, `SameSite=Lax` e `Secure` em produção. O cliente usa `credentials: "include"`. Para aplicativo nativo, o endpoint pode devolver token somente quando `X-Client-Platform: native` for informado; armazenamento seguro nativo deve ser usado antes da publicação mobile.
+A API define cookie `trotebox_session` com `HttpOnly`, `SameSite=Lax` e `Secure` em produção. O cliente usa `credentials: "include"`.
+
+**Requisito de produção:** Web e API devem permanecer no mesmo *site* do navegador, preferencialmente em subdomínios do mesmo domínio registrável, por exemplo `www.trotebox.com.br` e `api.trotebox.com.br`. Dois domínios de projeto `*.vercel.app` independentes não devem ser usados como desenho definitivo para a sessão por cookie. Configure também `ALLOWED_ORIGINS` com a origem Web exata.
+
+Não troque `SameSite=Lax` por `None` apenas para contornar domínio mal configurado; isso amplia a superfície de CSRF e ainda depende de políticas de cookies de terceiros.
+
+Para aplicativo nativo, o endpoint pode devolver token somente quando `X-Client-Platform: native` for informado; armazenamento seguro nativo deve ser usado antes da publicação mobile.
+
+
+## Ordem obrigatória da 0.3.7
+
+A API 0.3.7 exige a migration `20260815213000_revocable_sessions`. Para evitar uma janela em que o código novo tente usar uma tabela ainda inexistente, aplique a migration **antes** do deploy da nova API:
+
+```powershell
+npm ci
+npm run db:generate
+npm run db:deploy
+npm run quality:release
+```
+
+Somente depois faça commit/push que acione o deploy automático da Vercel. Se a migration rejeitar algum dado histórico por uma constraint financeira, interrompa o deploy e audite o registro; não remova a constraint para forçar a publicação.
 
 ## Webhooks
 

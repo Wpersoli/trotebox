@@ -1,58 +1,72 @@
-# Relatório de validação — TroteBox 0.3.6
+# Relatório de validação — TroteBox 0.3.7
 
-Data: 10 de agosto de 2026.
+Data: 15 de agosto de 2026.
+Baseline de origem: `c36f7e7` (`main`) — `chore: ajusta cron para Vercel Hobby`.
 
-## Baseline confirmado no Windows
+## Veredito deste pacote
 
-Antes desta consolidação, o projeto recuperado em `C:\Projetos\trote-box` concluiu `npm ci`, typecheck dos quatro workspaces, testes Vitest, build de produção da API e do Web e `npm audit --omit=dev` com **0 vulnerabilidades de produção**. O setup real aplicou a migration inicial e o seed no Supabase. Web respondeu HTTP 200 e a API retornou `health: ok`. O smoke funcional parou especificamente porque `CUSTOM_TTS_URL=` vazio era interpretado como URL inválida.
+**APROVADO como fonte 0.3.7 sanitizado para revalidação e deploy controlado**, com uma condição operacional obrigatória: aplicar a migration de sessão/constraints no Supabase antes de publicar a nova API.
 
-## Correções da 0.3.6
+A aprovação acima é do código-fonte e do pacote entregue. Não declara que uma migration foi aplicada no banco de produção nem que credenciais externas reais foram exercitadas neste sandbox.
 
-- `CUSTOM_TTS_URL=` vazio é normalizado para configuração ausente, com teste de regressão;
-- revisão R2: o fixture desse teste declara `NODE_ENV: 'test'` para compatibilidade com a tipagem global gerada/carregada pelo Next.js 16;
-- revisão R2: o smoke envia `X-Client-Platform: native` no `dev-login`, coerente com a política da API que só devolve JWT explicitamente para cliente nativo;
-- scripts PowerShell verificam `$LASTEXITCODE` e não imprimem mais aprovação depois de falha de `npm`, `node` ou `docker`;
-- `preflight` valida os quatro links de workspace `@trotebox/*`;
-- `next-env.d.ts` é tratado como arquivo gerado e `next typegen` precede o typecheck dos apps Next;
-- inventário/checksums ignoram `.env*` reais, `next-env.d.ts`, caches e builds;
-- `inventory:verify` detecta manifests desatualizados;
-- versões dos workspaces, dependências internas, OpenAPI e lockfile foram alinhadas em 0.3.6.
+## Escopo alterado
 
-## Validações executadas no ambiente de empacotamento
+- HOME unificada no padrão visual fornecido, com hero à esquerda e autenticação no mesmo documento;
+- `/login` deixa de manter formulário duplicado e direciona para `/#acesso`;
+- login público reduzido a **e-mail + OTP**; nome não é solicitado;
+- OTP de seis dígitos, uso único, TTL padrão de 7 min, máximo de 5 tentativas por challenge, cooldown de 60 s e limites adicionais por e-mail/IP;
+- reenvio invalida challenges anteriores;
+- sessão passa a ser revogável no servidor por `sid`;
+- logout revoga a sessão no banco;
+- carteira e histórico permanecem vinculados ao usuário autenticado;
+- Pix/Mercado Pago força o e-mail da sessão e não aceita e-mail do pagador vindo do cliente;
+- CPF/CNPJ removido do payload desta jornada para reduzir tratamento de PII;
+- conciliação Mercado Pago valida `Payment.id` e `providerPaymentId` esperados;
+- consulta autenticada de status e cron de reconciliação preservam recuperação em caso de atraso de webhook;
+- ledger recebe constraints SQL de sinais/reservas/valores;
+- API rejeita origem web não autorizada em mutações;
+- erros 5xx não devolvem `details` brutos de upstream em produção;
+- documentação, OpenAPI, inventário e versão alinhados em 0.3.7.
 
-- `node scripts/generate-inventory.mjs`: aprovado;
-- `node scripts/verify-inventory.mjs`: aprovado;
-- teste negativo de inventário desatualizado: aprovado (mudança temporária em README foi detectada);
-- teste de exclusão: `.env.local`, `packages/db/.env` e `next-env.d.ts` temporários não entraram no inventário;
-- `node scripts/validate-project.mjs`: **23 arquivos obrigatórios, 13 JSONs, 5 packages alinhados em 0.3.6, 64 fontes, 21 rotas/OpenAPI, 16 modelos e 6 enums Prisma**;
-- teste negativo de versão de workspace desalinhada: aprovado;
-- `node --no-warnings --experimental-strip-types scripts/domain-tests.mjs`: **7/7**;
-- parse/transpilação sintática com TypeScript 5.8.x: **71 arquivos TS/TSX**, sem diagnóstico sintático;
-- comparação de `package-lock.json`: **grafo de dependências de terceiros inalterado** em relação ao baseline 0.3.5 já auditado/compilado no Windows;
-- manifests finais verificados sem caminhos de `.env.local`, `packages/db/.env`, `node_modules`, `.next`, `*.tsbuildinfo` ou `next-env.d.ts`.
+## Validações executadas neste ambiente
 
-## Limite do sandbox
+- `npm run inventory`: **164 arquivos-fonte / 44 dependências**;
+- `npm run validate:repo`: **23 arquivos obrigatórios, 13 JSONs, 5 packages 0.3.7, 66 fontes, 22 rotas/OpenAPI, 17 modelos Prisma e 6 enums**;
+- `npm run inventory:verify`: aprovado;
+- `npm run test:domain`: **7/7**;
+- `npm run lint`: aprovado nos quatro workspaces;
+- TypeScript direto (`tsc --noEmit`) em contracts, db, api e web: aprovado;
+- grafo de dependências externas do `package-lock.json`: inalterado em relação ao baseline `c36f7e7`;
+- teste de regressão por execução direta dos schemas de autenticação/Pix: aprovado;
+- `git diff --check`: sem erro de whitespace (somente aviso esperado de normalização LF/CRLF no script PowerShell);
+- varredura de reutilização: nenhum dos valores sensíveis encontrados nos `.env` enviados aparece em arquivo rastreado pelo Git;
+- varredura por padrões de chaves privadas/tokens conhecidos: aprovada.
 
-A tentativa de `npm ci` no ambiente de empacotamento não pôde baixar os tarballs porque o registry intermediário do sandbox retornou `ECONNREFUSED`. Portanto, não é correto afirmar que o build completo foi recompilado neste sandbox. O grafo de terceiros não foi alterado; o baseline imediatamente anterior foi compilado integralmente no Windows.
+## Limite técnico do sandbox
 
-## Única revalidação externa necessária
+O ZIP recebido contém `node_modules` instalado no Windows. Neste ambiente Linux, `next build`/Vitest exigem binários opcionais Linux (`@next/swc-linux-x64-gnu` e `@rollup/rollup-linux-x64-gnu`) que não vieram no upload. A rede direta do sandbox também não conseguiu obter esses binários. Por isso, **não é correto registrar `npm run quality:release` como concluído aqui**.
 
-Como credenciais reais não são incluídas no ZIP, a confirmação final Web → API → Prisma → Supabase deve ser feita no Windows após substituir os arquivos:
+Esse limite é ambiental, não um diagnóstico de erro de TypeScript/lint/repositório: essas etapas foram executadas e aprovadas conforme a seção anterior.
+
+## Migration obrigatória antes da nova API
+
+A release adiciona:
+
+`packages/db/prisma/migrations/20260815213000_revocable_sessions/migration.sql`
+
+Ela cria sessões revogáveis e constraints financeiras. A API 0.3.7 depende da tabela `Session` no login.
+
+No Windows, com as variáveis corretas de banco carregadas e **antes de publicar a API nova**:
 
 ```powershell
 npm ci
-npm run quality:full
-npm run dev
+npm run db:generate
+npm run db:deploy
+npm run quality:release
 ```
 
-Em outro terminal:
+Se `db:deploy` acusar violação de constraint em dado histórico, **não force a migration**: audite a linha apontada antes de prosseguir.
 
-```powershell
-npm run smoke:local
-```
+## Segredos do ZIP de origem
 
-O smoke deve retornar `result: approved`.
-
-## Revalidação Windows — revisão R2
-
-Na primeira execução da acceptance 0.3.6 no Windows, `next typegen` tornou obrigatória a propriedade `NODE_ENV` em `NodeJS.ProcessEnv`; o novo teste de regressão construía um fixture tipado sem essa propriedade e o TypeScript retornou `TS2741`. A revisão R2 inclui `NODE_ENV: 'test'` nesse fixture. A revisão também corrige o smoke para solicitar o JWT de desenvolvimento como cliente `native`; sem esse header, o endpoint usa cookie para Web e omite `token`, enquanto o smoke depende de Bearer token. A falha não atingiu migration, seed, conectividade Supabase, runtime da API ou o parser de ambiente.
+O arquivo recebido continha arquivos locais de ambiente ignorados pelo Git. Eles não fazem parte do pacote sanitizado final. Como essas credenciais saíram do seu computador no upload, trate-as como potencialmente expostas e faça rotação das chaves/URLs sensíveis antes do deploy definitivo.

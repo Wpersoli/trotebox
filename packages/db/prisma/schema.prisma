@@ -89,6 +89,20 @@ model User {
   payments       Payment[]
   consents       Consent[]
   auditLogs      AuditLog[]
+  sessions       Session[]
+}
+
+
+model Session {
+  id         String    @id @default(cuid())
+  userId     String
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt])
 }
 
 model Consent {

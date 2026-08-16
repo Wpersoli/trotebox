@@ -21,7 +21,7 @@ const required = [
   'scripts/inventory-core.mjs',
   'scripts/generate-inventory.mjs',
   'scripts/verify-inventory.mjs',
-  'RELEASE_NOTES_0.3.6.md',
+  'RELEASE_NOTES_0.3.7.md',
   'LOCAL_TEST.md',
   'SUPABASE_LOCAL.md',
   '.env.example',
@@ -146,7 +146,17 @@ if (openApiPaths !== routeFiles.length) {
 }
 
 const prismaText = await readFile(join(root, 'packages/db/prisma/schema.prisma'), 'utf8');
-const migrationText = await readFile(join(root, 'packages/db/prisma/migrations/20260805010000_initial/migration.sql'), 'utf8');
+const migrationRoot = join(root, 'packages/db/prisma/migrations');
+const migrationDirectories = (await readdir(migrationRoot, { withFileTypes: true }))
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name)
+  .sort();
+const migrationParts = [];
+for (const directory of migrationDirectories) {
+  const migrationFile = join(migrationRoot, directory, 'migration.sql');
+  try { migrationParts.push(await readFile(migrationFile, 'utf8')); } catch { /* lock/metadata directories are ignored */ }
+}
+const migrationText = migrationParts.join('\n');
 const modelNames = [...prismaText.matchAll(/^model\s+(\w+)/gm)].map((match) => match[1]);
 const enumNames = [...prismaText.matchAll(/^enum\s+(\w+)/gm)].map((match) => match[1]);
 const models = modelNames.length;

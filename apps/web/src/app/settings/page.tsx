@@ -9,7 +9,7 @@ export default function SettingsPage() {
   return (
     <AppShell title="Configurações">
       <section className="card form-panel form-stack" style={{ maxWidth: 760 }}>
-        <div><span className="eyebrow">Conta TroteBox</span><h2>{user?.displayName}</h2><p className="muted">{user?.email}</p></div>
+        <div><span className="eyebrow">Seu espaço TroteBox</span><h2>Acesso protegido por e-mail</h2><p className="muted">{user?.email}</p></div>
         {isPreviewMode && <div className="notice">Você está no modo de demonstração local. Banco de dados, telefonia e pagamentos reais permanecem desligados.</div>}
         <div className="settings-list">
           <div><strong>Privacidade</strong><span>Dados sensíveis e segredos ficam fora do frontend.</span></div>

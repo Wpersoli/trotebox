@@ -7,8 +7,7 @@ export const e164Schema = z
 
 
 export const requestAuthCodeSchema = z.object({
-  email: z.string().email().transform((value) => value.toLowerCase()),
-  displayName: z.string().trim().min(2).max(80)
+  email: z.string().email().transform((value) => value.toLowerCase())
 });
 
 export const verifyAuthCodeSchema = z.object({
@@ -37,8 +36,6 @@ export const stripeCheckoutSchema = z.object({
 
 export const mercadoPagoPixSchema = z.object({
   packCode: z.string().trim().min(2).max(40),
-  payerEmail: z.string().email().transform((value) => value.toLowerCase()),
-  payerDocument: z.string().transform((value) => value.replace(/\D/g, '')).refine((value) => value.length >= 11 && value.length <= 14, 'CPF/CNPJ inválido.').optional(),
   idempotencyKey: z.string().uuid()
 });
 

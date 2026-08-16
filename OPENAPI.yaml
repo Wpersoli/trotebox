@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: TroteBox API
-  version: 0.3.6
+  version: 0.3.7
   description: API original TroteBox para autenticação, catálogo, carteira, chamadas, pagamentos, telefonia e webhooks.
 servers:
   - url: https://api.seudominio.com/api/v1
@@ -39,17 +39,16 @@ paths:
           application/json:
             schema:
               type: object
-              required: [email, displayName]
+              required: [email]
               properties:
                 email: { type: string, format: email }
-                displayName: { type: string, minLength: 2, maxLength: 80 }
       responses:
         '202': { description: Solicitação aceita }
         '429': { description: Limite de solicitações atingido }
   /auth/verify-code:
     post:
       security: []
-      description: Valida OTP e emite JWT de curta duração.
+      description: Valida OTP e emite sessão revogável de curta duração.
       requestBody:
         required: true
         content:
@@ -71,7 +70,7 @@ paths:
         '401': { description: Sessão ausente, inválida ou expirada }
   /auth/logout:
     post:
-      description: Encerra a sessão e expira o cookie web.
+      description: Revoga a sessão no servidor e expira o cookie web.
       responses:
         '200': { description: Sessão encerrada }
   /catalog:
@@ -130,14 +129,23 @@ paths:
           application/json:
             schema:
               type: object
-              required: [packCode, payerEmail, idempotencyKey]
+              required: [packCode, idempotencyKey]
               properties:
                 packCode: { type: string }
-                payerEmail: { type: string, format: email }
-                payerDocument: { type: string }
                 idempotencyKey: { type: string, format: uuid }
       responses:
-        '200': { description: Código Pix e metadados do pagamento }
+        '200': { description: Código Pix vinculado ao usuário autenticado e metadados do pagamento }
+  /payments/mercadopago/{paymentId}/status:
+    get:
+      description: Consulta o Mercado Pago e reconcilia um pagamento pertencente ao usuário autenticado.
+      parameters:
+        - in: path
+          name: paymentId
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Status interno reconciliado }
+        '404': { description: Pagamento não encontrado para o usuário }
   /webhooks/stripe:
     post:
       security: []
@@ -195,7 +203,7 @@ paths:
       security:
         - cronBearer: []
       responses:
-        '200': { description: Chamadas presas reconciliadas }
+        '200': { description: Chamadas presas e pagamentos Mercado Pago pendentes reconciliados }
 components:
   securitySchemes:
     bearerAuth:

@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   try {
     const user = await requireUser(request);
     const input = mercadoPagoPixSchema.parse(await jsonBody(request));
-    const result = await createPix(user.id, input.packCode, input.payerEmail, input.payerDocument, input.idempotencyKey);
+    const result = await createPix(user.id, input.packCode, user.email, input.idempotencyKey);
     await audit({ request, userId: user.id, action: 'PIX_CREATED', targetType: 'PAYMENT', targetId: result.internalPaymentId });
     return ok(result, 201);
   } catch (cause) { return handleError(cause); }

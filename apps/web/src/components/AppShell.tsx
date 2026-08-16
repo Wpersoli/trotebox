@@ -23,7 +23,7 @@ export function AppShell({ title, children }: { title: string; children: React.R
   const [balance, setBalance] = useState<number | null>(null);
 
   useEffect(() => {
-    if (ready && !user) router.replace('/login/');
+    if (ready && !user) router.replace('/#acesso');
     if (user) api.wallet().then((data) => setBalance(data.balanceCredits)).catch(() => undefined);
   }, [ready, user, router]);
 
