@@ -5,6 +5,7 @@ import { env } from './env';
 import { hashSubject, safeEqualHex } from './crypto';
 import { AppError } from './http';
 import { enforceRateLimit } from './rate-limit';
+import { deliverAuthCode } from './email-delivery';
 
 const DEFAULT_DISPLAY_NAME = 'Cliente TroteBox';
 
@@ -16,34 +17,6 @@ function requestIp(request: Request) {
   return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
     ?? request.headers.get('x-real-ip')?.trim()
     ?? 'unknown';
-}
-
-async function deliverCode(email: string, code: string) {
-  const config = env();
-  if (config.AUTH_DELIVERY === 'console') {
-    if (config.NODE_ENV === 'production') throw new AppError(503, 'AUTH_DELIVERY_NOT_CONFIGURED', 'Entrega de código não configurada.');
-    console.info('development_auth_code', { email, code });
-    return { devCode: code };
-  }
-  if (!config.RESEND_API_KEY || !config.EMAIL_FROM) throw new AppError(503, 'EMAIL_NOT_CONFIGURED', 'Serviço de e-mail não configurado.');
-
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${config.RESEND_API_KEY}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      from: config.EMAIL_FROM,
-      to: [email],
-      subject: 'Seu código de acesso TroteBox',
-      text: `Seu código de acesso TroteBox é ${code}. Ele expira em ${config.AUTH_CODE_TTL_MINUTES} minutos e só pode ser usado uma vez. Ignore esta mensagem se você não solicitou o acesso.`,
-      html: `<div style="font-family:Arial,sans-serif;max-width:520px;margin:auto"><h1>Código de acesso TroteBox</h1><p>Use o código abaixo para entrar no seu espaço exclusivo:</p><p style="font-size:32px;font-weight:700;letter-spacing:8px">${code}</p><p>Ele expira em ${config.AUTH_CODE_TTL_MINUTES} minutos e só pode ser usado uma vez. Ignore esta mensagem se você não solicitou o acesso.</p></div>`
-    }),
-    signal: AbortSignal.timeout(10_000)
-  });
-  if (!response.ok) throw new AppError(502, 'EMAIL_DELIVERY_FAILED', 'Não foi possível enviar o código de acesso.');
-  return {};
 }
 
 export async function requestAuthCode(input: RequestAuthCodeInput, request: Request) {
@@ -75,7 +48,7 @@ export async function requestAuthCode(input: RequestAuthCodeInput, request: Requ
   });
 
   try {
-    const delivery = await deliverCode(email, code);
+    const delivery = await deliverAuthCode(email, code);
     return { accepted: true, ...delivery };
   } catch (cause) {
     await prisma.authCode.delete({ where: { id: authCode.id } }).catch(() => undefined);

@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: TroteBox API
-  version: 0.3.7
+  version: 0.3.8
   description: API original TroteBox para autenticação, catálogo, carteira, chamadas, pagamentos, telefonia e webhooks.
 servers:
   - url: https://api.seudominio.com/api/v1
@@ -45,6 +45,8 @@ paths:
       responses:
         '202': { description: Solicitação aceita }
         '429': { description: Limite de solicitações atingido }
+        '502': { description: Provedor transacional indisponível ou rejeitou o envio }
+        '503': { description: Entrega transacional não configurada }
   /auth/verify-code:
     post:
       security: []

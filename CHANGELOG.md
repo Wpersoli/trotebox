@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.3.8 — 2026-08-16
+
+- Migra entrega de OTP de Resend para a API transacional Brevo sem alterar as regras de geração/validação do código.
+- Move transporte de e-mail para módulo dedicado e adiciona testes do payload/remetente.
+- Substitui `RESEND_API_KEY`/`EMAIL_FROM` por `BREVO_API_KEY`, `EMAIL_FROM_NAME` e `EMAIL_FROM_ADDRESS`.
+- Adiciona proxy `/api/v1/*` no projeto Web da Vercel para manter a sessão same-origin durante homologação em `*.vercel.app`.
+- Mantém desenvolvimento local apontando para `localhost:3001` e permite override por `NEXT_PUBLIC_API_BASE_URL`.
+- Não adiciona migration de banco nem altera ledger, sessões, Pix/Mercado Pago ou telefonia.
+
+## 0.3.7 — 2026-08-15
+
+- Unifica HOME e acesso passwordless por e-mail.
+- Adiciona sessão revogável por `sid`, hardening de OTP e constraints financeiras.
+- Vincula Pix ao e-mail autenticado e adiciona reconciliação Mercado Pago.
+
 - Revisão 0.3.6 R2: `smoke:local` passa `X-Client-Platform: native` no dev login para obter o JWT esperado pelo teste ponta a ponta.
 - Revisão de entrega 0.3.6 R2: corrige fixture `env.test.ts` com `NODE_ENV: test` para o `NodeJS.ProcessEnv` do Next.js 16.
 

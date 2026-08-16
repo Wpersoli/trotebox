@@ -1,4 +1,4 @@
-# Estado da implementação — TroteBox 0.3.7
+# Estado da implementação — TroteBox 0.3.8
 
 ## Implementado
 
@@ -14,6 +14,16 @@
 - gravação opcional consentida;
 - TTS por provedor ou API própria;
 - políticas antiabuso, idempotência e concorrência financeira.
+
+## Melhorias da 0.3.8
+
+1. Entrega de OTP migra de Resend para Brevo por API REST server-to-server.
+2. `BREVO_API_KEY` fica restrita ao backend; remetente passa a usar `EMAIL_FROM_NAME` + `EMAIL_FROM_ADDRESS`.
+3. Integração de e-mail sai de `auth-code.ts` e fica isolada em módulo próprio, sem alterar a geração/validação do OTP.
+4. Erros de rede/provedor de e-mail são tratados como 502 com mensagem sanitizada; status do upstream é registrado sem expor credenciais.
+5. Web em produção usa `/api/v1` same-origin e a Vercel faz rewrite para `trotebox-api.vercel.app`, evitando depender de cookies cross-site entre dois projetos `*.vercel.app`.
+6. Desenvolvimento local mantém fallback para `http://localhost:3001/api/v1`; builds nativos continuam podendo usar `NEXT_PUBLIC_API_BASE_URL` como URL direta.
+7. Nenhuma migration ou mudança do ledger/pagamentos foi introduzida.
 
 ## Melhorias da 0.3.7
 
@@ -43,7 +53,7 @@
 
 ## Ainda depende de infraestrutura real
 
-- banco PostgreSQL/Supabase: conexão, migration inicial e seed já validados no ambiente local; resta validar o smoke final da 0.3.7 após a correção de TTS;
+- banco PostgreSQL/Supabase: conexão, migration inicial e seed já validados no ambiente local; migration 0.3.7 já existe; a 0.3.8 não adiciona migration e requer apenas revalidação do smoke de autenticação/OTP;
 - Twilio/Vonage sandbox;
 - Stripe/Mercado Pago sandbox;
 - Android Studio/Xcode;

@@ -35,4 +35,22 @@ describe('environment parsing', () => {
     expect(parsed.AUTH_CODE_TTL_MINUTES).toBe(7);
   });
 
+
+  it('accepts Brevo as the transactional OTP delivery provider', () => {
+    const parsed = parseEnv({
+      ...baseEnv,
+      AUTH_DELIVERY: 'brevo',
+      BREVO_API_KEY: 'brevo-test-key-placeholder',
+      EMAIL_FROM_NAME: 'TroteBox',
+      EMAIL_FROM_ADDRESS: 'sender@example.com'
+    });
+    expect(parsed.AUTH_DELIVERY).toBe('brevo');
+    expect(parsed.EMAIL_FROM_NAME).toBe('TroteBox');
+    expect(parsed.EMAIL_FROM_ADDRESS).toBe('sender@example.com');
+  });
+
+  it('rejects an invalid transactional sender address', () => {
+    expect(() => parseEnv({ ...baseEnv, EMAIL_FROM_ADDRESS: 'invalid-email' })).toThrow();
+  });
+
 });

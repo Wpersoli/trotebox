@@ -7,7 +7,7 @@ import { useAuth } from './AuthProvider';
 import { api, isPreviewMode } from '@/lib/api';
 
 const authMode = process.env.NEXT_PUBLIC_AUTH_MODE ?? 'passwordless';
-const RESEND_SECONDS = 60;
+const OTP_RESEND_COOLDOWN_SECONDS = 60;
 
 function maskEmail(value: string) {
   const [local, domain] = value.split('@');
@@ -53,7 +53,7 @@ export function HomeAccess() {
       setDevelopmentCode(result.devCode ?? '');
       setStep('code');
       setCode('');
-      setResendIn(RESEND_SECONDS);
+      setResendIn(OTP_RESEND_COOLDOWN_SECONDS);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Não foi possível enviar o código.');
     } finally {

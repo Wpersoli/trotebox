@@ -1,72 +1,76 @@
-# Relatório de validação — TroteBox 0.3.7
+# Relatório de validação — TroteBox 0.3.8
 
-Data: 15 de agosto de 2026.
-Baseline de origem: `c36f7e7` (`main`) — `chore: ajusta cron para Vercel Hobby`.
+Data: 16 de agosto de 2026.
+Baseline recebido: `ff8403f` (`main`) — `feat: release TroteBox v0.3.7 passwordless e hardening financeiro`.
 
 ## Veredito deste pacote
 
-**APROVADO como fonte 0.3.7 sanitizado para revalidação e deploy controlado**, com uma condição operacional obrigatória: aplicar a migration de sessão/constraints no Supabase antes de publicar a nova API.
+**APROVADO como fonte TroteBox 0.3.8 sanitizado para revalidação final no Windows e deploy controlado.**
 
-A aprovação acima é do código-fonte e do pacote entregue. Não declara que uma migration foi aplicada no banco de produção nem que credenciais externas reais foram exercitadas neste sandbox.
+A release preserva banco, sessões revogáveis, ledger e pagamentos da 0.3.7. Não existe migration nova. O escopo funcional novo é a troca do transporte de OTP para Brevo e o proxy same-origin do Web para a API na Vercel.
+
+A aprovação acima não afirma envio real de e-mail, pois a `BREVO_API_KEY` do usuário não foi fornecida ao pacote/sandbox e deve permanecer secreta. O smoke real do OTP deve ser feito somente após configurar a chave diretamente na Vercel.
 
 ## Escopo alterado
 
-- HOME unificada no padrão visual fornecido, com hero à esquerda e autenticação no mesmo documento;
-- `/login` deixa de manter formulário duplicado e direciona para `/#acesso`;
-- login público reduzido a **e-mail + OTP**; nome não é solicitado;
-- OTP de seis dígitos, uso único, TTL padrão de 7 min, máximo de 5 tentativas por challenge, cooldown de 60 s e limites adicionais por e-mail/IP;
-- reenvio invalida challenges anteriores;
-- sessão passa a ser revogável no servidor por `sid`;
-- logout revoga a sessão no banco;
-- carteira e histórico permanecem vinculados ao usuário autenticado;
-- Pix/Mercado Pago força o e-mail da sessão e não aceita e-mail do pagador vindo do cliente;
-- CPF/CNPJ removido do payload desta jornada para reduzir tratamento de PII;
-- conciliação Mercado Pago valida `Payment.id` e `providerPaymentId` esperados;
-- consulta autenticada de status e cron de reconciliação preservam recuperação em caso de atraso de webhook;
-- ledger recebe constraints SQL de sinais/reservas/valores;
-- API rejeita origem web não autorizada em mutações;
-- erros 5xx não devolvem `details` brutos de upstream em produção;
-- documentação, OpenAPI, inventário e versão alinhados em 0.3.7.
+- remove integração de runtime com Resend (`RESEND_API_KEY`, `EMAIL_FROM`, `api.resend.com`);
+- adiciona `AUTH_DELIVERY=brevo`, `BREVO_API_KEY`, `EMAIL_FROM_NAME` e `EMAIL_FROM_ADDRESS`;
+- isola entrega transacional em `apps/api/src/server/email-delivery.ts`;
+- mantém código OTP de 6 dígitos, TTL 7 min, uso único, máximo 5 tentativas, cooldown 60 s, invalidação no reenvio e rate limit;
+- adiciona tratamento de timeout/rede da Brevo e erro 502 sanitizado;
+- adiciona teste de payload transacional e testes das novas variáveis de ambiente;
+- Web em produção pode usar `/api/v1` no próprio host; `apps/web/vercel.json` encaminha para `https://trotebox-api.vercel.app/api/v1/*`;
+- mantém fallback local para `http://localhost:3001/api/v1` quando a URL pública não é definida;
+- nenhuma dependência externa foi adicionada, removida ou atualizada;
+- nenhuma migration foi adicionada.
 
 ## Validações executadas neste ambiente
 
-- `npm run inventory`: **164 arquivos-fonte / 44 dependências**;
-- `npm run validate:repo`: **23 arquivos obrigatórios, 13 JSONs, 5 packages 0.3.7, 66 fontes, 22 rotas/OpenAPI, 17 modelos Prisma e 6 enums**;
-- `npm run inventory:verify`: aprovado;
+- `npm run validate:repo`: aprovado — 23 arquivos obrigatórios, 13 JSONs, 5 packages 0.3.8, 68 fontes, 22 rotas/OpenAPI, 17 modelos Prisma e 6 enums;
+- `npm run inventory` / `npm run inventory:verify`: aprovados após regeneração final;
 - `npm run test:domain`: **7/7**;
 - `npm run lint`: aprovado nos quatro workspaces;
-- TypeScript direto (`tsc --noEmit`) em contracts, db, api e web: aprovado;
-- grafo de dependências externas do `package-lock.json`: inalterado em relação ao baseline `c36f7e7`;
-- teste de regressão por execução direta dos schemas de autenticação/Pix: aprovado;
-- `git diff --check`: sem erro de whitespace (somente aviso esperado de normalização LF/CRLF no script PowerShell);
-- varredura de reutilização: nenhum dos valores sensíveis encontrados nos `.env` enviados aparece em arquivo rastreado pelo Git;
-- varredura por padrões de chaves privadas/tokens conhecidos: aprovada.
+- TypeScript direto (`tsc --noEmit`) em contracts, db, API e Web: aprovado;
+- `git diff --check`: sem erro de whitespace; somente aviso esperado de normalização LF/CRLF do script PowerShell;
+- grafo de dependências externas do `package-lock.json`: **0 adições, 0 remoções, 0 mudanças de versão** em relação à 0.3.7;
+- `nanoid`: permanece em **3.3.18** no lockfile;
+- varredura por reutilização exata de valores sensíveis dos `.env` locais em arquivos distribuíveis: **0 ocorrências**;
+- varredura por padrões de Brevo/GitHub/Stripe/AWS/private key: **0 ocorrências**;
+- validador passou a bloquear chave Brevo com padrão `xkeysib-*`, variáveis legadas do Resend e ausência do rewrite same-origin.
 
 ## Limite técnico do sandbox
 
-O ZIP recebido contém `node_modules` instalado no Windows. Neste ambiente Linux, `next build`/Vitest exigem binários opcionais Linux (`@next/swc-linux-x64-gnu` e `@rollup/rollup-linux-x64-gnu`) que não vieram no upload. A rede direta do sandbox também não conseguiu obter esses binários. Por isso, **não é correto registrar `npm run quality:release` como concluído aqui**.
+O ZIP recebido contém `node_modules` instalado no Windows. Neste ambiente Linux faltam os binários opcionais Linux de Next/SWC, Rollup e esbuild. A rede direta do sandbox não permite reinstalar esses opcionais.
 
-Esse limite é ambiental, não um diagnóstico de erro de TypeScript/lint/repositório: essas etapas foram executadas e aprovadas conforme a seção anterior.
+Por isso, `next typegen`, Vitest e `next build` completos não podem ser registrados como concluídos neste ambiente. Esse é um limite de plataforma do `node_modules` recebido, não um erro detectado no fonte: lint e os quatro `tsc --noEmit` passam.
 
-## Migration obrigatória antes da nova API
-
-A release adiciona:
-
-`packages/db/prisma/migrations/20260815213000_revocable_sessions/migration.sql`
-
-Ela cria sessões revogáveis e constraints financeiras. A API 0.3.7 depende da tabela `Session` no login.
-
-No Windows, com as variáveis corretas de banco carregadas e **antes de publicar a API nova**:
+No Windows do usuário, execute a trava final antes de commit/push:
 
 ```powershell
+cd "C:\Projetos\trote-box"
 npm ci
-npm run db:generate
-npm run db:deploy
+npm audit --omit=dev
 npm run quality:release
 ```
 
-Se `db:deploy` acusar violação de constraint em dado histórico, **não force a migration**: audite a linha apontada antes de prosseguir.
+## Configuração operacional obrigatória após substituir o fonte
 
-## Segredos do ZIP de origem
+No projeto `trotebox-api` da Vercel:
 
-O arquivo recebido continha arquivos locais de ambiente ignorados pelo Git. Eles não fazem parte do pacote sanitizado final. Como essas credenciais saíram do seu computador no upload, trate-as como potencialmente expostas e faça rotação das chaves/URLs sensíveis antes do deploy definitivo.
+```text
+AUTH_DELIVERY=brevo
+BREVO_API_KEY=<segredo criado no Brevo>
+EMAIL_FROM_NAME=TroteBox
+EMAIL_FROM_ADDRESS=<remetente verificado no Brevo>
+AUTH_CODE_TTL_MINUTES=7
+```
+
+No projeto `trotebox-web`, para usar o proxy same-origin atual, deixe `NEXT_PUBLIC_API_BASE_URL` ausente/vazio e mantenha `NEXT_PUBLIC_CLIENT_PLATFORM=web`.
+
+A chave Brevo deve ser criada/armazenada diretamente na Vercel e nunca inserida no ZIP, GitHub ou documentação.
+
+## Sanitização
+
+O ZIP de origem continha conteúdo local que não deve ser distribuído: `.git`, `node_modules`, `apps/api/.env.local`, `apps/web/.env.local` e `packages/db/.env`. Esses itens são excluídos do pacote final.
+
+O pacote final mantém apenas `.env.example` com placeholders não secretos.

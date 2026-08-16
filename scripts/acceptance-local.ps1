@@ -100,7 +100,7 @@ function Stop-ProcessTreeBestEffort([int]$RootProcessId) {
 
 Write-Host ''
 Write-Host '===================================================' -ForegroundColor Cyan
-Write-Host ' TROTEBOX - ACCEPTANCE LOCAL 0.3.7' -ForegroundColor Cyan
+Write-Host ' TROTEBOX - ACCEPTANCE LOCAL 0.3.8' -ForegroundColor Cyan
 Write-Host '===================================================' -ForegroundColor Cyan
 
 if ((Test-PortOpen 3000) -or (Test-PortOpen 3001)) {
@@ -171,6 +171,6 @@ finally {
 if ($acceptanceSucceeded) {
   Write-Host ''
   Write-Host '===================================================' -ForegroundColor Green
-  Write-Host ' TROTEBOX 0.3.7 - ACCEPTANCE APROVADA' -ForegroundColor Green
+  Write-Host ' TROTEBOX 0.3.8 - ACCEPTANCE APROVADA' -ForegroundColor Green
   Write-Host '===================================================' -ForegroundColor Green
 }

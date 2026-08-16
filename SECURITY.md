@@ -1,4 +1,4 @@
-# Segurança — TroteBox 0.3.7
+# Segurança — TroteBox 0.3.8
 
 ## Controles implementados
 
@@ -7,10 +7,10 @@
 - sessão web revogável no servidor por `sid`, com cookie `HttpOnly`, `SameSite=Lax` e `Secure` em produção;
 - token só é retornado explicitamente para cliente identificado como `native`;
 - CORS por allowlist com credenciais e rejeição ativa de origens não autorizadas em operações mutáveis;
-- cliente HTTP com timeout (`AbortController`) e mensagens de erro sanitizadas;
+- cliente HTTP com timeout (`AbortController`) e mensagens de erro sanitizadas; na Vercel, o Web usa proxy `/api/v1` same-origin para a API durante homologação sem domínio próprio;
 - erros de infraestrutura/upstream não devolvem `details` brutos em produção;
 - headers de segurança no hosting web (CSP, HSTS, frame denial, nosniff, referrer e permissions policy);
-- OTP de seis dígitos com uso único, 5 tentativas por challenge, cooldown de 60 s, TTL curto e rate limit adicional por e-mail/IP;
+- OTP de seis dígitos com uso único, 5 tentativas por challenge, cooldown de 60 s, TTL curto e rate limit adicional por e-mail/IP; entrega transacional isolada no backend pela API Brevo;
 - webhooks Stripe/Twilio/Vonage/Mercado Pago validados;
 - reconciliação Mercado Pago vinculada ao `Payment.id` e `providerPaymentId` esperados;
 - idempotência em pagamentos, chamadas e webhooks;
@@ -33,7 +33,7 @@
 1. Desative `ENABLE_DEV_AUTH`, `NEXT_PUBLIC_ENABLE_DEV_LOGIN` e `NEXT_PUBLIC_PREVIEW_MODE`.
 2. Gere segredos distintos para JWT, criptografia, hashes, OTP e cron.
 3. Configure domínios HTTPS definitivos e revise CSP/allowlist.
-4. Configure `AUTH_CODE_TTL_MINUTES=7`, SMTP/Resend próprio e teste entregabilidade do OTP.
+4. Configure `AUTH_CODE_TTL_MINUTES=7`, `AUTH_DELIVERY=brevo`, `BREVO_API_KEY`, `EMAIL_FROM_NAME` e `EMAIL_FROM_ADDRESS`; valide entregabilidade do OTP e autentique domínio próprio antes da abertura comercial.
 5. Teste webhooks com credenciais sandbox/teste antes de produção.
 6. Implemente Secure Storage/Keychain/Keystore para sessão no Capacitor antes da publicação mobile.
 7. Defina retenção e armazenamento privado de gravações.
@@ -42,4 +42,4 @@
 
 ## Segredos
 
-Nunca versione `.env`, chaves privadas, URLs de banco com senha, tokens de provedores ou credenciais administrativas.
+Nunca versione `.env`, chaves privadas, URLs de banco com senha, tokens de provedores ou credenciais administrativas. A `BREVO_API_KEY` deve existir somente em secret store/variável protegida do backend.

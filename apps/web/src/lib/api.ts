@@ -1,8 +1,10 @@
 import type { CreditPackSummary, ScriptSummary, WalletSummary } from '@trotebox/contracts';
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3001/api/v1';
-const requestTimeoutMs = Number(process.env.NEXT_PUBLIC_API_TIMEOUT_MS ?? 10000);
 const clientPlatform = process.env.NEXT_PUBLIC_CLIENT_PLATFORM ?? 'web';
+const configuredBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
+const baseUrl = configuredBaseUrl
+  || (process.env.NODE_ENV === 'production' && clientPlatform === 'web' ? '/api/v1' : 'http://localhost:3001/api/v1');
+const requestTimeoutMs = Number(process.env.NEXT_PUBLIC_API_TIMEOUT_MS ?? 10000);
 export const isPreviewMode = process.env.NEXT_PUBLIC_PREVIEW_MODE === 'true';
 
 const previewScripts: ScriptSummary[] = [

@@ -1,6 +1,6 @@
 {
   "name": "@trotebox/web",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "private": true,
   "scripts": {
     "dev": "next dev --port 3000",
@@ -20,7 +20,7 @@
     "@capacitor/ios": "8.5.0",
     "@capacitor/splash-screen": "8.0.0",
     "@capacitor/status-bar": "8.0.0",
-    "@trotebox/contracts": "0.3.7",
+    "@trotebox/contracts": "0.3.8",
     "next": "16.3.0",
     "react": "19.2.0",
     "react-dom": "19.2.0"

@@ -21,7 +21,7 @@ const required = [
   'scripts/inventory-core.mjs',
   'scripts/generate-inventory.mjs',
   'scripts/verify-inventory.mjs',
-  'RELEASE_NOTES_0.3.7.md',
+  'RELEASE_NOTES_0.3.8.md',
   'LOCAL_TEST.md',
   'SUPABASE_LOCAL.md',
   '.env.example',
@@ -95,18 +95,45 @@ const envText = await readFile(join(root, '.env.example'), 'utf8');
 for (const origin of ['capacitor://localhost', 'https://localhost']) {
   if (!envText.includes(origin)) throw new Error(`Origem Capacitor ausente em .env.example: ${origin}`);
 }
-for (const requiredEnv of ['DATABASE_URL=', 'DIRECT_URL=', 'JWT_SECRET=', 'DATA_ENCRYPTION_KEY=', 'HASH_PEPPER=']) {
+for (const requiredEnv of ['DATABASE_URL=', 'DIRECT_URL=', 'JWT_SECRET=', 'DATA_ENCRYPTION_KEY=', 'HASH_PEPPER=', 'BREVO_API_KEY=', 'EMAIL_FROM_NAME=', 'EMAIL_FROM_ADDRESS=']) {
   if (!envText.includes(requiredEnv)) throw new Error(`Variável ausente em .env.example: ${requiredEnv.slice(0, -1)}`);
+}
+if (envText.includes('RESEND_API_KEY=') || /^EMAIL_FROM=/m.test(envText)) {
+  throw new Error('Variáveis legadas do Resend ainda presentes em .env.example.');
 }
 const secretPatterns = [
   new RegExp(['sk', 'live', '[A-Za-z0-9]{12,}'].join('_')),
   new RegExp(['sk', 'test', '[A-Za-z0-9]{12,}'].join('_')),
   new RegExp(['ghp', '[A-Za-z0-9]{20,}'].join('_')),
+  /xkeysib-[A-Za-z0-9_-]{20,}/,
   /AKIA[0-9A-Z]{16}/,
   new RegExp(['-----BEGIN', 'PRIVATE KEY-----'].join(' '))
 ];
-for (const pattern of secretPatterns) {
-  if (pattern.test(envText)) throw new Error(`Possível segredo real em .env.example: ${pattern}`);
+const textExtensions = new Set(['.ts', '.tsx', '.js', '.mjs', '.cjs', '.json', '.md', '.yaml', '.yml', '.txt', '.csv', '.ps1', '.example']);
+for (const file of files) {
+  if (!textExtensions.has(extname(file)) && !file.endsWith('.env.example')) continue;
+  const text = await readFile(file, 'utf8');
+  for (const pattern of secretPatterns) {
+    if (pattern.test(text)) throw new Error(`Possível segredo real em ${relative(root, file)}: ${pattern}`);
+  }
+}
+
+const deliverySources = [
+  join(root, 'apps/api/src/server/env.ts'),
+  join(root, 'apps/api/src/server/email-delivery.ts'),
+  join(root, 'apps/api/.env.example')
+];
+for (const file of deliverySources) {
+  const text = await readFile(file, 'utf8');
+  if (text.includes('RESEND_API_KEY') || text.includes('api.resend.com')) {
+    throw new Error(`Integração Resend legada ainda presente em ${relative(root, file)}.`);
+  }
+}
+
+const webVercel = JSON.parse(await readFile(join(root, 'apps/web/vercel.json'), 'utf8'));
+const apiRewrite = webVercel.rewrites?.find((item) => item.source === '/api/v1/:path*');
+if (!apiRewrite || apiRewrite.destination !== 'https://trotebox-api.vercel.app/api/v1/:path*') {
+  throw new Error('Rewrite same-origin /api/v1 da Vercel ausente ou divergente.');
 }
 
 const normalizedPath = (file) => file.replaceAll('\\', '/');

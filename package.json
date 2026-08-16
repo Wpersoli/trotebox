@@ -1,6 +1,6 @@
 {
   "name": "trotebox-platform",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "private": true,
   "description": "Plataforma original de trotes de comédia com frontend responsivo, créditos, telefonia programável e clientes web/mobile.",
   "workspaces": [

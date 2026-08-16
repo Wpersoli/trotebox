@@ -1,4 +1,4 @@
-# TroteBox 0.3.7
+# TroteBox 0.3.8
 
 > **Riso na linha. Surpresa na caixa.**
 
@@ -12,8 +12,8 @@ Monorepo autoral para uma plataforma de experiências de comédia por telefone, 
 - modo **preview visual** sem Supabase, Docker, Vercel ou backend;
 - frontend Next.js 16 com exportação estática para Capacitor 8;
 - API Next.js separada;
-- autenticação passwordless por e-mail com OTP de uso único, rate limit e sessão revogável em cookie `HttpOnly`; clientes nativos recebem token apenas quando identificados como `native`;
-- timeout e sanitização de erros no cliente HTTP;
+- autenticação passwordless por e-mail com OTP de uso único entregue pela Brevo, rate limit e sessão revogável em cookie `HttpOnly`; clientes nativos recebem token apenas quando identificados como `native`;
+- timeout e sanitização de erros no cliente HTTP; em produção Web, `/api/v1` é encaminhado pela Vercel ao projeto da API para manter a sessão same-origin durante homologação sem domínio próprio;
 - PostgreSQL/Supabase + Prisma;
 - ledger transacional de créditos;
 - Pix via Mercado Pago no fluxo público; adaptador Stripe preservado no backend para compatibilidade legada;
