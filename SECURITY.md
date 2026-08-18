@@ -1,4 +1,4 @@
-# Segurança — TroteBox 0.3.8
+# Segurança — TroteBox 0.3.9
 
 ## Controles implementados
 
@@ -12,6 +12,9 @@
 - headers de segurança no hosting web (CSP, HSTS, frame denial, nosniff, referrer e permissions policy);
 - OTP de seis dígitos com uso único, 5 tentativas por challenge, cooldown de 60 s, TTL curto e rate limit adicional por e-mail/IP; entrega transacional isolada no backend pela API Brevo;
 - webhooks Stripe/Twilio/Vonage/Mercado Pago validados;
+- provider mock de telefonia bloqueado em produção; adaptadores reais só são anunciados como disponíveis com configuração operacional completa;
+- Vonage sem SDK transitivo: chamada criada por HTTPS com JWT RS256 de 5 minutos, `jti` único e chave privada restrita ao backend;
+- nova cobrança Pix exige access token e segredo de webhook antes de ser criada;
 - reconciliação Mercado Pago vinculada ao `Payment.id` e `providerPaymentId` esperados;
 - idempotência em pagamentos, chamadas e webhooks;
 - ledger de créditos em transações PostgreSQL, com constraints de banco para sinais e reservas;

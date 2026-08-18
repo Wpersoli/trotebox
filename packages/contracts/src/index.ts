@@ -90,6 +90,11 @@ export type CreditPackSummary = {
   highlight?: boolean;
 };
 
+export type PlatformCapabilities = {
+  pixPayments: boolean;
+  outboundCalls: boolean;
+};
+
 export type WalletSummary = {
   balanceCredits: number;
   reservedCredits: number;

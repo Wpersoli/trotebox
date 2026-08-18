@@ -1,4 +1,4 @@
-# Estado da implementação — TroteBox 0.3.8
+# Estado da implementação — TroteBox 0.3.9
 
 ## Implementado
 
@@ -9,11 +9,21 @@
 - Next.js com exportação estática + Capacitor Android/iOS;
 - API separada com OTP/passwordless endurecido, sessão web revogável `HttpOnly` e JWT com `sid` para fluxo nativo;
 - PostgreSQL/Prisma com usuários, consentimentos, catálogo, chamadas, eventos, pagamentos, carteira, ledger, webhooks, supressão, rate limit e auditoria;
-- adaptadores mock, Twilio e Vonage;
+- adaptadores Twilio/Vonage para produção e mock restrito a desenvolvimento/preview;
 - Pix Mercado Pago vinculado ao e-mail autenticado, com webhook + reconciliação ativa; adaptador Stripe preservado no backend;
 - gravação opcional consentida;
 - TTS por provedor ou API própria;
 - políticas antiabuso, idempotência e concorrência financeira.
+
+## Melhorias da 0.3.9
+
+1. Providers de telefonia passam a ser carregados sob demanda; consulta de histórico não carrega SDK/provider opcional.
+2. `@vonage/server-sdk` é removido; Vonage Voice API usa HTTPS direto e JWT RS256 assinado pelo backend com `jose`.
+3. Provedor `mock` é recusado em produção para impedir chamadas simuladas de consumirem créditos reais.
+4. Catálogo publica somente flags booleanas de disponibilidade, sem expor credenciais ou nome do provedor.
+5. Web bloqueia Pix e chamada real enquanto a configuração segura correspondente estiver incompleta.
+6. Backend exige webhook Mercado Pago antes de nova cobrança e credenciais Vonage completas antes de iniciar chamada.
+7. Nenhuma migration ou mudança de ledger/sessão foi introduzida.
 
 ## Melhorias da 0.3.8
 

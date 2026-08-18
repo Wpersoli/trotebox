@@ -8,6 +8,7 @@ import { enforceRateLimit } from './rate-limit';
 import { reserveCredits, releaseCredits, releaseCreditsInTransaction, captureCreditsInTransaction } from './wallet';
 import { telephonyProvider } from './telephony';
 import { audit } from './audit';
+import { platformCapabilities } from './capabilities';
 import { prepareVoiceAsset } from './voice';
 
 export async function createCall(userId: string, input: CreateCallInput, request: Request) {
@@ -20,6 +21,9 @@ export async function createCall(userId: string, input: CreateCallInput, request
   if (existing) return existing;
 
   const config = env();
+  if (!platformCapabilities(config).outboundCalls) {
+    throw new AppError(503, 'TELEPHONY_NOT_CONFIGURED', 'Telefonia temporariamente indisponível. Nenhum crédito foi reservado.');
+  }
 
   await enforceRateLimit('call:user:hour', hashSubject(userId), config.MAX_CALLS_PER_USER_PER_HOUR, 60 * 60 * 1000);
   await enforceRateLimit('call:recipient:day', phoneHash, config.MAX_CALLS_PER_RECIPIENT_PER_DAY, 24 * 60 * 60 * 1000);
@@ -56,7 +60,7 @@ export async function createCall(userId: string, input: CreateCallInput, request
     const voiceAssetUrl = await prepareVoiceAsset(script);
     if (voiceAssetUrl) await prisma.callOrder.update({ where: { id: call.id }, data: { voiceAssetUrl } });
     const base = config.PUBLIC_API_URL.replace(/\/$/, '');
-    const provider = telephonyProvider();
+    const provider = await telephonyProvider();
     const started = await provider.startCall({
       callId: call.id,
       to: phone,

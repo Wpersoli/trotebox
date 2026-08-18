@@ -8,7 +8,8 @@ import { api } from '@/lib/api';
 
 export default function CatalogPage() {
   const [scripts, setScripts] = useState<ScriptSummary[]>([]);
-  useEffect(() => { api.catalog().then((data) => setScripts(data.scripts)).catch(() => undefined); }, []);
+  const [outboundCallsAvailable, setOutboundCallsAvailable] = useState(false);
+  useEffect(() => { api.catalog().then((data) => { setScripts(data.scripts); setOutboundCallsAvailable(data.capabilities.outboundCalls); }).catch(() => undefined); }, []);
 
   return (
     <AppShell title="Trotes">
@@ -16,10 +17,10 @@ export default function CatalogPage() {
       <div className="catalog-grid">
         {scripts.map((script) => (
           <article className="card script-card" key={script.id}>
-            <div className={`script-art ${script.accent}`}><span className="status-pill ok">Disponível</span><span className="script-art-icon">☎</span></div>
+            <div className={`script-art ${script.accent}`}><span className={`status-pill ${outboundCallsAvailable ? 'ok' : 'warn'}`}>{outboundCallsAvailable ? 'Disponível' : 'Em configuração'}</span><span className="script-art-icon">☎</span></div>
             <div className="script-content">
               <span className="eyebrow">{script.category}</span><h3>{script.title}</h3><p>{script.description}</p>
-              <div className="script-meta"><span className="script-price">{script.creditCost} créditos</span><Link className="button secondary" href={`/calls/new/?script=${script.id}`}>Escolher</Link></div>
+              <div className="script-meta"><span className="script-price">{script.creditCost} créditos</span>{outboundCallsAvailable ? <Link className="button secondary" href={`/calls/new/?script=${script.id}`}>Escolher</Link> : <span className="button secondary disabled" aria-disabled="true">Em breve</span>}</div>
             </div>
           </article>
         ))}

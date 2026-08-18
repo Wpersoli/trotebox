@@ -17,11 +17,12 @@ export default function WalletPage() {
   const [wallet, setWallet] = useState<WalletSummary | null>(null);
   const [packs, setPacks] = useState<CreditPackSummary[]>([]);
   const [pix, setPix] = useState<PixState | null>(null);
+  const [pixAvailable, setPixAvailable] = useState(isPreviewMode);
   const [error, setError] = useState('');
 
   useEffect(() => {
     api.wallet().then(setWallet).catch(() => undefined);
-    api.catalog().then((data) => setPacks(data.packs)).catch(() => undefined);
+    api.catalog().then((data) => { setPacks(data.packs); setPixAvailable(data.capabilities.pixPayments); }).catch(() => undefined);
   }, []);
 
   const pixPaymentId = pix?.internalPaymentId;
@@ -78,6 +79,7 @@ export default function WalletPage() {
 
       {commerceMode === 'web' ? (
         <>
+          {!pixAvailable && !isPreviewMode && <div className="notice" style={{ marginBottom: 18 }}><strong>Pix em configuração:</strong> as compras estão temporariamente indisponíveis. Nenhuma cobrança será iniciada.</div>}
           {error && <div className="error-box" style={{ marginBottom: 18 }}>{error}</div>}
           {pix && (
             <div className="card form-panel" style={{ marginBottom: 18 }}>
@@ -106,7 +108,7 @@ export default function WalletPage() {
                 <div className="pack-credits">{pack.credits}</div>
                 <div className="pack-price">créditos · {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(pack.priceCents / 100)}</div>
                 <div className="payment-options payment-options-single">
-                  <button className="button" onClick={() => mercadoPago(pack.code)}>Comprar com Pix · Mercado Pago</button>
+                  <button className="button" disabled={!pixAvailable} onClick={() => mercadoPago(pack.code)}>{pixAvailable ? 'Comprar com Pix · Mercado Pago' : 'Pix temporariamente indisponível'}</button>
                 </div>
               </article>
             ))}

@@ -15,12 +15,14 @@ export default function NewCallPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [busy, setBusy] = useState(false);
+  const [outboundCallsAvailable, setOutboundCallsAvailable] = useState(isPreviewMode);
 
   useEffect(() => {
     const requestedScript = new URLSearchParams(window.location.search).get('script') ?? '';
     api.catalog()
       .then((data) => {
         setScripts(data.scripts);
+        setOutboundCallsAvailable(data.capabilities.outboundCalls);
         const exists = data.scripts.some((item) => item.id === requestedScript);
         setScriptId(exists ? requestedScript : (data.scripts[0]?.id ?? ''));
       })
@@ -42,6 +44,7 @@ export default function NewCallPage() {
       <form className="form-grid" onSubmit={submit}>
         <section className="card form-panel form-stack">
           {isPreviewMode && <div className="notice"><strong>Modo preview:</strong> este formulário é apenas visual. Nenhuma chamada será feita.</div>}
+          {!isPreviewMode && !outboundCallsAvailable && <div className="notice"><strong>Telefonia em configuração:</strong> você pode consultar o catálogo, mas nenhuma chamada real será iniciada até a integração estar disponível.</div>}
           <div className="field"><label htmlFor="script">Trote</label><select id="script" className="select" value={scriptId} onChange={(e) => setScriptId(e.target.value)}>{scripts.map((script) => <option key={script.id} value={script.id}>{script.title} · {script.creditCost} créditos</option>)}</select></div>
           <div className="field"><label htmlFor="phone">Telefone do destinatário</label><input id="phone" className="input" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+5511999999999" required /><span className="muted">Use país + DDD + número. Exemplo: +5511999999999.</span></div>
           <div className="field"><label htmlFor="label">Apelido interno opcional</label><input id="label" className="input" value={label} onChange={(e) => setLabel(e.target.value)} maxLength={80} placeholder="Ex.: amigo do trabalho" /></div>
@@ -49,14 +52,14 @@ export default function NewCallPage() {
           <label className="checkbox-row"><input type="checkbox" checked={recording} onChange={(e) => setRecording(e.target.checked)} /><span>Confirmo que eventual gravação foi previamente autorizada pelas pessoas envolvidas. A gravação também precisa estar habilitada no servidor.</span></label>
           <div className="notice">Números de emergência, destinos bloqueados e padrões de abuso são recusados automaticamente.</div>
           {error && <div className="error-box">{error}</div>}{success && <div className="success-box">{success}</div>}
-          <button className="button" disabled={busy || !consent || !scriptId}>{busy ? 'Preparando…' : isPreviewMode ? 'Simular trote' : 'Confirmar e iniciar'}</button>
+          <button className="button" disabled={busy || !consent || !scriptId || !outboundCallsAvailable}>{busy ? 'Preparando…' : isPreviewMode ? 'Simular trote' : outboundCallsAvailable ? 'Confirmar e iniciar' : 'Telefonia indisponível'}</button>
         </section>
 
         <aside className="card summary-card">
           <span className="eyebrow">Dentro da caixa</span><h2>{selected?.title ?? 'Selecione um trote'}</h2><p className="muted">{selected?.description}</p>
           <div className="summary-line"><span>Duração estimada</span><strong>{selected ? `${selected.durationSeconds}s` : '—'}</strong></div>
           <div className="summary-line"><span>Custo</span><strong>{selected ? `${selected.creditCost} créditos` : '—'}</strong></div>
-          <div className="summary-line"><span>Telefonia</span><strong>{isPreviewMode ? 'Simulada' : 'Servidor próprio'}</strong></div>
+          <div className="summary-line"><span>Telefonia</span><strong>{isPreviewMode ? 'Simulada' : outboundCallsAvailable ? 'Disponível' : 'Em configuração'}</strong></div>
         </aside>
       </form>
     </AppShell>

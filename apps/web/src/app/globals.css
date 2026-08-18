@@ -678,3 +678,5 @@ tr:last-child td { border-bottom: 0; }
 @media (max-width: 700px) {
   .home-hero-copy-overlay { position: static; width: 100%; border-width: 1px 0 0; box-shadow: none; font-size: .76rem; }
 }
+
+.button.secondary.disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }

@@ -1,4 +1,4 @@
-import type { CreditPackSummary, ScriptSummary, WalletSummary } from '@trotebox/contracts';
+import type { CreditPackSummary, PlatformCapabilities, ScriptSummary, WalletSummary } from '@trotebox/contracts';
 
 const clientPlatform = process.env.NEXT_PUBLIC_CLIENT_PLATFORM ?? 'web';
 const configuredBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
@@ -21,6 +21,8 @@ const previewPacks: CreditPackSummary[] = [
   { code: 'plus', name: 'Risada', credits: 40, priceCents: 2990, currency: 'BRL', highlight: true },
   { code: 'pro', name: 'Gargalhada', credits: 100, priceCents: 5990, currency: 'BRL' }
 ];
+
+const previewCapabilities: PlatformCapabilities = { pixPayments: true, outboundCalls: true };
 
 const previewWallet: WalletSummary = {
   balanceCredits: 36,
@@ -46,6 +48,16 @@ export class ApiError extends Error {
 
 type ErrorPayload = { error?: { code?: string } } | null;
 
+function friendlyMessageForCode(code: string) {
+  switch (code) {
+    case 'MERCADOPAGO_NOT_CONFIGURED': return 'Pix temporariamente indisponível. Nenhuma cobrança foi criada.';
+    case 'TELEPHONY_NOT_CONFIGURED': return 'Telefonia temporariamente indisponível. Nenhum crédito foi consumido.';
+    case 'TWILIO_NOT_CONFIGURED':
+    case 'VONAGE_NOT_CONFIGURED': return 'Telefonia ainda não configurada. Nenhum crédito foi consumido.';
+    default: return 'Não foi possível completar a solicitação.';
+  }
+}
+
 async function request<T>(path: string, init: RequestInit = {}, timeoutMs = requestTimeoutMs): Promise<T> {
   const controller = new AbortController();
   const headers = new Headers(init.headers);
@@ -65,7 +77,8 @@ async function request<T>(path: string, init: RequestInit = {}, timeoutMs = requ
     const payload = await response.json().catch(() => null) as ErrorPayload | T;
     if (!response.ok) {
       const errorPayload = payload as ErrorPayload;
-      throw new ApiError(response.status, 'Não foi possível completar a solicitação.', errorPayload?.error?.code ?? 'API_ERROR');
+      const code = errorPayload?.error?.code ?? 'API_ERROR';
+      throw new ApiError(response.status, friendlyMessageForCode(code), code);
     }
     return payload as T;
   } catch (cause) {
@@ -106,7 +119,7 @@ export const api = {
 
   logout: async () => isPreviewMode ? { ok: true } : request<{ ok: true }>('/auth/logout', { method: 'POST' }),
 
-  catalog: async () => isPreviewMode ? { scripts: previewScripts, packs: previewPacks } : request<{ scripts: ScriptSummary[]; packs: CreditPackSummary[] }>('/catalog'),
+  catalog: async () => isPreviewMode ? { scripts: previewScripts, packs: previewPacks, capabilities: previewCapabilities } : request<{ scripts: ScriptSummary[]; packs: CreditPackSummary[]; capabilities: PlatformCapabilities }>('/catalog'),
   wallet: async () => isPreviewMode ? previewWallet : request<WalletSummary>('/wallet'),
   calls: async () => isPreviewMode ? { calls: previewCalls } : request<{ calls: Array<Record<string, unknown>> }>('/calls'),
 

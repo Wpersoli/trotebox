@@ -31,7 +31,7 @@ Variáveis obrigatórias incluem `DATABASE_URL`, `DIRECT_URL` quando aplicável,
 
 ### OTP por Brevo
 
-Para homologação/produção da 0.3.8:
+Para homologação/produção da 0.3.9:
 
 ```text
 AUTH_DELIVERY=brevo
@@ -79,7 +79,7 @@ Se futuramente o backend Web mudar de destino, atualize a `destination` do rewri
 
 A API define cookie `trotebox_session` com `HttpOnly`, `SameSite=Lax`, `Secure` em produção e `Path=/`. O cliente usa `credentials: "include"`.
 
-Na 0.3.8, o navegador chama `/api/v1/*` no próprio domínio Web e a Vercel atua como reverse proxy para o projeto API. Isso evita depender de cookie de terceiro entre dois projetos `*.vercel.app` independentes.
+Na 0.3.9, o navegador chama `/api/v1/*` no próprio domínio Web e a Vercel atua como reverse proxy para o projeto API. Isso evita depender de cookie de terceiro entre dois projetos `*.vercel.app` independentes.
 
 Quando houver domínio próprio, prefira manter Web e API no mesmo site registrável, por exemplo `trotebox.com.br` e `api.trotebox.com.br`, ou continue usando proxy same-origin.
 
@@ -89,7 +89,7 @@ Para aplicativo nativo, o endpoint pode devolver token somente quando `X-Client-
 
 ## Banco — estado herdado da 0.3.7
 
-A migration `20260815213000_revocable_sessions` continua obrigatória para a arquitetura atual. Se ela já foi aplicada no Supabase, a 0.3.8 **não adiciona migration de banco**.
+A migration `20260815213000_revocable_sessions` continua obrigatória para a arquitetura atual. Se ela já foi aplicada no Supabase, a 0.3.9 **não adiciona migration de banco**.
 
 Para ambiente novo:
 
@@ -102,7 +102,7 @@ npm run quality:release
 
 Se `db:deploy` acusar violação de constraint em dado histórico, interrompa e audite o registro; não remova a constraint para forçar a publicação.
 
-## Ordem de publicação da 0.3.8
+## Ordem de publicação da 0.3.9
 
 1. Garanta que a migration 0.3.7 já esteja aplicada.
 2. Configure as variáveis Brevo no projeto `trotebox-api`.
@@ -112,6 +112,18 @@ Se `db:deploy` acusar violação de constraint em dado histórico, interrompa e 
 6. Espere Web e API ficarem `Ready` no mesmo commit.
 7. Teste `/api/v1/health` pelo domínio Web e depois faça o smoke OTP completo.
 8. Só depois valide pagamentos sandbox/real conforme a fase do projeto.
+
+
+## Disponibilidade segura de recursos
+
+A 0.3.9 não anuncia nem inicia recursos incompletos:
+
+- Pix exige `MERCADOPAGO_ACCESS_TOKEN` + `MERCADOPAGO_WEBHOOK_SECRET`;
+- Twilio exige SID, auth token e número de origem;
+- Vonage exige application id, API key, private key, número de origem e signature secret;
+- `TELEPHONY_PROVIDER=mock` é apenas desenvolvimento/preview e retorna indisponibilidade em produção.
+
+Enquanto essas condições não forem satisfeitas, a interface mostra o recurso como em configuração e o backend mantém a recusa como defesa em profundidade.
 
 ## Webhooks
 

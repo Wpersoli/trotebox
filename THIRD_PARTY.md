@@ -9,7 +9,7 @@ Principais componentes:
 - Prisma — ORM e migrações;
 - Zod — contratos e validação;
 - Twilio SDK — telefonia programável;
-- Vonage Server SDK — telefonia programável;
+- Vonage Voice API — integração HTTPS direta; autenticação JWT usa `jose`;
 - Stripe SDK — checkout e webhooks;
 - jose — JWT;
 - Vitest, TypeScript e ESLint — testes, tipagem e qualidade. Os workspaces são orquestrados diretamente pelo npm para evitar dependência de binários adicionais no Windows.

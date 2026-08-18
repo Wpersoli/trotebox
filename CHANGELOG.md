@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.9 — 2026-08-18
+
+- Isola providers de telefonia com carregamento lazy e impede mock em produção.
+- Remove `@vonage/server-sdk` e a incompatibilidade CJS/ESM observada em `/api/v1/calls`.
+- Implementa Vonage Voice API diretamente por HTTPS + JWT RS256 com `jose`.
+- Expõe apenas flags de disponibilidade operacional no catálogo e desabilita Pix/telefonia no Web enquanto incompletos.
+- Exige webhook Mercado Pago antes de criar nova cobrança e configuração Vonage completa antes de iniciar chamada.
+- Falha cedo antes de reservar créditos quando telefonia está indisponível; adiciona timeout/validação de upstream no Mercado Pago e exports Prisma explícitos para build mais previsível.
+- Não adiciona migration de banco.
+
 ## 0.3.8 — 2026-08-16
 
 - Migra entrega de OTP de Resend para a API transacional Brevo sem alterar as regras de geração/validação do código.

@@ -1,4 +1,4 @@
-# TroteBox 0.3.8
+# TroteBox 0.3.9
 
 > **Riso na linha. Surpresa na caixa.**
 
@@ -17,7 +17,7 @@ Monorepo autoral para uma plataforma de experiências de comédia por telefone, 
 - PostgreSQL/Supabase + Prisma;
 - ledger transacional de créditos;
 - Pix via Mercado Pago no fluxo público; adaptador Stripe preservado no backend para compatibilidade legada;
-- Twilio, Vonage ou provedor mock;
+- Twilio ou Vonage em produção; provedor mock somente em desenvolvimento/preview;
 - OTP/passwordless, idempotência, rate limit, auditoria e política antiabuso.
 
 ## Caminho local adotado

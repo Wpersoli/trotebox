@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: TroteBox API
-  version: 0.3.8
+  version: 0.3.9
   description: API original TroteBox para autenticação, catálogo, carteira, chamadas, pagamentos, telefonia e webhooks.
 servers:
   - url: https://api.seudominio.com/api/v1
@@ -79,7 +79,7 @@ paths:
     get:
       security: []
       responses:
-        '200': { description: Roteiros ativos e pacotes de crédito }
+        '200': { description: Roteiros, pacotes e flags de disponibilidade operacional (Pix/telefonia) }
   /wallet:
     get:
       responses:

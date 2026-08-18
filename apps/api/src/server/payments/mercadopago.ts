@@ -4,6 +4,8 @@ import { env } from '../env';
 import { safeEqualHex } from '../crypto';
 import { AppError } from '../http';
 
+const MERCADOPAGO_TIMEOUT_MS = 12_000;
+
 function accessToken() {
   const token = env().MERCADOPAGO_ACCESS_TOKEN;
   if (!token) throw new AppError(503, 'MERCADOPAGO_NOT_CONFIGURED', 'Mercado Pago não configurado.');
@@ -11,6 +13,10 @@ function accessToken() {
 }
 
 export async function createPix(userId: string, packCode: string, payerEmail: string, idempotencyKey: string) {
+  const config = env();
+  if (!config.MERCADOPAGO_ACCESS_TOKEN || !config.MERCADOPAGO_WEBHOOK_SECRET) {
+    throw new AppError(503, 'MERCADOPAGO_NOT_CONFIGURED', 'Mercado Pago não configurado para cobrança segura.');
+  }
   const existing = await prisma.payment.findUnique({ where: { idempotencyKey }, include: { creditPack: true } });
   if (existing && (existing.userId !== userId || existing.creditPack.code !== packCode || existing.provider !== PaymentProvider.MERCADOPAGO)) throw new AppError(409, 'IDEMPOTENCY_CONFLICT', 'Chave idempotente já usada em outra operação.');
   if (existing?.providerPaymentId) {
@@ -25,26 +31,35 @@ export async function createPix(userId: string, packCode: string, payerEmail: st
     amountCents: pack.priceCents, currency: pack.currency, credits: pack.credits, idempotencyKey
   }});
 
-  const response = await fetch('https://api.mercadopago.com/v1/payments', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken()}`,
-      'Content-Type': 'application/json',
-      'X-Idempotency-Key': idempotencyKey
-    },
-    body: JSON.stringify({
-      transaction_amount: pack.priceCents / 100,
-      description: `${pack.name} — ${pack.credits} créditos`,
-      payment_method_id: 'pix',
-      external_reference: payment.id,
-      notification_url: `${env().PUBLIC_API_URL.replace(/\/$/, '')}/api/v1/webhooks/mercadopago`,
-      // Data minimization: the payment is bound to the authenticated e-mail.
-      // CPF/CNPJ is intentionally not collected by TroteBox in this flow.
-      payer: { email: payerEmail }
-    })
-  });
-  const payload = await response.json() as Record<string, any>;
+  let response: Response;
+  try {
+    response = await fetch('https://api.mercadopago.com/v1/payments', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken()}`,
+        'Content-Type': 'application/json',
+        'X-Idempotency-Key': idempotencyKey
+      },
+      body: JSON.stringify({
+        transaction_amount: pack.priceCents / 100,
+        description: `${pack.name} — ${pack.credits} créditos`,
+        payment_method_id: 'pix',
+        external_reference: payment.id,
+        notification_url: `${config.PUBLIC_API_URL.replace(/\/$/, '')}/api/v1/webhooks/mercadopago`,
+        // Data minimization: the payment is bound to the authenticated e-mail.
+        // CPF/CNPJ is intentionally not collected by TroteBox in this flow.
+        payer: { email: payerEmail }
+      }),
+      signal: AbortSignal.timeout(MERCADOPAGO_TIMEOUT_MS)
+    });
+  } catch {
+    throw new AppError(502, 'MERCADOPAGO_UNAVAILABLE', 'Mercado Pago temporariamente indisponível. Tente novamente com a mesma solicitação.');
+  }
+  const payload = await response.json().catch(() => null) as Record<string, any> | null;
   if (!response.ok) throw new AppError(502, 'MERCADOPAGO_CREATE_FAILED', 'Mercado Pago recusou a criação do Pix.', payload);
+  if (!payload || typeof payload.id !== 'number' && typeof payload.id !== 'string') {
+    throw new AppError(502, 'MERCADOPAGO_INVALID_RESPONSE', 'Mercado Pago retornou uma resposta inválida.');
+  }
 
   await prisma.payment.update({ where: { id: payment.id }, data: { providerPaymentId: String(payload.id), rawStatus: String(payload.status ?? '') } });
   return pixResponse(payload, payment.id);
@@ -62,11 +77,20 @@ function pixResponse(payload: Record<string, any>, internalPaymentId: string) {
 }
 
 export async function getMercadoPagoPayment(id: string) {
-  const response = await fetch(`https://api.mercadopago.com/v1/payments/${encodeURIComponent(id)}`, {
-    headers: { Authorization: `Bearer ${accessToken()}` }
-  });
-  const payload = await response.json() as Record<string, any>;
+  let response: Response;
+  try {
+    response = await fetch(`https://api.mercadopago.com/v1/payments/${encodeURIComponent(id)}`, {
+      headers: { Authorization: `Bearer ${accessToken()}` },
+      signal: AbortSignal.timeout(MERCADOPAGO_TIMEOUT_MS)
+    });
+  } catch {
+    throw new AppError(502, 'MERCADOPAGO_UNAVAILABLE', 'Mercado Pago temporariamente indisponível para consulta.');
+  }
+  const payload = await response.json().catch(() => null) as Record<string, any> | null;
   if (!response.ok) throw new AppError(502, 'MERCADOPAGO_FETCH_FAILED', 'Não foi possível consultar o pagamento.', payload);
+  if (!payload || (typeof payload.id !== 'number' && typeof payload.id !== 'string')) {
+    throw new AppError(502, 'MERCADOPAGO_INVALID_RESPONSE', 'Mercado Pago retornou uma resposta inválida.');
+  }
   return payload;
 }
 
