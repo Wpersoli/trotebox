@@ -45,7 +45,6 @@ export async function createPix(userId: string, packCode: string, payerEmail: st
         description: `${pack.name} — ${pack.credits} créditos`,
         payment_method_id: 'pix',
         external_reference: payment.id,
-        notification_url: `${config.PUBLIC_API_URL.replace(/\/$/, '')}/api/v1/webhooks/mercadopago`,
         // Data minimization: the payment is bound to the authenticated e-mail.
         // CPF/CNPJ is intentionally not collected by TroteBox in this flow.
         payer: { email: payerEmail }

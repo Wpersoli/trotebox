@@ -46,7 +46,7 @@ path,bytes,lines,sha256
 "apps/api/src/server/env.ts",2575,54,618513706e18da5136453cc9d59630e7f8719381c33522acaf602343d9419d70
 "apps/api/src/server/http.ts",1693,44,aae66e6111b4f8cf761097070912c92d30a7d9ef0623800ccad5be08d5a5eecd
 "apps/api/src/server/payment-events.ts",7015,119,8838de533cfced4422f244f4e3214966ff2e8ba799f54e30423cc71e56234f50
-"apps/api/src/server/payments/mercadopago.ts",5696,115,628b5fd800110bb0ce97220cdd5aa43f038e49e24c34bf2b2b1fd593ad64b8c7
+"apps/api/src/server/payments/mercadopago.ts",5595,114,2ff21c980c424a2fde8beed47b2d0c718dea43d8c0d853ed72072a76027940a2
 "apps/api/src/server/payments/stripe.ts",3055,56,89c73413e6aef6ff1da2a1e5021f6f2dc37d87a57cd243aee337e977f0df16b5
 "apps/api/src/server/phone-policy-core.ts",1608,44,a79a959b32d9bc6ce21fd990781eb2a5e4448bb080e6244eaef268a49fb1baa1
 "apps/api/src/server/phone-policy.test.ts",713,11,198bcdc8128ac47bf4566cb916c19005866a2a92a9c8913b48f23c1069159acc
