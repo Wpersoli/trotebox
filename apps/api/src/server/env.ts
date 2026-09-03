@@ -25,6 +25,7 @@ const schema = z.object({
   TWILIO_ACCOUNT_SID: z.string().optional(),
   TWILIO_AUTH_TOKEN: z.string().optional(),
   TWILIO_FROM_NUMBER: z.string().optional(),
+  TWILIO_TRIAL_MODE: z.string().default('false').transform((v) => v === 'true'),
   TWILIO_VALIDATE_SIGNATURES: z.string().default('true').transform((v) => v === 'true'),
   VONAGE_APPLICATION_ID: z.string().optional(),
   VONAGE_API_KEY: z.string().optional(),

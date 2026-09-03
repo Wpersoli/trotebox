@@ -48,7 +48,7 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `apps/api/src/server/email-delivery.test.ts` | 911 | `afeec84dc966ba0af0066d360d2d3e09be1e07f032829520b69c9544ed815558` |
 | `apps/api/src/server/email-delivery.ts` | 3733 | `b091e6feef00e927ddaaeef46a26f54cc5699b5a5f6946ef64803caecbba3458` |
 | `apps/api/src/server/env.test.ts` | 1855 | `1fb4778225a8b74f8e65bfadf7dbe91e766ea26acbda83a3cb9c073950ae287b` |
-| `apps/api/src/server/env.ts` | 2575 | `618513706e18da5136453cc9d59630e7f8719381c33522acaf602343d9419d70` |
+| `apps/api/src/server/env.ts` | 2656 | `9aa82728a08b1ba4a06da931ff1c93132cf8987cdd9d8d61cba2ae2b911cf74d` |
 | `apps/api/src/server/http.ts` | 1693 | `aae66e6111b4f8cf761097070912c92d30a7d9ef0623800ccad5be08d5a5eecd` |
 | `apps/api/src/server/payment-events.ts` | 7015 | `8838de533cfced4422f244f4e3214966ff2e8ba799f54e30423cc71e56234f50` |
 | `apps/api/src/server/payments/mercadopago.ts` | 5662 | `cca224c30c15d4de1d77d35d65f224155d25f70ce9ace205b01abfb8bf54e4a9` |
@@ -62,7 +62,7 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `apps/api/src/server/recordings.ts` | 1675 | `6cba42018eed02bc99abc587bdbc814ab5da634a7244d829e337d1addaca5c96` |
 | `apps/api/src/server/telephony/index.ts` | 823 | `0208b33ecbacb31d299ce2f54cb3899338f5d752cce86b24f461e0a35a693367` |
 | `apps/api/src/server/telephony/mock.ts` | 298 | `6eeaf6b5e12f0c57d507b44957295feab3d678f94dbf387039f899b66452098c` |
-| `apps/api/src/server/telephony/twilio.ts` | 1248 | `a5cb714b0d6da0f1377cbc6330ef9b356e9852a10c43ed1ecce8f93a03329215` |
+| `apps/api/src/server/telephony/twilio.ts` | 1826 | `7ee215c37b0bb6d8b10de017fa026ccce953f1115308e789265f94719d373612` |
 | `apps/api/src/server/telephony/types.ts` | 373 | `81df27176b7d152add66be4cef5b5ed03c5800418ee844880128f331aac9d42e` |
 | `apps/api/src/server/telephony/vonage.test.ts` | 1030 | `7ee683ff6ad11aafd2dd8d3f0a30faa1f1b76e9e0f9f654ab33610614da5bfc9` |
 | `apps/api/src/server/telephony/vonage.ts` | 3059 | `91883c69b001ceaf4bd5a3ca7677e67e7a846080e4d0f1a3b1be1cc3ee2fa778` |
