@@ -1,9 +1,9 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState, useRef } from 'react';
 import type { ScriptSummary } from '@trotebox/contracts';
 import { AppShell } from '@/components/AppShell';
-import { api, isPreviewMode } from '@/lib/api';
+import { ApiError, api, isPreviewMode } from '@/lib/api';
 
 export default function NewCallPage() {
   const [scripts, setScripts] = useState<ScriptSummary[]>([]);
@@ -29,14 +29,75 @@ export default function NewCallPage() {
       .catch(() => undefined);
   }, []);
   const selected = useMemo(() => scripts.find((item) => item.id === scriptId), [scripts, scriptId]);
+  const submitLockRef = useRef(false);
+  const idempotencyRef = useRef<{ fingerprint: string; key: string } | null>(null);
 
   async function submit(event: FormEvent) {
-    event.preventDefault(); setBusy(true); setError(''); setSuccess('');
+    event.preventDefault();
+
+    if (submitLockRef.current) return;
+
+    submitLockRef.current = true;
+    setBusy(true);
+    setError('');
+    setSuccess('');
+
+    const recipientPhone = phone.replace(/[\s()-]/g, '');
+    const payload = {
+      scriptId,
+      recipientPhone,
+      recipientLabel: label || undefined,
+      consentConfirmed: consent,
+      recordingConsentConfirmed: recording
+    };
+
+    const fingerprint = JSON.stringify(payload);
+    const previousAttempt = idempotencyRef.current;
+
+    const attempt =
+      previousAttempt?.fingerprint === fingerprint
+        ? previousAttempt
+        : {
+            fingerprint,
+            key: crypto.randomUUID()
+          };
+
+    idempotencyRef.current = attempt;
+
     try {
-      const result = await api.createCall({ scriptId, recipientPhone: phone.replace(/[\s()-]/g, ''), recipientLabel: label || undefined, consentConfirmed: consent, recordingConsentConfirmed: recording, idempotencyKey: crypto.randomUUID() });
-      setSuccess(isPreviewMode ? `Simulação criada com sucesso: ${String(result.call.scriptTitle ?? 'Trote')}. Nenhuma ligação real foi realizada.` : `Trote criado com sucesso. Identificador: ${String(result.call.id)}`);
-    } catch (cause) { setError(cause instanceof Error ? cause.message : 'Não foi possível criar o trote.'); }
-    finally { setBusy(false); }
+      const result = await api.createCall({
+        ...payload,
+        idempotencyKey: attempt.key
+      });
+
+      idempotencyRef.current = null;
+
+      setSuccess(
+        isPreviewMode
+          ? `Simulação criada com sucesso: ${String(result.call.scriptTitle ?? 'Trote')}. Nenhuma ligação real foi realizada.`
+          : `Trote criado com sucesso. Identificador: ${String(result.call.id)}`
+      );
+    } catch (cause) {
+      const uncertainResult =
+        cause instanceof ApiError &&
+        (
+          cause.code === 'REQUEST_TIMEOUT' ||
+          cause.code === 'NETWORK_ERROR'
+        );
+
+      if (!uncertainResult) {
+        idempotencyRef.current = null;
+      }
+
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : 'Não foi possível criar o trote.'
+      );
+    } finally {
+      submitLockRef.current = false;
+      setBusy(false);
+    }
   }
 
   return (

@@ -36,7 +36,7 @@ path,bytes,lines,sha256
 "apps/api/src/server/audit.ts",974,25,9647a6e35029a1980fab8bd00928290ee855abcff9f6e3eeea6f46f06a28eaa3
 "apps/api/src/server/auth-code.ts",4057,97,0e80f56641c62fdc0091c244809fd385a7f15562036d42e0d59b7bf8cd613d46
 "apps/api/src/server/auth.ts",4618,137,456f47252e9ef3ce2f92d377d61c56b04df555cac6d54c558e7f470757fd7ab6
-"apps/api/src/server/calls.ts",8243,144,3181a390554e870ccc2727f9463f0a04e2b64dd0fbf0c6dd2e4a7713886dbf45
+"apps/api/src/server/calls.ts",8373,156,fbb31523ddf79b32eb82e8c7ad513637e8c39a0775a21eb934f5622c24d810d5
 "apps/api/src/server/capabilities.test.ts",1761,45,6281957d71e5b1ae7f5573c9fd6d5060e33ce4bc7ad90ae77971f91f2fbae3a5
 "apps/api/src/server/capabilities.ts",803,25,d827a9c6517d00cc3c99f7c428998c6c3c7093785ead41b85eb1e0416f3cbca9
 "apps/api/src/server/crypto.ts",1412,34,3f71dc0928a53cdfdd6d0b6a639948c838da5673c41238e8fc920a86c6b7bfbb
@@ -53,7 +53,7 @@ path,bytes,lines,sha256
 "apps/api/src/server/phone-policy.ts",418,16,0c8b090f7c8f29aa719fd7abe7831ba74c6d64ad5370703e717b2fe641e3d328
 "apps/api/src/server/provider-signatures.ts",1633,31,94828217a2598ef982466b4911577ec5e4bd674805e801b0a95a024c700e5c1b
 "apps/api/src/server/provider-status.ts",1050,33,2aa434eb737119261b97168b0629bf184d7ff17a17ffc51140444f79150fe8f5
-"apps/api/src/server/rate-limit.ts",968,20,f4c981342687674b54784dcbe5fde1c9d844f021d8078418d99c8e3c438ce3b5
+"apps/api/src/server/rate-limit.ts",1780,79,586e7caaf09b83d78f72a6237339fecb9ca7963b3fb7cac1d341ba17261651ba
 "apps/api/src/server/recordings.ts",1675,46,6cba42018eed02bc99abc587bdbc814ab5da634a7244d829e337d1addaca5c96
 "apps/api/src/server/telephony/index.ts",823,26,0208b33ecbacb31d299ce2f54cb3899338f5d752cce86b24f461e0a35a693367
 "apps/api/src/server/telephony/mock.ts",298,8,6eeaf6b5e12f0c57d507b44957295feab3d678f94dbf387039f899b66452098c
@@ -90,7 +90,7 @@ path,bytes,lines,sha256
 "apps/web/public/favicon.png",2578,0,7f67454758c00872dfc7647a16a1d10d406372bc77b38c0b602d968b7e2d1ebe
 "apps/web/public/icon.svg",1047,19,b1fcec0b642051bda96f4fb2b1339f361b4c665719ba1771422a409da67c5ab5
 "apps/web/public/manifest.webmanifest",536,15,abce5feee517096bbe2edddda01630d6cd897d36f8850b18af9c0e97750c4707
-"apps/web/src/app/calls/new/page.tsx",5375,68,be371e72f21156d504710ebb7346e5465862c8fd1bf6a039c187ff98cfdfb41b
+"apps/web/src/app/calls/new/page.tsx",6460,129,e320a74eec007be26ef555ade8b014800d5dde42f2bbcf61b0a68e38e1edfa25
 "apps/web/src/app/calls/page.tsx",1683,31,5355a4e89718b23a3ddf37280ef9ca38a9b25871283f341918a13b034d560ac6
 "apps/web/src/app/catalog/page.tsx",1789,31,3e58483e56227acc8985070e1c1db7ff01271e58ed692c957e88dc20e4babfcf
 "apps/web/src/app/dashboard/page.tsx",2428,44,29e313d9bca81a8a9178f7b4e4e8964b2cf8f883bb535aa35b581babf4fb52ae

@@ -4,7 +4,7 @@ import { env } from './env';
 import { encrypt, hashSubject } from './crypto';
 import { AppError } from './http';
 import { validateRecipient } from './phone-policy';
-import { enforceRateLimit } from './rate-limit';
+import { enforceRateLimits } from './rate-limit';
 import { reserveCredits, releaseCredits, releaseCreditsInTransaction, captureCreditsInTransaction } from './wallet';
 import { telephonyProvider } from './telephony';
 import { audit } from './audit';
@@ -25,8 +25,20 @@ export async function createCall(userId: string, input: CreateCallInput, request
     throw new AppError(503, 'TELEPHONY_NOT_CONFIGURED', 'Telefonia temporariamente indisponível. Nenhum crédito foi reservado.');
   }
 
-  await enforceRateLimit('call:user:hour', hashSubject(userId), config.MAX_CALLS_PER_USER_PER_HOUR, 60 * 60 * 1000);
-  await enforceRateLimit('call:recipient:day', phoneHash, config.MAX_CALLS_PER_RECIPIENT_PER_DAY, 24 * 60 * 60 * 1000);
+  await enforceRateLimits([
+    {
+      bucket: 'call:user:hour',
+      subjectHash: hashSubject(userId),
+      limit: config.MAX_CALLS_PER_USER_PER_HOUR,
+      windowMs: 60 * 60 * 1000
+    },
+    {
+      bucket: 'call:recipient:day',
+      subjectHash: phoneHash,
+      limit: config.MAX_CALLS_PER_RECIPIENT_PER_DAY,
+      windowMs: 24 * 60 * 60 * 1000
+    }
+  ]);
 
   const suppression = await prisma.suppression.findUnique({ where: { recipientPhoneHash: phoneHash } });
   if (suppression && (!suppression.expiresAt || suppression.expiresAt > new Date())) {
