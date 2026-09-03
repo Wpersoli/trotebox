@@ -71,6 +71,7 @@ function pixResponse(payload: Record<string, any>, internalPaymentId: string) {
     paymentId: String(payload.id),
     qrCode: String(tx.qr_code ?? ''),
     qrCodeBase64: tx.qr_code_base64 ? String(tx.qr_code_base64) : undefined,
+    ticketUrl: tx.ticket_url ? String(tx.ticket_url) : undefined,
     expiresAt: payload.date_of_expiration ? String(payload.date_of_expiration) : undefined
   };
 }

@@ -51,7 +51,7 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `apps/api/src/server/env.ts` | 2575 | `618513706e18da5136453cc9d59630e7f8719381c33522acaf602343d9419d70` |
 | `apps/api/src/server/http.ts` | 1693 | `aae66e6111b4f8cf761097070912c92d30a7d9ef0623800ccad5be08d5a5eecd` |
 | `apps/api/src/server/payment-events.ts` | 7015 | `8838de533cfced4422f244f4e3214966ff2e8ba799f54e30423cc71e56234f50` |
-| `apps/api/src/server/payments/mercadopago.ts` | 5595 | `2ff21c980c424a2fde8beed47b2d0c718dea43d8c0d853ed72072a76027940a2` |
+| `apps/api/src/server/payments/mercadopago.ts` | 5662 | `cca224c30c15d4de1d77d35d65f224155d25f70ce9ace205b01abfb8bf54e4a9` |
 | `apps/api/src/server/payments/stripe.ts` | 3055 | `89c73413e6aef6ff1da2a1e5021f6f2dc37d87a57cd243aee337e977f0df16b5` |
 | `apps/api/src/server/phone-policy-core.ts` | 1608 | `a79a959b32d9bc6ce21fd990781eb2a5e4448bb080e6244eaef268a49fb1baa1` |
 | `apps/api/src/server/phone-policy.test.ts` | 713 | `198bcdc8128ac47bf4566cb916c19005866a2a92a9c8913b48f23c1069159acc` |
@@ -104,12 +104,12 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `apps/web/src/app/login/page.tsx` | 463 | `fe57a0c01c1a011a15c758421be102bc6470e31a31637c2de460e1bd6eeb422f` |
 | `apps/web/src/app/page.tsx` | 4757 | `26b8da1acdc35b9b2d31aa0c058cfa79e4fa1e0fd2b925e8d0ce7ff841726b7f` |
 | `apps/web/src/app/settings/page.tsx` | 1229 | `7ca66e13f3d08391858eb19c4c30a2ec5eead880dc2ad10acb0fe72b86b4241f` |
-| `apps/web/src/app/wallet/page.tsx` | 6361 | `677b2df339191d365ac01a58d532ee342152b2e52920f43438e51e50b7c7c6a1` |
+| `apps/web/src/app/wallet/page.tsx` | 15284 | `96c8512fa3b4e7c9b74a95b0f733925cb1566f0de4cb67b38865229815d8d117` |
 | `apps/web/src/components/AppShell.tsx` | 2604 | `e39e15f619da2d00a8b951021b982bb6ba847592ba7e40c63bb59ae3758f74de` |
 | `apps/web/src/components/AuthProvider.tsx` | 2408 | `ed68f26ca40c1116e6e2edea33d3e509f55ae3cb5594e7525cd074dbe31b4ad4` |
 | `apps/web/src/components/Brand.tsx` | 823 | `742aea8346fdc69d978ea5396ecc536d24e3f9bf4ee02877adb6c537683bd23b` |
 | `apps/web/src/components/HomeAccess.tsx` | 6754 | `4a0d0b8c16d5b1bdad05897e6e914fa37e4c106885f11f056b8993150fea732e` |
-| `apps/web/src/lib/api.ts` | 9521 | `b21eaf7e037e5eb3ace4055a19bb75ec24bb28c95cc6d288e134eb9514ca014a` |
+| `apps/web/src/lib/api.ts` | 9541 | `c1d12082419c50b22908bea5fccfe7b0a95d8f02e9c354c56b5467f1ac4c1dff` |
 | `apps/web/tsconfig.json` | 380 | `1a564353bec19c7296e901979f5f38cea3476e588043813d58de185b5472c6e4` |
 | `apps/web/vercel.json` | 1486 | `442220b39bea1b4a92cb59725788b5ba6f5c1ba32db4080eb0b07fc3decee216` |
 | `ARCHITECTURE.md` | 3156 | `2e8867ee28d1676ad0f663c778f3b255268045d655351248a5babfedcc11fbe0` |

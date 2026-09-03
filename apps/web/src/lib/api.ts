@@ -139,7 +139,7 @@ export const api = {
 
   pix: async (packCode: string) => isPreviewMode
     ? { internalPaymentId: 'preview-internal-pix', paymentId: 'preview-pix', qrCode: `00020126TROTEBOX-PREVIEW-${packCode}`, expiresAt: new Date(Date.now() + 1800000).toISOString() }
-    : request<{ internalPaymentId: string; paymentId: string; qrCode: string; qrCodeBase64?: string; expiresAt?: string }>('/payments/mercadopago/pix', { method: 'POST', body: JSON.stringify({ packCode, idempotencyKey: crypto.randomUUID() }) }),
+    : request<{ internalPaymentId: string; paymentId: string; qrCode: string; qrCodeBase64?: string; ticketUrl?: string; expiresAt?: string }>('/payments/mercadopago/pix', { method: 'POST', body: JSON.stringify({ packCode, idempotencyKey: crypto.randomUUID() }) }),
 
   mercadoPagoStatus: async (internalPaymentId: string) => isPreviewMode
     ? { status: 'PENDING', reconciled: false }
