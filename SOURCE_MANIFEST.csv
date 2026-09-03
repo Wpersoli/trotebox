@@ -104,7 +104,7 @@ path,bytes,lines,sha256
 "apps/web/src/components/AuthProvider.tsx",2408,71,ed68f26ca40c1116e6e2edea33d3e509f55ae3cb5594e7525cd074dbe31b4ad4
 "apps/web/src/components/Brand.tsx",823,29,742aea8346fdc69d978ea5396ecc536d24e3f9bf4ee02877adb6c537683bd23b
 "apps/web/src/components/HomeAccess.tsx",6754,172,4a0d0b8c16d5b1bdad05897e6e914fa37e4c106885f11f056b8993150fea732e
-"apps/web/src/lib/api.ts",9541,148,c1d12082419c50b22908bea5fccfe7b0a95d8f02e9c354c56b5467f1ac4c1dff
+"apps/web/src/lib/api.ts",9539,148,02bc9620d0e18646594d8dfee62682ac0db3a8294b6e125557ce961e774c5da3
 "apps/web/tsconfig.json",380,27,1a564353bec19c7296e901979f5f38cea3476e588043813d58de185b5472c6e4
 "apps/web/vercel.json",1486,52,442220b39bea1b4a92cb59725788b5ba6f5c1ba32db4080eb0b07fc3decee216
 "ARCHITECTURE.md",3156,60,2e8867ee28d1676ad0f663c778f3b255268045d655351248a5babfedcc11fbe0
@@ -139,7 +139,7 @@ path,bytes,lines,sha256
 "packages/db/prisma/migrations/migration_lock.toml",24,2,1db17a8d051aa136110736752c5e1f8b7ed92b6ea8e803112fbbe2497047c210
 "packages/db/prisma/schema.prisma",9195,334,74d7ae521748c5c7fa43dc820c8205a016b3e07ab508dd4f2a65b6b33bed1239
 "packages/db/src/client.ts",540,21,3974bdecdbe6694600e26ba9adc2fd32da95e0529d014fd9f3fb3ea31121b9c4
-"packages/db/src/seed.ts",4049,105,f31549888e11562f6c4adf6197ba7fd38497b4e60750fe74cd1212449697fef3
+"packages/db/src/seed.ts",4047,105,fc03c6e12f8fedfbad6a22e7da5aef97581938b390a08272255006fb835a3a5f
 "packages/db/tsconfig.json",121,8,9e388ea60852028037c4fd8a6e0311c02d4ff1703d66e5f9b22276b07dcb82d2
 "README.md",4080,123,713c83cfdd320e58e9625538a8d772993a6185b8b3b309c0f587487a6d784847
 "REBRAND_0.3.1.md",955,34,6b3ed821a4728b042385a18b2782fa22f47cf2f9578b20204e71d7d40bf66c9f

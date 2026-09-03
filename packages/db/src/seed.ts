@@ -73,9 +73,9 @@ async function main() {
   }
 
   const packs = [
-    { code: 'starter', name: 'Caixinha', credits: 15, priceCents: 1490, sortOrder: 1 },
-    { code: 'plus', name: 'Risada', credits: 40, priceCents: 2990, sortOrder: 2 },
-    { code: 'pro', name: 'Gargalhada', credits: 100, priceCents: 5990, sortOrder: 3 }
+    { code: 'starter', name: 'Caixinha', credits: 5, priceCents: 1490, sortOrder: 1 },
+    { code: 'plus', name: 'Risada', credits: 15, priceCents: 2990, sortOrder: 2 },
+    { code: 'pro', name: 'Gargalhada', credits: 35, priceCents: 5990, sortOrder: 3 }
   ];
 
   for (const pack of packs) {

@@ -17,18 +17,18 @@ const previewScripts: ScriptSummary[] = [
 ];
 
 const previewPacks: CreditPackSummary[] = [
-  { code: 'starter', name: 'Caixinha', credits: 15, priceCents: 1490, currency: 'BRL' },
-  { code: 'plus', name: 'Risada', credits: 40, priceCents: 2990, currency: 'BRL', highlight: true },
-  { code: 'pro', name: 'Gargalhada', credits: 100, priceCents: 5990, currency: 'BRL' }
+  { code: 'starter', name: 'Caixinha', credits: 5, priceCents: 1490, currency: 'BRL' },
+  { code: 'plus', name: 'Risada', credits: 15, priceCents: 2990, currency: 'BRL', highlight: true },
+  { code: 'pro', name: 'Gargalhada', credits: 35, priceCents: 5990, currency: 'BRL' }
 ];
 
 const previewCapabilities: PlatformCapabilities = { pixPayments: true, outboundCalls: true };
 
 const previewWallet: WalletSummary = {
-  balanceCredits: 36,
+  balanceCredits: 11,
   reservedCredits: 0,
   recentEntries: [
-    { id: 'wallet-1', type: 'CREDIT', amountCredits: 40, description: 'Pacote Risada', createdAt: new Date(Date.now() - 86400000 * 2).toISOString() },
+    { id: 'wallet-1', type: 'CREDIT', amountCredits: 15, description: 'Pacote Risada', createdAt: new Date(Date.now() - 86400000 * 2).toISOString() },
     { id: 'wallet-2', type: 'CAPTURE', amountCredits: -4, description: 'Pesquisa muito séria', createdAt: new Date(Date.now() - 86400000).toISOString() }
   ]
 };
