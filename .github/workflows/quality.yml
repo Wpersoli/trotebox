@@ -11,6 +11,7 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     services:
       postgres:
         image: postgres:17-alpine
@@ -41,8 +42,8 @@ jobs:
       NEXT_PUBLIC_API_BASE_URL: http://localhost:3001/api/v1
       NEXT_PUBLIC_ENABLE_DEV_LOGIN: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
