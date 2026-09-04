@@ -6,6 +6,7 @@ const schema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PUBLIC_WEB_URL: z.string().url().default('http://localhost:3000'),
   PUBLIC_API_URL: z.string().url().default('http://localhost:3001'),
+  ALLOWED_ORIGINS: z.string().optional(),
   JWT_SECRET: z.string().min(32),
   DATA_ENCRYPTION_KEY: z.string().min(32),
   HASH_PEPPER: z.string().min(32),
@@ -44,7 +45,16 @@ const schema = z.object({
 });
 
 export function parseEnv(input: NodeJS.ProcessEnv) {
-  return schema.parse(input);
+  const parsed = schema.parse(input);
+  if (parsed.NODE_ENV === 'production') {
+    if (parsed.ENABLE_DEV_AUTH) throw new Error('ENABLE_DEV_AUTH must be false in production.');
+    if (parsed.MOCK_CALL_AUTO_COMPLETE) throw new Error('MOCK_CALL_AUTO_COMPLETE must be false in production.');
+    if (parsed.TELEPHONY_PROVIDER === 'mock') throw new Error('TELEPHONY_PROVIDER cannot be mock in production.');
+    if (!parsed.ALLOWED_ORIGINS?.trim()) throw new Error('ALLOWED_ORIGINS must be configured in production.');
+    if (parsed.AUTH_DELIVERY === 'console') throw new Error('AUTH_DELIVERY cannot be console in production.');
+    if (parsed.TWILIO_VALIDATE_SIGNATURES === false) throw new Error('TWILIO_VALIDATE_SIGNATURES must be true in production.');
+  }
+  return parsed;
 }
 
 let cache: z.infer<typeof schema> | undefined;
