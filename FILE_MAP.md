@@ -6,7 +6,7 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 |---|---:|---|
 | `.env.example` | 1806 | `a591655f00e6906fff2d4f13d69b8671704da3ced360670fce024377141e7bae` |
 | `.gitattributes` | 148 | `4c6dc5c1a2f021628223f24b46a42138cd4dd3781f22f0eddee0ee3558c96bcf` |
-| `.github/workflows/quality.yml` | 1735 | `4019ba1b0ae4e37bc219493dfb1b770463f7fe87c42c9940705a93fb49268de3` |
+| `.github/workflows/quality.yml` | 1808 | `6331d1cc423c60a7a5657de750a68a3be2282bb5f06d20e1060be1d178d983cc` |
 | `.gitignore` | 203 | `af5d3e3f3b978c939e01927b2f86a9edc9cb8cdffe97c0312916412f258e3cb5` |
 | `.npmrc` | 75 | `27bc72205631c71b21618ec6f4f8453eb32d019c992afce9b64abe5cedea856c` |
 | `.nvmrc` | 3 | `f14b4987904bcb5814e4459a057ed4d20f58a633152288a761214dcd28780b56` |
@@ -18,7 +18,8 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `apps/api/src/app/api/v1/auth/request-code/route.ts` | 665 | `b77a5b550f443078b888ab4053ced874903cdd39440e8c77a89a38a1e01c708d` |
 | `apps/api/src/app/api/v1/auth/session/route.ts` | 417 | `f6957ad13e2916366d349a8287fa01d3d236c3fedd4fa4006d8215d4109c88d2` |
 | `apps/api/src/app/api/v1/auth/verify-code/route.ts` | 976 | `5adfbf871b76df43ab67dfc13ed64b12a9ee71c8f38660d4665a90ad156a72ec` |
-| `apps/api/src/app/api/v1/calls/[id]/route.ts` | 1487 | `10c4b607ca7c24ebc14891333d8b902279f16dc84d937ffaf32879f0b3e8528e` |
+| `apps/api/src/app/api/v1/calls/[id]/recording/route.ts` | 3256 | `3c06863f041861d91b1d537db112f8719534287d61f3c6750c270bbc1fb34bf2` |
+| `apps/api/src/app/api/v1/calls/[id]/route.ts` | 1576 | `974e91e0d8997d057b315515f64f305420955f30857ca24f45e72ed6208907d6` |
 | `apps/api/src/app/api/v1/calls/route.ts` | 1651 | `38ef5c436fdbbf3f46453c84e8d1137b2808f8c7140f1f5cdad68a366c630e88` |
 | `apps/api/src/app/api/v1/catalog/route.ts` | 991 | `ccedf26d6fe9143aead055d825515d28e4e57e505edd74852ea4be44ad9250a7` |
 | `apps/api/src/app/api/v1/cron/reconcile/route.ts` | 3592 | `262f76471f1d16616e0a9d931a5981fb005f179c1dba78bfda4a5d6251b357c7` |
@@ -29,9 +30,9 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `apps/api/src/app/api/v1/telephony/twilio/answer/[id]/route.ts` | 1698 | `be7f9a9af767b6b36a4f7e09bb38baf86878973bdc6cdac77a94e248d7154e92` |
 | `apps/api/src/app/api/v1/telephony/vonage/answer/[id]/route.ts` | 2072 | `5420b743a6030de43da572ca6a28e7f8a15178d034b74e617e4c7560f126b560` |
 | `apps/api/src/app/api/v1/wallet/route.ts` | 906 | `e2747a9e6336dfba4d1d971b658bba44bde65fe2261f16c307734cf08414eee6` |
-| `apps/api/src/app/api/v1/webhooks/mercadopago/route.ts` | 1899 | `2800bdbd129fb326a08c54d9d049b52339e48ecfd74ae3c3cc788a858d3a46da` |
+| `apps/api/src/app/api/v1/webhooks/mercadopago/route.ts` | 2062 | `5fcbe0798a6b7a1e44617987200587275d8c1f6e6275b806c7087271089ed7a6` |
 | `apps/api/src/app/api/v1/webhooks/stripe/route.ts` | 3684 | `579c2e6f3d62c4c476003ea6c1e27d14347f703e7c668f174fff5fd341d8b19a` |
-| `apps/api/src/app/api/v1/webhooks/twilio/recording/route.ts` | 2465 | `663e0a80677ba005c0df1f2e3cbffbdc2659ef213da99c81b05d7135fdec885b` |
+| `apps/api/src/app/api/v1/webhooks/twilio/recording/route.ts` | 2630 | `0056635d94686ca2802e018ba8a0eee32a94d36370c2d6a47dd94278b0c3f061` |
 | `apps/api/src/app/api/v1/webhooks/twilio/status/route.ts` | 1911 | `3836b567b4a5c97165ddc3868f6e47531a2bdae954269610980740c191367e37` |
 | `apps/api/src/app/api/v1/webhooks/vonage/recording/route.ts` | 2326 | `5721ab87a46fbe80031c97575098a399c2c7f442ffd9f5018d08b6f74f51718c` |
 | `apps/api/src/app/api/v1/webhooks/vonage/status/route.ts` | 2060 | `7e2a90e42474b7bca585c6fd96458fe8a54d132d8fe6fe492b3042df4b1d5738` |
@@ -130,7 +131,7 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `LICENSE-PROPRIETARY.md` | 431 | `cdcbc75e04fce9ee38f99f8d53a4538188835226e49770cb61ddf91f8e7879b3` |
 | `LOCAL_TEST.md` | 1497 | `52f2fc9cb314ee15a8f8dffe347c995c2046170d42717ec5a7d3e3e0d182b31d` |
 | `MEDIA_PIPELINE.md` | 2022 | `7f26175fa53078dc2a8b067a769bcbe4177d5f094c9c3440ac3da06cd9f3c504` |
-| `OPENAPI.yaml` | 7283 | `07261fff5b87368b7efc189e93d47b941a35be7f25e6c14c561157f5b6d6dd62` |
+| `OPENAPI.yaml` | 7905 | `e3da247d501c11a4feeed9bf732fc766b00773387cd749773f28916940bdad4c` |
 | `package-lock.json` | 346281 | `350f3ecb81aba81b7d619b0f96092beffaa477fba21bbd10720819bd06957fe0` |
 | `package.json` | 2892 | `f1b1584df349a85a427ffc0ad2494648095956ec4b85b0fc770aa283f402cf6f` |
 | `packages/contracts/package.json` | 478 | `d710e003264bc972e22b39d64b186cd7f5763c692c380d8103b0771689c559c9` |
