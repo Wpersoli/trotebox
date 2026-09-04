@@ -1,4 +1,5 @@
 import { maskPhone, PhonePolicyViolation, validateRecipientCore } from '../apps/api/src/server/phone-policy-core.ts';
+import { parseEnv } from '../apps/api/src/server/env.ts';
 
 let passed = 0;
 function test(name, fn) {
@@ -22,6 +23,35 @@ function expectViolation(phone, code) {
   throw new Error(`Esperava bloqueio ${code} para ${phone}.`);
 }
 
+function baseEnv(overrides = {}) {
+  return {
+    NODE_ENV: 'development',
+    PUBLIC_WEB_URL: 'http://localhost:3000',
+    PUBLIC_API_URL: 'http://localhost:3001',
+    ALLOWED_ORIGINS: 'http://localhost:3000',
+    JWT_SECRET: 'development-secret-with-more-than-32-characters',
+    DATA_ENCRYPTION_KEY: 'development-data-key-with-more-than-32-characters',
+    HASH_PEPPER: 'development-hash-pepper-with-more-than-32-characters',
+    AUTH_CODE_PEPPER: 'development-auth-code-pepper-with-more-than-32-characters',
+    ENABLE_DEV_AUTH: 'true',
+    AUTH_DELIVERY: 'console',
+    TELEPHONY_PROVIDER: 'mock',
+    MOCK_CALL_AUTO_COMPLETE: 'true',
+    TWILIO_VALIDATE_SIGNATURES: 'true',
+    ...overrides
+  };
+}
+
+function expectEnvFailure(overrides, message) {
+  try {
+    parseEnv(baseEnv(overrides));
+  } catch (cause) {
+    if (String(cause?.message ?? '').includes(message)) return;
+    throw cause;
+  }
+  throw new Error(`Esperava falha de ambiente contendo: ${message}`);
+}
+
 test('aceita E.164 brasileiro regular', () => {
   if (validateRecipientCore('+5511999999999') !== '+5511999999999') throw new Error('Normalização divergente.');
 });
@@ -36,5 +66,14 @@ test('mascara o telefone', () => {
   const masked = maskPhone('+5511999999999');
   if (masked !== '+551••••••999') throw new Error(`Máscara divergente: ${masked}`);
 });
+test('falha fechado para dev auth em produção', () => expectEnvFailure({ NODE_ENV: 'production', ENABLE_DEV_AUTH: 'true', AUTH_DELIVERY: 'brevo', TELEPHONY_PROVIDER: 'twilio', MOCK_CALL_AUTO_COMPLETE: 'false' }, 'ENABLE_DEV_AUTH'));
+test('falha fechado para mock em produção', () => expectEnvFailure({ NODE_ENV: 'production', ENABLE_DEV_AUTH: 'false', AUTH_DELIVERY: 'brevo', TELEPHONY_PROVIDER: 'mock', MOCK_CALL_AUTO_COMPLETE: 'false' }, 'TELEPHONY_PROVIDER'));
+test('falha fechado sem origens permitidas em produção', () => expectEnvFailure({ NODE_ENV: 'production', ENABLE_DEV_AUTH: 'false', AUTH_DELIVERY: 'brevo', TELEPHONY_PROVIDER: 'twilio', MOCK_CALL_AUTO_COMPLETE: 'false', ALLOWED_ORIGINS: '' }, 'ALLOWED_ORIGINS'));
+test('falha fechado para entrega console em produção', () => expectEnvFailure({ NODE_ENV: 'production', ENABLE_DEV_AUTH: 'false', AUTH_DELIVERY: 'console', TELEPHONY_PROVIDER: 'twilio', MOCK_CALL_AUTO_COMPLETE: 'false' }, 'AUTH_DELIVERY'));
 
-console.log(`Domain tests aprovados: ${passed}/7.`);
+test('aceita configuração de produção segura', () => {
+  const parsed = parseEnv(baseEnv({ NODE_ENV: 'production', ENABLE_DEV_AUTH: 'false', AUTH_DELIVERY: 'brevo', TELEPHONY_PROVIDER: 'twilio', MOCK_CALL_AUTO_COMPLETE: 'false', ALLOWED_ORIGINS: 'https://trotebox.com' }));
+  if (parsed.NODE_ENV !== 'production' || parsed.ENABLE_DEV_AUTH || parsed.MOCK_CALL_AUTO_COMPLETE) throw new Error('Configuração segura não foi preservada.');
+});
+
+console.log(`Domain tests aprovados: ${passed}/12.`);
