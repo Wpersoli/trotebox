@@ -39,6 +39,8 @@ export async function POST(request: Request) {
       await markWebhookProcessed(registered.event.id);
       return ok({ received: true });
     } catch (cause) {
+      // Keep processedAt null on failure so Twilio can retry safely.
+      // The error is persisted for observability without acknowledging the event as complete.
       await markWebhookProcessed(registered.event.id, cause instanceof Error ? cause.message : 'unknown');
       throw cause;
     }
