@@ -49,6 +49,8 @@ jobs:
           cache: npm
       - name: Install dependencies and refresh lockfile
         run: npm install --ignore-scripts
+      - name: Synchronize lockfile from manifest
+        run: npm install --package-lock-only --ignore-scripts
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
       - name: Generate recovery inventory
