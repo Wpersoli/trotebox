@@ -122,7 +122,7 @@ export const api = {
 
   catalog: async () => isPreviewMode ? { scripts: previewScripts, packs: previewPacks, capabilities: previewCapabilities } : request<{ scripts: ScriptSummary[]; packs: CreditPackSummary[]; capabilities: PlatformCapabilities }>('/catalog'),
   wallet: async () => isPreviewMode ? previewWallet : request<WalletSummary>('/wallet'),
-  calls: async () => isPreviewMode ? { calls: previewCalls } : request<{ calls: Array<Record<string, unknown> }>('/calls'),
+  calls: async () => isPreviewMode ? { calls: previewCalls } : request<{ calls: Array<Record<string, unknown>> }>('/calls'),
 
   createCall: async (input: Record<string, unknown>) => {
     if (isPreviewMode) {
