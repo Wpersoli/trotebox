@@ -28,6 +28,8 @@ export async function POST(request: Request) {
       await markWebhookProcessed(registered.event.id);
       return ok({ received: true });
     } catch (cause) {
+      // Do not set processedAt on failure. Mercado Pago can retry the notification,
+      // while the unique externalEventId still makes the handler idempotent.
       await markWebhookProcessed(registered.event.id, cause instanceof Error ? cause.message : 'unknown');
       throw cause;
     }
