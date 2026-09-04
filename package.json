@@ -50,10 +50,10 @@
   },
   "overrides": {
     "@prisma/config": {
-      "deepmerge-ts": "8.0.1"
+      "deepmerge-ts": "^8.0.0"
     },
-    "deepmerge-ts": "8.0.1",
-    "qs": "6.16.0"
+    "deepmerge-ts": "^8.0.0",
+    "qs": "^6.16.0"
   },
   "license": "UNLICENSED",
   "packageManager": "npm@10.9.2"
