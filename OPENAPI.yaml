@@ -60,7 +60,7 @@ paths:
               required: [email, code]
               properties:
                 email: { type: string, format: email }
-                code: { type: string, pattern: '^\d{6}$' }
+                code: { type: string, pattern: '^\\d{6}$' }
       responses:
         '200': { description: Token e usuário }
         '401': { description: Código inválido ou expirado }
@@ -109,6 +109,20 @@ paths:
       responses:
         '200': { description: Detalhes da chamada pertencente ao usuário }
         '404': { description: Chamada não encontrada }
+  /calls/{id}/recording:
+    get:
+      description: Reproduz a gravação somente para o proprietário autenticado, quando disponível e não expirada.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Áudio da gravação }
+        '401': { description: Autenticação ausente ou inválida }
+        '403': { description: Gravação não pertence ao usuário }
+        '404': { description: Gravação indisponível, excluída ou expirada }
+        '409': { description: Gravação ainda em processamento }
   /payments/stripe/checkout:
     post:
       requestBody:
@@ -223,7 +237,7 @@ components:
         scriptId: { type: string }
         recipientPhone:
           type: string
-          pattern: '^\+[1-9]\d{7,14}$'
+          pattern: '^\\+[1-9]\\d{7,14}$'
         recipientLabel: { type: string, maxLength: 80 }
         consentConfirmed: { type: boolean, const: true }
         recordingConsentConfirmed: { type: boolean, default: false }
