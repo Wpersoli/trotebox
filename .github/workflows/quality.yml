@@ -48,6 +48,8 @@ jobs:
           cache: npm
       - name: Install locked dependencies
         run: npm ci
+      - name: Refresh recovery inventory in workspace
+        run: npm run inventory
       - name: Verify recovery inventory
         run: npm run inventory:verify
       - run: npm run db:generate
