@@ -13,9 +13,9 @@
     "@trotebox/contracts": "0.3.9",
     "@trotebox/db": "0.3.9",
     "jose": "6.0.0",
-    "next": "16.3.0",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
+    "next": "16.3.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
     "stripe": "18.0.0",
     "twilio": "5.8.0",
     "zod": "4.4.3"
