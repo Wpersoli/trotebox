@@ -31,7 +31,9 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     if (recording.deletedAt || (recording.expiresAt && recording.expiresAt <= new Date())) {
       throw new AppError(410, 'RECORDING_EXPIRED', 'Esta gravação não está mais disponível.');
     }
-    if (recording.status !== 'AVAILABLE_AT_PROVIDER' && recording.status !== 'PROCESSING') {
+    // Only completed provider recordings may be streamed. PROCESSING must wait for
+    // the media pipeline to promote the record to AVAILABLE_AT_PROVIDER.
+    if (recording.status !== 'AVAILABLE_AT_PROVIDER') {
       throw new AppError(409, 'RECORDING_NOT_AVAILABLE', 'A gravação ainda não está disponível.');
     }
     if (!recording.providerDownloadUrlEncrypted) throw new AppError(404, 'RECORDING_SOURCE_MISSING', 'Origem da gravação indisponível.');
