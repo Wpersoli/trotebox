@@ -8,6 +8,7 @@ const base = {
   DATA_ENCRYPTION_KEY: 'd'.repeat(32),
   HASH_PEPPER: 'h'.repeat(32),
   AUTH_CODE_PEPPER: 'a'.repeat(32),
+  AUTH_DELIVERY: 'brevo',
   TELEPHONY_PROVIDER: 'mock',
   VOICE_ENGINE: 'provider',
   ENABLE_DEV_AUTH: 'false',
