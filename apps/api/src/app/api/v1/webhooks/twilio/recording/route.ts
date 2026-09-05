@@ -20,7 +20,7 @@ export async function POST(request: Request) {
 
     const externalId = `${recordingSid}:${recordingStatus || 'unknown'}`;
     const rawBody = new URLSearchParams(params).toString();
-    const registered = await registerWebhook({ provider: WebhookProvider.TWILIO, externalEventId: externalId, signatureValid: true, rawBody, payload: params });
+    const registered = await registerWebhook({ provider: WebhookProvider.TWILIO, externalEventId: externalId, signatureValid: true, rawBody });
     if (registered.duplicate && registered.event.processedAt) return ok({ received: true, duplicate: true });
 
     try {
@@ -39,8 +39,6 @@ export async function POST(request: Request) {
       await markWebhookProcessed(registered.event.id);
       return ok({ received: true });
     } catch (cause) {
-      // Keep processedAt null on failure so Twilio can retry safely.
-      // The error is persisted for observability without acknowledging the event as complete.
       await markWebhookProcessed(registered.event.id, cause instanceof Error ? cause.message : 'unknown');
       throw cause;
     }
