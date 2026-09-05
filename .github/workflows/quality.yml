@@ -65,6 +65,8 @@ jobs:
             $errors | ForEach-Object { Write-Error $_.Message }
             exit 1
           }
+      - name: Validate Node orchestration script
+        run: node --check scripts/dev-all.mjs
       - name: Install locked dependencies
         run: npm ci --ignore-scripts
       - name: Audit production dependencies
