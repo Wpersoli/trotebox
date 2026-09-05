@@ -26,16 +26,15 @@ export function okPublic<T>(data: T, status = 200) {
 export function handleError(cause: unknown) {
   const requestId = randomUUID();
   if (cause instanceof AppError) {
-    // Nunca devolva payload bruto de provedores/infra em produção. Alguns
-    // AppError carregam detalhes de upstream úteis apenas em desenvolvimento.
     const details = process.env.NODE_ENV === 'production' ? undefined : cause.details;
     if (cause.status >= 500) {
       console.error({ requestId, code: cause.code, status: cause.status, message: cause.message });
     }
+    const isProductionServerError = process.env.NODE_ENV === 'production' && cause.status >= 500;
     return NextResponse.json({
       error: {
-        code: cause.code,
-        message: cause.message,
+        code: isProductionServerError ? 'INTERNAL_ERROR' : cause.code,
+        message: isProductionServerError ? 'Erro interno inesperado.' : cause.message,
         ...(details !== undefined ? { details } : {}),
         requestId
       }
@@ -44,7 +43,8 @@ export function handleError(cause: unknown) {
   if (cause instanceof ZodError) {
     return NextResponse.json({ error: { code: 'VALIDATION_ERROR', message: 'Dados inválidos.', details: cause.flatten(), requestId } }, { status: 400 });
   }
-  console.error({ requestId, cause });
+  const error = cause instanceof Error ? cause : new Error('Unknown error');
+  console.error({ requestId, name: error.name, message: error.message, stack: error.stack });
   return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: 'Erro interno inesperado.', requestId } }, { status: 500 });
 }
 
