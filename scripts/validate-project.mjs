@@ -137,8 +137,15 @@ if (!apiRewrite || apiRewrite.destination !== 'https://trotebox-api.vercel.app/a
 }
 
 const normalizedPath = (file) => file.replaceAll('\\', '/');
-const routeFiles = files.filter((file) => normalizedPath(file).includes('/apps/api/src/app/api/') && normalizedPath(file).endsWith('/route.ts'));
-const routes = routeFiles.map((file) => relative(join(root, 'apps/api/src/app/api'), dirname(file)).replaceAll('\\', '/'));
+const apiRoutesRoot = resolve(root, 'apps/api/src/app/api');
+const routeFiles = files.filter((file) => {
+  const normalizedFile = resolve(file);
+  const relativeToApiRoutes = relative(apiRoutesRoot, normalizedFile);
+  return !relativeToApiRoutes.startsWith('..')
+    && relativeToApiRoutes !== ''
+    && normalizedPath(normalizedFile).endsWith('/route.ts');
+});
+const routes = routeFiles.map((file) => relative(apiRoutesRoot, dirname(file)).replaceAll('\\', '/'));
 if (new Set(routes).size !== routes.length) throw new Error('Há colisão de rotas na API.');
 
 function candidates(path) {

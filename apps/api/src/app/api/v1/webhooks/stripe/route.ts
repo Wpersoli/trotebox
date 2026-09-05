@@ -18,8 +18,11 @@ export async function POST(request: Request) {
   } catch (cause) { return handleError(cause); }
 
   const registered = await registerWebhook({
-    provider: WebhookProvider.STRIPE, externalEventId: event.id, signatureValid: true,
-    rawBody, payload: JSON.parse(rawBody) as Record<string, unknown>
+    provider: WebhookProvider.STRIPE,
+    externalEventId: event.id,
+    signatureValid: true,
+    rawBody,
+    payload: { id: event.id, type: event.type, created: event.created, livemode: event.livemode }
   });
   if (registered.duplicate && registered.event.processedAt) return ok({ received: true, duplicate: true });
 

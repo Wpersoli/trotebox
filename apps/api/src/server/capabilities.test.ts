@@ -4,11 +4,16 @@ import { platformCapabilities } from './capabilities';
 
 const base = {
   NODE_ENV: 'test',
+  PUBLIC_WEB_URL: 'http://localhost:3000',
+  PUBLIC_API_URL: 'http://localhost:3001',
+  ALLOWED_ORIGINS: 'http://localhost:3000',
   JWT_SECRET: 'j'.repeat(32),
   DATA_ENCRYPTION_KEY: 'd'.repeat(32),
   HASH_PEPPER: 'h'.repeat(32),
   AUTH_CODE_PEPPER: 'a'.repeat(32),
   AUTH_DELIVERY: 'brevo',
+  BREVO_API_KEY: 'brevo-test-key',
+  EMAIL_FROM_ADDRESS: 'no-reply@trotebox.test',
   TELEPHONY_PROVIDER: 'mock',
   VOICE_ENGINE: 'provider',
   ENABLE_DEV_AUTH: 'false',
@@ -19,7 +24,14 @@ const base = {
 
 describe('platform capabilities', () => {
   it('rejects mock telephony configuration in production', () => {
-    expect(() => parseEnv({ ...base, NODE_ENV: 'production', ALLOWED_ORIGINS: 'https://trotebox.com' })).toThrow(
+    expect(() => parseEnv({
+      ...base,
+      NODE_ENV: 'production',
+      PUBLIC_WEB_URL: 'https://trotebox.com',
+      PUBLIC_API_URL: 'https://api.trotebox.com',
+      ALLOWED_ORIGINS: 'https://trotebox.com',
+      TELEPHONY_PROVIDER: 'mock'
+    })).toThrow(
       'TELEPHONY_PROVIDER cannot be mock in production.'
     );
   });
@@ -34,21 +46,26 @@ describe('platform capabilities', () => {
   });
 
   it('requires complete Vonage production configuration', () => {
-    const partial = parseEnv({
+    const productionBase = {
       ...base,
       NODE_ENV: 'production',
-      ALLOWED_ORIGINS: 'https://trotebox.com',
+      PUBLIC_WEB_URL: 'https://trotebox.com',
+      PUBLIC_API_URL: 'https://api.trotebox.com',
+      ALLOWED_ORIGINS: 'https://trotebox.com'
+    } satisfies NodeJS.ProcessEnv;
+
+    expect(() => parseEnv({
+      ...productionBase,
       TELEPHONY_PROVIDER: 'vonage',
       VONAGE_APPLICATION_ID: 'app',
       VONAGE_PRIVATE_KEY: 'key',
       VONAGE_FROM_NUMBER: '5511000000000'
-    });
-    expect(platformCapabilities(partial).outboundCalls).toBe(false);
+    })).toThrow(
+      'Vonage application, API key, private key, from number and signature secret are required in production.'
+    );
 
     const complete = parseEnv({
-      ...base,
-      NODE_ENV: 'production',
-      ALLOWED_ORIGINS: 'https://trotebox.com',
+      ...productionBase,
       TELEPHONY_PROVIDER: 'vonage',
       VONAGE_APPLICATION_ID: 'app',
       VONAGE_API_KEY: 'api-key',

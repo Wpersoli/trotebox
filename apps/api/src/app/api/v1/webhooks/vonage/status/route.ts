@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     const status = String(body.status ?? '');
     if (!uuid) throw new AppError(400, 'MISSING_CALL_ID', 'UUID Vonage ausente.');
     const externalId = `${uuid}:${status}:${String(body.timestamp ?? body.sequence ?? sha256(rawBody))}`;
-    const registered = await registerWebhook({ provider: WebhookProvider.VONAGE, externalEventId: externalId, signatureValid: true, rawBody, payload: body });
+    const registered = await registerWebhook({ provider: WebhookProvider.VONAGE, externalEventId: externalId, signatureValid: true, rawBody });
     if (registered.duplicate && registered.event.processedAt) return ok({ received: true, duplicate: true });
     try {
       const mappedStatus = mapVonageStatus(status);
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
         ...(providerConversationId !== undefined ? { providerConversationId } : {}),
         status: mappedStatus,
         providerEventId: externalId,
-        payload: body
+        payload: { uuid, status, ...(providerConversationId ? { conversation_uuid: providerConversationId } : {}), ...(body.timestamp !== undefined ? { timestamp: body.timestamp } : {}), ...(body.sequence !== undefined ? { sequence: body.sequence } : {}) }
       });
       await markWebhookProcessed(registered.event.id);
       return ok({ received: true });

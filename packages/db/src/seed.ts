@@ -1,6 +1,10 @@
 import { prisma } from './client';
 
 async function main() {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('db:seed é destinado a ambientes de desenvolvimento e homologação; produção deve usar apenas migrações e dados operacionais aprovados.');
+  }
+
   const scripts = [
     {
       slug: 'entrega-impossivel',

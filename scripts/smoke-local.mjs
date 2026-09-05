@@ -41,19 +41,29 @@ const walletBefore = await request('/wallet', { headers });
 assert(Number.isInteger(walletBefore.balanceCredits), 'Saldo inicial inválido.');
 
 const script = catalog.scripts[0];
+const idempotencyKey = randomUUID();
+const callBody = {
+  scriptId: script.id,
+  recipientPhone: phone,
+  recipientLabel: 'Teste automatizado local',
+  consentConfirmed: true,
+  recordingConsentConfirmed: false,
+  idempotencyKey
+};
+
 const created = await request('/calls', {
   method: 'POST',
   headers,
-  body: JSON.stringify({
-    scriptId: script.id,
-    recipientPhone: phone,
-    recipientLabel: 'Teste automatizado local',
-    consentConfirmed: true,
-    recordingConsentConfirmed: false,
-    idempotencyKey: randomUUID()
-  })
+  body: JSON.stringify(callBody)
 });
 assert(created.call?.id, 'Chamada simulada sem identificador.');
+
+const duplicate = await request('/calls', {
+  method: 'POST',
+  headers,
+  body: JSON.stringify(callBody)
+});
+assert(duplicate.call?.id === created.call.id, 'Idempotência não retornou a mesma chamada.');
 
 const calls = await request('/calls', { headers });
 assert(calls.calls.some((call) => call.id === created.call.id), 'Chamada criada não apareceu no histórico.');
@@ -67,6 +77,7 @@ console.log(JSON.stringify({
   health: health.status,
   user: email,
   callId: created.call.id,
+  duplicateCallId: duplicate.call.id,
   callStatus: created.call.status,
   balanceBefore: walletBefore.balanceCredits,
   balanceAfter: walletAfter.balanceCredits

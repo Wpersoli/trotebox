@@ -19,11 +19,18 @@ export async function POST(request: Request) {
     if (!callSid) throw new AppError(400, 'MISSING_CALL_SID', 'CallSid ausente.');
     const externalId = `${callSid}:${status}:${sequence}`;
     const rawBody = new URLSearchParams(params).toString();
-    const registered = await registerWebhook({ provider: WebhookProvider.TWILIO, externalEventId: externalId, signatureValid: true, rawBody, payload: params });
+    const registered = await registerWebhook({ provider: WebhookProvider.TWILIO, externalEventId: externalId, signatureValid: true, rawBody });
     if (registered.duplicate && registered.event.processedAt) return ok({ received: true, duplicate: true });
     try {
       const mappedStatus = mapTwilioStatus(status);
-      if (mappedStatus) await applyCallStatus({ providerCallId: callSid, status: mappedStatus, providerEventId: externalId, payload: params });
+      if (mappedStatus) {
+        await applyCallStatus({
+          providerCallId: callSid,
+          status: mappedStatus,
+          providerEventId: externalId,
+          payload: { callSid, status, sequence }
+        });
+      }
       await markWebhookProcessed(registered.event.id);
       return ok({ received: true });
     } catch (cause) {
