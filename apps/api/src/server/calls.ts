@@ -11,14 +11,20 @@ import { audit } from './audit';
 import { platformCapabilities } from './capabilities';
 import { prepareVoiceAsset } from './voice';
 
+function assertSameIdempotency(existing: { userId: string; scriptId: string; recipientPhoneHash: string }, userId: string, scriptId: string, recipientPhoneHash: string) {
+  if (existing.userId !== userId || existing.scriptId !== scriptId || existing.recipientPhoneHash !== recipientPhoneHash) {
+    throw new AppError(409, 'IDEMPOTENCY_CONFLICT', 'Chave idempotente já usada com dados diferentes.');
+  }
+}
+
 export async function createCall(userId: string, input: CreateCallInput, request: Request) {
   const phone = validateRecipient(input.recipientPhone);
   const phoneHash = hashSubject(phone);
   const existing = await prisma.callOrder.findUnique({ where: { idempotencyKey: input.idempotencyKey }, include: { script: true } });
-  if (existing && (existing.userId !== userId || existing.scriptId !== input.scriptId || existing.recipientPhoneHash !== phoneHash)) {
-    throw new AppError(409, 'IDEMPOTENCY_CONFLICT', 'Chave idempotente já usada com dados diferentes.');
+  if (existing) {
+    assertSameIdempotency(existing, userId, input.scriptId, phoneHash);
+    return existing;
   }
-  if (existing) return existing;
 
   const config = env();
   if (!platformCapabilities(config).outboundCalls) {
@@ -48,25 +54,35 @@ export async function createCall(userId: string, input: CreateCallInput, request
   const script = await prisma.script.findUnique({ where: { id: input.scriptId } });
   if (!script?.active) throw new AppError(404, 'SCRIPT_NOT_FOUND', 'Experiência indisponível.');
 
-  const call = await prisma.$transaction(async (tx) => {
-    const created = await tx.callOrder.create({ data: {
-      userId,
-      scriptId: script.id,
-      status: CallStatus.VALIDATING,
-      recipientPhoneEncrypted: encrypt(phone),
-      recipientPhoneHash: phoneHash,
-      recipientLabel: input.recipientLabel ?? null,
-      consentConfirmedAt: new Date(),
-      recordingConsentAt: input.recordingConsentConfirmed ? new Date() : null,
-      creditCost: script.creditCost,
-      reservedCredits: script.creditCost,
-      telephonyProvider: config.TELEPHONY_PROVIDER,
-      idempotencyKey: input.idempotencyKey
-    }});
-    await reserveCredits(tx, userId, script.creditCost, created.id);
-    await tx.callEvent.create({ data: { callId: created.id, status: CallStatus.CREDIT_RESERVED } });
-    return tx.callOrder.update({ where: { id: created.id }, data: { status: CallStatus.CREDIT_RESERVED } });
-  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+  let call;
+  try {
+    call = await prisma.$transaction(async (tx) => {
+      const created = await tx.callOrder.create({ data: {
+        userId,
+        scriptId: script.id,
+        status: CallStatus.VALIDATING,
+        recipientPhoneEncrypted: encrypt(phone),
+        recipientPhoneHash: phoneHash,
+        recipientLabel: input.recipientLabel ?? null,
+        consentConfirmedAt: new Date(),
+        recordingConsentAt: input.recordingConsentConfirmed ? new Date() : null,
+        creditCost: script.creditCost,
+        reservedCredits: script.creditCost,
+        telephonyProvider: config.TELEPHONY_PROVIDER,
+        idempotencyKey: input.idempotencyKey
+      }});
+      await reserveCredits(tx, userId, script.creditCost, created.id);
+      await tx.callEvent.create({ data: { callId: created.id, status: CallStatus.CREDIT_RESERVED } });
+      return tx.callOrder.update({ where: { id: created.id }, data: { status: CallStatus.CREDIT_RESERVED } });
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+  } catch (cause) {
+    if (!(cause instanceof Prisma.PrismaClientKnownRequestError) || cause.code !== 'P2002') throw cause;
+
+    const raced = await prisma.callOrder.findUnique({ where: { idempotencyKey: input.idempotencyKey }, include: { script: true } });
+    if (!raced) throw cause;
+    assertSameIdempotency(raced, userId, input.scriptId, phoneHash);
+    return raced;
+  }
 
   try {
     const voiceAssetUrl = await prepareVoiceAsset(script);
