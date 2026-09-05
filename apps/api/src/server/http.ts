@@ -25,13 +25,15 @@ export function okPublic<T>(data: T, status = 200) {
 
 function isDatabaseConnectivityError(cause: unknown) {
   if (!(cause instanceof Error)) return false;
+  const errorCode = 'errorCode' in cause && typeof cause.errorCode === 'string' ? cause.errorCode : '';
+  if (['P1000', 'P1001', 'P1002', 'P1010'].includes(errorCode)) return true;
+
   const message = cause.message.toLowerCase();
-  return cause.name === 'PrismaClientInitializationError'
-    || message.includes('ecircuitbreaker')
+  return message.includes('ecircuitbreaker')
     || message.includes('too many authentication failures')
     || message.includes('password authentication failed')
-    || message.includes('p1000')
-    || message.includes('p1001');
+    || message.includes("can't reach database server")
+    || message.includes('timed out');
 }
 
 export function handleError(cause: unknown) {
