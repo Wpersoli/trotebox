@@ -28,6 +28,28 @@ function Test-PortOpen([int]$Port) {
   }
 }
 
+function Get-HttpFailureResult($Exception) {
+  $response = $Exception.Response
+  if ($null -eq $response) { return $null }
+
+  $content = ''
+  try {
+    $stream = $response.GetResponseStream()
+    if ($null -ne $stream) {
+      $reader = New-Object System.IO.StreamReader($stream)
+      try { $content = $reader.ReadToEnd() } finally { $reader.Dispose() }
+      $stream.Dispose()
+    }
+  } catch {
+    $content = ''
+  }
+
+  return [pscustomobject]@{
+    StatusCode = [int]$response.StatusCode
+    Content = $content
+  }
+}
+
 function Wait-Http([string]$Url, [int]$TimeoutSeconds) {
   $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
   $lastError = $null
@@ -36,6 +58,8 @@ function Wait-Http([string]$Url, [int]$TimeoutSeconds) {
       $response = Invoke-WebRequest -Uri $Url -UseBasicParsing -TimeoutSec 5
       if ($response.StatusCode -ge 200 -and $response.StatusCode -lt 500) { return $response }
     } catch {
+      $httpFailure = Get-HttpFailureResult $_.Exception
+      if ($null -ne $httpFailure) { return $httpFailure }
       $lastError = $_.Exception.Message
     }
     Start-Sleep -Seconds 2
@@ -95,7 +119,7 @@ function Stop-ProcessTreeBestEffort([int]$RootProcessId) {
     Start-Sleep -Milliseconds 500
   }
 
-  Write-Warning 'A acceptance foi aprovada, mas uma das portas 3000/3001 ainda parece ocupada. Feche o processo manualmente antes da próxima execução local.'
+  Write-Warning 'A acceptance falhou, mas uma das portas 3000/3001 ainda parece ocupada. Feche o processo manualmente antes da próxima execução local.'
 }
 
 Write-Host ''
@@ -130,8 +154,16 @@ try {
 
   $webResponse = Wait-Http 'http://localhost:3000' $StartupTimeoutSeconds
   if ($webResponse.StatusCode -ne 200) { throw "Web não respondeu HTTP 200: $($webResponse.StatusCode)" }
+
   $healthResponse = Wait-Http 'http://localhost:3001/api/v1/health' $StartupTimeoutSeconds
-  if ($healthResponse.StatusCode -ne 200) { throw "Health não respondeu HTTP 200: $($healthResponse.StatusCode)" }
+  if ($healthResponse.StatusCode -ne 200) {
+    $body = ''
+    if ($null -ne $healthResponse.Content) { $body = [string]$healthResponse.Content }
+    if ($healthResponse.StatusCode -eq 503 -and $body -match 'DATABASE_UNAVAILABLE') {
+      throw 'API iniciou, mas o banco de dados está indisponível ou as credenciais locais são inválidas. O acceptance foi interrompido imediatamente para evitar novas tentativas de autenticação contra o Supabase.'
+    }
+    throw "Health da API não respondeu HTTP 200: $($healthResponse.StatusCode)."
+  }
   $health = $healthResponse.Content | ConvertFrom-Json
   if ($health.status -ne 'ok') { throw "Health da API não retornou status ok: $($healthResponse.Content)" }
 
