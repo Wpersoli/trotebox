@@ -59,7 +59,12 @@ function Wait-Http([string]$Url, [int]$TimeoutSeconds) {
       if ($response.StatusCode -ge 200 -and $response.StatusCode -lt 500) { return $response }
     } catch {
       $httpFailure = Get-HttpFailureResult $_.Exception
-      if ($null -ne $httpFailure) { return $httpFailure }
+      if ($null -ne $httpFailure) {
+        if ($httpFailure.StatusCode -ge 500) {
+          throw "HTTP $($httpFailure.StatusCode) em $Url: $($httpFailure.Content)"
+        }
+        return $httpFailure
+      }
       $lastError = $_.Exception.Message
     }
     Start-Sleep -Seconds 2
@@ -155,15 +160,19 @@ try {
   $webResponse = Wait-Http 'http://localhost:3000' $StartupTimeoutSeconds
   if ($webResponse.StatusCode -ne 200) { throw "Web não respondeu HTTP 200: $($webResponse.StatusCode)" }
 
-  $healthResponse = Wait-Http 'http://localhost:3001/api/v1/health' $StartupTimeoutSeconds
-  if ($healthResponse.StatusCode -ne 200) {
-    $body = ''
-    if ($null -ne $healthResponse.Content) { $body = [string]$healthResponse.Content }
-    if ($healthResponse.StatusCode -eq 503 -and $body -match 'DATABASE_UNAVAILABLE') {
-      throw 'API iniciou, mas o banco de dados está indisponível ou as credenciais locais são inválidas. O acceptance foi interrompido imediatamente para evitar novas tentativas de autenticação contra o Supabase.'
+  try {
+    $healthResponse = Wait-Http 'http://localhost:3001/api/v1/health' $StartupTimeoutSeconds
+    if ($healthResponse.StatusCode -ne 200) {
+      $body = if ($null -ne $healthResponse.Content) { [string]$healthResponse.Content } else { '' }
+      if ($healthResponse.StatusCode -eq 503 -and $body -match 'DATABASE_UNAVAILABLE') {
+        throw 'API iniciou, mas o banco de dados está indisponível ou as credenciais locais são inválidas. O acceptance foi interrompido imediatamente para evitar novas tentativas de autenticação contra o Supabase.'
+      }
+      throw "Health da API não respondeu HTTP 200: $($healthResponse.StatusCode)."
     }
-    throw "Health da API não respondeu HTTP 200: $($healthResponse.StatusCode)."
+  } catch {
+    throw $_
   }
+
   $health = $healthResponse.Content | ConvertFrom-Json
   if ($health.status -ne 'ok') { throw "Health da API não retornou status ok: $($healthResponse.Content)" }
 
