@@ -48,29 +48,43 @@ export async function createCall(userId: string, input: CreateCallInput, request
   const script = await prisma.script.findUnique({ where: { id: input.scriptId } });
   if (!script?.active) throw new AppError(404, 'SCRIPT_NOT_FOUND', 'Experiência indisponível.');
 
-  const call = await prisma.$transaction(async (tx) => {
-    const created = await tx.callOrder.create({ data: {
-      userId,
-      scriptId: script.id,
-      status: CallStatus.VALIDATING,
-      recipientPhoneEncrypted: encrypt(phone),
-      recipientPhoneHash: phoneHash,
-      recipientLabel: input.recipientLabel ?? null,
-      consentConfirmedAt: new Date(),
-      recordingConsentAt: input.recordingConsentConfirmed ? new Date() : null,
-      creditCost: script.creditCost,
-      reservedCredits: script.creditCost,
-      telephonyProvider: config.TELEPHONY_PROVIDER,
-      idempotencyKey: input.idempotencyKey
-    }});
-    await reserveCredits(tx, userId, script.creditCost, created.id);
-    await tx.callEvent.create({ data: { callId: created.id, status: CallStatus.CREDIT_RESERVED } });
-    return tx.callOrder.update({ where: { id: created.id }, data: { status: CallStatus.CREDIT_RESERVED } });
-  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+  let call;
+  try {
+    call = await prisma.$transaction(async (tx) => {
+      const created = await tx.callOrder.create({ data: {
+        userId,
+        scriptId: script.id,
+        status: CallStatus.VALIDATING,
+        recipientPhoneEncrypted: encrypt(phone),
+        recipientPhoneHash: phoneHash,
+        recipientLabel: input.recipientLabel ?? null,
+        consentConfirmedAt: new Date(),
+        recordingConsentAt: input.recordingConsentConfirmed ? new Date() : null,
+        creditCost: script.creditCost,
+        reservedCredits: script.creditCost,
+        telephonyProvider: config.TELEPHONY_PROVIDER,
+        idempotencyKey: input.idempotencyKey
+      }});
+      await reserveCredits(tx, userId, script.creditCost, created.id);
+      await tx.callEvent.create({ data: { callId: created.id, status: CallStatus.CREDIT_RESERVED } });
+      return tx.callOrder.update({ where: { id: created.id }, data: { status: CallStatus.CREDIT_RESERVED } });
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+  } catch (cause) {
+    if (!(cause instanceof Prisma.PrismaClientKnownRequestError) || cause.code !== 'P2002') throw cause;
+    const raced = await prisma.callOrder.findUnique({ where: { idempotencyKey: input.idempotencyKey }, include: { script: true } });
+    if (!raced) throw cause;
+    if (raced.userId !== userId || raced.scriptId !== input.scriptId || raced.recipientPhoneHash !== phoneHash) {
+      throw new AppError(409, 'IDEMPOTENCY_CONFLICT', 'Chave idempotente já usada com dados diferentes.');
+    }
+    return raced;
+  }
+
+  let providerCallId: string | undefined;
 
   try {
     const voiceAssetUrl = await prepareVoiceAsset(script);
     if (voiceAssetUrl) await prisma.callOrder.update({ where: { id: call.id }, data: { voiceAssetUrl } });
+
     const base = config.PUBLIC_API_URL.replace(/\/$/, '');
     const provider = await telephonyProvider();
     const started = await provider.startCall({
@@ -81,20 +95,48 @@ export async function createCall(userId: string, input: CreateCallInput, request
       recordingStatusUrl: `${base}/api/v1/webhooks/${config.TELEPHONY_PROVIDER}/recording`,
       recordingAllowed: config.RECORDING_ENABLED && Boolean(input.recordingConsentConfirmed)
     });
-    const updated = await prisma.callOrder.update({ where: { id: call.id }, data: { providerCallId: started.providerCallId, status: CallStatus.DIALING } });
-    await prisma.callEvent.create({ data: { callId: call.id, providerEventId: `start:${started.providerCallId}`, status: CallStatus.DIALING } });
-    await audit({ request, userId, action: 'CALL_CREATED', targetType: 'CALL', targetId: call.id, metadata: { scriptId: script.id, provider: started.provider } });
+    providerCallId = started.providerCallId;
+
+    const updated = await prisma.callOrder.update({ where: { id: call.id }, data: { providerCallId, status: CallStatus.DIALING } });
+    try {
+      await prisma.callEvent.create({ data: { callId: call.id, providerEventId: `start:${providerCallId}`, status: CallStatus.DIALING } });
+    } catch (cause) {
+      console.error({ callId: call.id, providerCallId, eventPersistenceError: cause });
+    }
+    try {
+      await audit({ request, userId, action: 'CALL_CREATED', targetType: 'CALL', targetId: call.id, metadata: { scriptId: script.id, provider: started.provider } });
+    } catch (cause) {
+      console.error({ callId: call.id, auditError: cause });
+    }
+
     if (started.provider === 'mock' && config.MOCK_CALL_AUTO_COMPLETE) {
       const completed = await applyCallStatus({
-        providerCallId: started.providerCallId,
+        providerCallId,
         status: CallStatus.COMPLETED,
-        providerEventId: `mock:completed:${started.providerCallId}`,
+        providerEventId: `mock:completed:${providerCallId}`,
         payload: { simulated: true }
       });
       return { ...completed, script };
     }
     return { ...updated, script };
   } catch (cause) {
+    if (providerCallId) {
+      try {
+        await prisma.callOrder.update({
+          where: { id: call.id },
+          data: {
+            providerCallId,
+            status: CallStatus.DIALING,
+            failureCode: 'PROVIDER_STATE_SYNC_PENDING',
+            failureMessage: 'A chamada foi iniciada; a sincronização do estado será concluída pelos callbacks do provedor.'
+          }
+        });
+      } catch (syncCause) {
+        console.error({ callId: call.id, providerCallId, syncError: syncCause });
+      }
+      throw new AppError(502, 'PROVIDER_STATE_SYNC_FAILED', 'A chamada foi iniciada, mas a confirmação do estado está pendente. Consulte o histórico em instantes.');
+    }
+
     await prisma.callOrder.update({ where: { id: call.id }, data: { status: CallStatus.FAILED, failureCode: 'PROVIDER_START_FAILED', failureMessage: cause instanceof Error ? cause.message.slice(0, 300) : 'unknown' } });
     await releaseCredits(userId, script.creditCost, call.id, 'Liberação por falha ao iniciar chamada');
     throw cause;
@@ -119,8 +161,6 @@ export async function applyCallStatus(input: { providerCallId: string; providerC
     let call = await tx.callOrder.findUnique({ where: { providerCallId: input.providerCallId } });
     if (!call) throw new AppError(404, 'CALL_NOT_FOUND', 'Chamada não encontrada.');
 
-    // A Vonage identifica a gravação pela conversa, enquanto os eventos de chamada usam o UUID da perna.
-    // Persistimos a associação mesmo quando o evento é duplicado, atrasado ou chega após um estado terminal.
     if (input.providerConversationId && call.providerConversationId !== input.providerConversationId) {
       call = await tx.callOrder.update({ where: { id: call.id }, data: { providerConversationId: input.providerConversationId } });
     }
@@ -136,8 +176,6 @@ export async function applyCallStatus(input: { providerCallId: string; providerC
     };
     await tx.callEvent.create({ data: eventData });
 
-    // Webhooks podem chegar duplicados ou fora de ordem. Um estado terminal nunca regride,
-    // impedindo dupla captura/liberação ou uso da reserva pertencente a outra chamada.
     if (terminalStatus.has(call.status)) return call;
     const currentRank = progressRank[call.status];
     const incomingRank = progressRank[input.status];
