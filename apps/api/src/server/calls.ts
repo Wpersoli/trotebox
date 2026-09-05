@@ -105,7 +105,7 @@ export async function createCall(userId: string, input: CreateCallInput, request
   const script = await prisma.script.findUnique({ where: { id: input.scriptId } });
   if (!script?.active) throw new AppError(404, 'SCRIPT_NOT_FOUND', 'Experiência indisponível.');
 
-  let call: Awaited<ReturnType<typeof prisma.callOrder.findUnique>>;
+  let call: Awaited<ReturnType<typeof prisma.callOrder.findUnique>> = null;
   let lastTransactionError: unknown;
 
   for (let attempt = 0; attempt < IDEMPOTENCY_RETRY_DELAYS_MS.length; attempt += 1) {
