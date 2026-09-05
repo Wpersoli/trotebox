@@ -24,7 +24,14 @@ const base = {
 
 describe('platform capabilities', () => {
   it('rejects mock telephony configuration in production', () => {
-    expect(() => parseEnv({ ...base, NODE_ENV: 'production', PUBLIC_WEB_URL: 'https://trotebox.com', PUBLIC_API_URL: 'https://api.trotebox.com', ALLOWED_ORIGINS: 'https://trotebox.com' })).toThrow(
+    expect(() => parseEnv({
+      ...base,
+      NODE_ENV: 'production',
+      PUBLIC_WEB_URL: 'https://trotebox.com',
+      PUBLIC_API_URL: 'https://api.trotebox.com',
+      ALLOWED_ORIGINS: 'https://trotebox.com',
+      TELEPHONY_PROVIDER: 'mock'
+    })).toThrow(
       'TELEPHONY_PROVIDER cannot be mock in production.'
     );
   });
@@ -47,14 +54,15 @@ describe('platform capabilities', () => {
       ALLOWED_ORIGINS: 'https://trotebox.com'
     } satisfies NodeJS.ProcessEnv;
 
-    const partial = parseEnv({
+    expect(() => parseEnv({
       ...productionBase,
       TELEPHONY_PROVIDER: 'vonage',
       VONAGE_APPLICATION_ID: 'app',
       VONAGE_PRIVATE_KEY: 'key',
       VONAGE_FROM_NUMBER: '5511000000000'
-    });
-    expect(platformCapabilities(partial).outboundCalls).toBe(false);
+    })).toThrow(
+      'Vonage application, API key, private key, from number and signature secret are required in production.'
+    );
 
     const complete = parseEnv({
       ...productionBase,
