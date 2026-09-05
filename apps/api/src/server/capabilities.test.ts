@@ -12,6 +12,8 @@ const base = {
   HASH_PEPPER: 'h'.repeat(32),
   AUTH_CODE_PEPPER: 'a'.repeat(32),
   AUTH_DELIVERY: 'brevo',
+  BREVO_API_KEY: 'brevo-test-key',
+  EMAIL_FROM_ADDRESS: 'no-reply@trotebox.test',
   TELEPHONY_PROVIDER: 'mock',
   VOICE_ENGINE: 'provider',
   ENABLE_DEV_AUTH: 'false',
