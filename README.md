@@ -1,22 +1,14 @@
-# TroteBox 0.3.9
+# TroteBox
 
-> **Riso na linha. Surpresa na caixa.**
+Monorepo autoral para uma plataforma de experiências de comédia por telefone, com controles de consentimento, créditos e política antiabuso desde a criação do pedido.
 
-Monorepo autoral para uma plataforma de experiências de comédia por telefone, com frontend responsivo, clientes móveis via Capacitor, API própria, carteira de créditos e adaptadores de telefonia/pagamento.
+## Stack
 
-## Nesta versão
-
-- identidade visual TroteBox consolidada;
-- wordmark, mascote e ícones separados para responsividade;
-- paleta clara com roxo, laranja, amarelo, vermelho/coral e verde;
-- modo **preview visual** sem Supabase, Docker, Vercel ou backend;
-- frontend Next.js 16 com exportação estática para Capacitor 8;
-- API Next.js separada;
-- autenticação passwordless por e-mail com OTP de uso único entregue pela Brevo, rate limit e sessão revogável em cookie `HttpOnly`; clientes nativos recebem token apenas quando identificados como `native`;
-- timeout e sanitização de erros no cliente HTTP; em produção Web, `/api/v1` é encaminhado pela Vercel ao projeto da API para manter a sessão same-origin durante homologação sem domínio próprio;
-- PostgreSQL/Supabase + Prisma;
-- ledger transacional de créditos;
-- Pix via Mercado Pago no fluxo público; adaptador Stripe preservado no backend para compatibilidade legada;
+- Next.js 16 no frontend web responsivo e cliente mobile via Capacitor;
+- API Node.js/Next.js com TypeScript e Zod;
+- PostgreSQL/Supabase com Prisma;
+- créditos transacionais com ledger;
+- Pix via Mercado Pago e compatibilidade legada com Stripe;
 - Twilio ou Vonage em produção; provedor mock somente em desenvolvimento/preview;
 - OTP/passwordless, idempotência, rate limit, auditoria e política antiabuso.
 
@@ -53,16 +45,9 @@ URLs padrão:
 - Web: `http://localhost:3000`
 - API: `http://localhost:3001/api/v1/health`
 
-## Comandos principais
+## Qualidade
 
 ```powershell
-npm run preview:web
-npm run validate:repo
-npm run test:domain
-npm run lint
-npm run typecheck
-npm run test
-npm run build
 npm run quality
 ```
 
@@ -71,12 +56,8 @@ npm run quality
 ## Estrutura
 
 ```text
-apps/
-  web/        Next.js + Capacitor + TroteBox UI
-  api/        API, auth, pagamentos, telefonia e webhooks
-packages/
-  contracts/  schemas/tipos compartilhados
-  db/         Prisma, migrations, seed e cliente PostgreSQL
+apps/         web + api
+packages/     contracts + db
 scripts/      setup, preview, smoke test e validações
 ```
 
@@ -86,16 +67,16 @@ O código-fonte é público para inspeção e colaboração. Segredos, ambientes
 
 ## Segurança
 
-- nunca publique `.env`, URLs de banco, tokens ou segredos;
-- `service_role` do Supabase nunca deve ir para o frontend;
-- autenticação de desenvolvimento deve ser desligada em produção;
-- gravação permanece desativada por padrão;
-- chamadas de emergência, padrões especiais bloqueados e destinos em supressão não devem ser processados;
-- o navegador não altera saldo diretamente;
-- pagamentos e telefonia são confirmados no backend por eventos assinados/idempotentes.
+- nunca commitar segredos reais;
+- `service_role` apenas no backend quando aplicável;
+- autenticação de desenvolvimento bloqueada em produção;
+- gravação desativada por padrão e condicionada a consentimento específico;
+- destinos de emergência e outros destinos restritos são bloqueados;
+- números em supressão não podem ser contatados;
+- limites por usuário e por destinatário protegem o uso do serviço;
+- callbacks de provedores são validados antes do processamento;
+- créditos são reservados e capturados/liberados transacionalmente;
+- seeds são destinados a desenvolvimento/homologação e recusam execução com `NODE_ENV=production`;
+- respostas públicas cacheáveis não recebem dados de usuário nem credenciais.
 
-Consulte `SECURITY.md`, `THREAT_MODEL.md`, `ARCHITECTURE.md` e `DEPLOY.md`.
-
-## Integridade de recovery
-
-Após mudanças versionadas, execute `npm run inventory` e `npm run inventory:verify`. Arquivos `.env*` reais e `next-env.d.ts` são locais/gerados e não entram nos manifests.
+O serviço não deve ser usado para ameaça, perseguição, fraude, impersonação ou assédio.
