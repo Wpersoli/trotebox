@@ -4,6 +4,9 @@ import { platformCapabilities } from './capabilities';
 
 const base = {
   NODE_ENV: 'test',
+  PUBLIC_WEB_URL: 'http://localhost:3000',
+  PUBLIC_API_URL: 'http://localhost:3001',
+  ALLOWED_ORIGINS: 'http://localhost:3000',
   JWT_SECRET: 'j'.repeat(32),
   DATA_ENCRYPTION_KEY: 'd'.repeat(32),
   HASH_PEPPER: 'h'.repeat(32),
@@ -19,7 +22,7 @@ const base = {
 
 describe('platform capabilities', () => {
   it('rejects mock telephony configuration in production', () => {
-    expect(() => parseEnv({ ...base, NODE_ENV: 'production', ALLOWED_ORIGINS: 'https://trotebox.com' })).toThrow(
+    expect(() => parseEnv({ ...base, NODE_ENV: 'production', PUBLIC_WEB_URL: 'https://trotebox.com', PUBLIC_API_URL: 'https://api.trotebox.com', ALLOWED_ORIGINS: 'https://trotebox.com' })).toThrow(
       'TELEPHONY_PROVIDER cannot be mock in production.'
     );
   });
@@ -34,10 +37,16 @@ describe('platform capabilities', () => {
   });
 
   it('requires complete Vonage production configuration', () => {
-    const partial = parseEnv({
+    const productionBase = {
       ...base,
       NODE_ENV: 'production',
-      ALLOWED_ORIGINS: 'https://trotebox.com',
+      PUBLIC_WEB_URL: 'https://trotebox.com',
+      PUBLIC_API_URL: 'https://api.trotebox.com',
+      ALLOWED_ORIGINS: 'https://trotebox.com'
+    } satisfies NodeJS.ProcessEnv;
+
+    const partial = parseEnv({
+      ...productionBase,
       TELEPHONY_PROVIDER: 'vonage',
       VONAGE_APPLICATION_ID: 'app',
       VONAGE_PRIVATE_KEY: 'key',
@@ -46,9 +55,7 @@ describe('platform capabilities', () => {
     expect(platformCapabilities(partial).outboundCalls).toBe(false);
 
     const complete = parseEnv({
-      ...base,
-      NODE_ENV: 'production',
-      ALLOWED_ORIGINS: 'https://trotebox.com',
+      ...productionBase,
       TELEPHONY_PROVIDER: 'vonage',
       VONAGE_APPLICATION_ID: 'app',
       VONAGE_API_KEY: 'api-key',
