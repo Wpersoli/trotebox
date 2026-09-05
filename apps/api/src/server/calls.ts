@@ -56,7 +56,9 @@ async function persistProviderStart(callId: string, providerCallId: string) {
     } catch (cause) {
       lastError = cause;
       if (!isRetryableTransactionError(cause)) throw cause;
-      await sleep(PROVIDER_PERSIST_RETRY_DELAYS_MS[attempt]);
+      const delayMs = PROVIDER_PERSIST_RETRY_DELAYS_MS[attempt];
+      if (delayMs === undefined) break;
+      await sleep(delayMs);
     }
   }
 
@@ -133,15 +135,21 @@ export async function createCall(userId: string, input: CreateCallInput, request
     } catch (cause) {
       lastTransactionError = cause;
       if (!isRetryableTransactionError(cause)) throw cause;
-      await sleep(IDEMPOTENCY_RETRY_DELAYS_MS[attempt]);
+      const delayMs = IDEMPOTENCY_RETRY_DELAYS_MS[attempt];
+      if (delayMs === undefined) break;
+      await sleep(delayMs);
     }
   }
 
   if (!call) {
     const winner = await prisma.callOrder.findUnique({ where: { idempotencyKey: input.idempotencyKey }, include: { script: true } });
-    if (!winner) throw lastTransactionError;
+    if (!winner) {
+      throw lastTransactionError instanceof Error
+        ? lastTransactionError
+        : new AppError(503, 'CALL_CREATION_RETRY_EXHAUSTED', 'Não foi possível confirmar a criação da chamada.');
+    }
     assertIdempotentMatch(winner, userId, input.scriptId, phoneHash);
-    return winner;
+    call = winner;
   }
 
   let providerAccepted = false;
@@ -215,8 +223,6 @@ export async function applyCallStatus(input: { providerCallId: string; providerC
     };
     await tx.callEvent.create({ data: eventData });
 
-    // Webhooks podem chegar duplicados ou fora de ordem. Um estado terminal nunca regride,
-    // impedindo dupla captura/liberação ou uso da reserva pertencente a outra chamada.
     if (terminalStatus.has(call.status)) return call;
     const currentRank = progressRank[call.status];
     const incomingRank = progressRank[input.status];
