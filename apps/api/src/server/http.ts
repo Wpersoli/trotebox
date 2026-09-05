@@ -12,6 +12,15 @@ export function ok<T>(data: T, status = 200) {
   return NextResponse.json(data, { status, headers: { 'Cache-Control': 'no-store' } });
 }
 
+export function okPublic<T>(data: T, status = 200) {
+  return NextResponse.json(data, {
+    status,
+    headers: {
+      'Cache-Control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=600'
+    }
+  });
+}
+
 export function handleError(cause: unknown) {
   const requestId = randomUUID();
   if (cause instanceof AppError) {
