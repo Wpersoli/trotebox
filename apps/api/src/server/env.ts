@@ -51,6 +51,12 @@ export function parseEnv(input: NodeJS.ProcessEnv) {
     if (parsed.MOCK_CALL_AUTO_COMPLETE) throw new Error('MOCK_CALL_AUTO_COMPLETE must be false in production.');
     if (parsed.TELEPHONY_PROVIDER === 'mock') throw new Error('TELEPHONY_PROVIDER cannot be mock in production.');
     if (!parsed.ALLOWED_ORIGINS?.trim()) throw new Error('ALLOWED_ORIGINS must be configured in production.');
+    if (!parsed.ALLOWED_ORIGINS.split(',').map((origin) => origin.trim()).filter(Boolean).every((origin) => new URL(origin).protocol === 'https:')) {
+      throw new Error('All ALLOWED_ORIGINS entries must use HTTPS in production.');
+    }
+    if (new URL(parsed.PUBLIC_WEB_URL).protocol !== 'https:' || new URL(parsed.PUBLIC_API_URL).protocol !== 'https:') {
+      throw new Error('PUBLIC_WEB_URL and PUBLIC_API_URL must use HTTPS in production.');
+    }
     if (parsed.AUTH_DELIVERY === 'console') throw new Error('AUTH_DELIVERY cannot be console in production.');
     if (parsed.TWILIO_VALIDATE_SIGNATURES === false) throw new Error('TWILIO_VALIDATE_SIGNATURES must be true in production.');
     if (!parsed.BREVO_API_KEY || !parsed.EMAIL_FROM_ADDRESS) throw new Error('BREVO_API_KEY and EMAIL_FROM_ADDRESS are required in production.');
