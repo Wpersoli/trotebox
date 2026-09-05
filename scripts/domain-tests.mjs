@@ -58,6 +58,7 @@ function productionTestEnv(overrides = {}) {
     TWILIO_AUTH_TOKEN: 'auth-token',
     TWILIO_FROM_NUMBER: '+5511000000000',
     TWILIO_VALIDATE_SIGNATURES: 'true',
+    CRON_SECRET: 'cron-secret-with-at-least-16-chars',
     ...overrides
   });
 }
@@ -90,10 +91,11 @@ test('falha fechado para dev auth em produção', () => expectEnvFailure({ ENABL
 test('falha fechado para mock em produção', () => expectEnvFailure({ TELEPHONY_PROVIDER: 'mock' }, 'TELEPHONY_PROVIDER'));
 test('falha fechado sem origens permitidas em produção', () => expectEnvFailure({ ALLOWED_ORIGINS: '' }, 'ALLOWED_ORIGINS'));
 test('falha fechado para entrega console em produção', () => expectEnvFailure({ AUTH_DELIVERY: 'console' }, 'AUTH_DELIVERY'));
+test('falha fechado sem segredo de cron em produção', () => expectEnvFailure({ CRON_SECRET: '' }, 'CRON_SECRET'));
 
 test('aceita configuração de produção segura', () => {
   const parsed = parseEnv(productionTestEnv());
-  if (parsed.NODE_ENV !== 'production' || parsed.ENABLE_DEV_AUTH || parsed.MOCK_CALL_AUTO_COMPLETE) throw new Error('Configuração segura não foi preservada.');
+  if (parsed.NODE_ENV !== 'production' || parsed.ENABLE_DEV_AUTH || parsed.MOCK_CALL_AUTO_COMPLETE || !parsed.CRON_SECRET) throw new Error('Configuração segura não foi preservada.');
 });
 
-console.log(`Domain tests aprovados: ${passed}/12.`);
+console.log(`Domain tests aprovados: ${passed}/13.`);
