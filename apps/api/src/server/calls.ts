@@ -44,10 +44,19 @@ async function persistProviderStart(callId: string, providerCallId: string) {
             failureMessage: null
           }
         });
-        await tx.callEvent.create({
-          data: {
+        await tx.callEvent.upsert({
+          where: {
+            callId_providerEventId: {
+              callId,
+              providerEventId: `start:${providerCallId}`
+            }
+          },
+          create: {
             callId,
             providerEventId: `start:${providerCallId}`,
+            status: CallStatus.DIALING
+          },
+          update: {
             status: CallStatus.DIALING
           }
         });
