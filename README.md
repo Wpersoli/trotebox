@@ -1,14 +1,22 @@
-# TroteBox
+# TroteBox 0.3.9
 
-Monorepo autoral para uma plataforma de experiências de comédia por telefone, com controles de consentimento, créditos e política antiabuso desde a criação do pedido.
+> **Riso na linha. Surpresa na caixa.**
 
-## Stack
+Monorepo autoral para uma plataforma de experiências de comédia por telefone, com frontend responsivo, clientes móveis via Capacitor, API própria, carteira de créditos e adaptadores de telefonia/pagamento.
 
-- Next.js 16 no frontend web responsivo e cliente mobile via Capacitor;
-- API Node.js/Next.js com TypeScript e Zod;
-- PostgreSQL/Supabase com Prisma;
-- créditos transacionais com ledger;
-- Pix via Mercado Pago e compatibilidade legada com Stripe;
+## Nesta versão
+
+- identidade visual TroteBox consolidada;
+- wordmark, mascote e ícones separados para responsividade;
+- paleta clara com roxo, laranja, amarelo, vermelho/coral e verde;
+- modo **preview visual** sem Supabase, Docker, Vercel ou backend;
+- frontend Next.js 16 com exportação estática para Capacitor 8;
+- API Next.js separada;
+- autenticação passwordless por e-mail com OTP de uso único entregue pela Brevo, rate limit e sessão revogável em cookie `HttpOnly`; clientes nativos recebem token apenas quando identificados como `native`;
+- timeout e sanitização de erros no cliente HTTP; em produção Web, `/api/v1` é encaminhado pela Vercel ao projeto da API para manter a sessão same-origin durante homologação sem domínio próprio;
+- PostgreSQL/Supabase + Prisma;
+- ledger transacional de créditos;
+- Pix via Mercado Pago no fluxo público; adaptador Stripe preservado no backend para compatibilidade legada;
 - Twilio ou Vonage em produção; provedor mock somente em desenvolvimento/preview;
 - OTP/passwordless, idempotência, rate limit, auditoria e política antiabuso.
 
@@ -25,7 +33,7 @@ npm run preview:web
 
 Abra `http://127.0.0.1:3000`.
 
-O preview usa dados simulados e permite navegar pela HOME com OTP simulado, dashboard, catálogo, novo trote, histórico, créditos e configurações. Não requer banco ou API.
+O preview usa dados simulados e permite navegar por HOME com OTP simulado, dashboard, catálogo, novo trote, histórico, créditos e configurações. Não requer banco ou API.
 
 ### Stack completa — quando a infraestrutura estiver configurada
 
@@ -40,14 +48,21 @@ Em outro terminal:
 npm run smoke:local
 ```
 
-URLs padrão:
+## URLs padrão
 
 - Web: `http://localhost:3000`
 - API: `http://localhost:3001/api/v1/health`
 
-## Qualidade
+## Comandos principais
 
 ```powershell
+npm run preview:web
+npm run validate:repo
+npm run test:domain
+npm run lint
+npm run typecheck
+npm run test
+npm run build
 npm run quality
 ```
 
@@ -56,8 +71,12 @@ npm run quality
 ## Estrutura
 
 ```text
-apps/         web + api
-packages/     contracts + db
+apps/
+  web/        Next.js + Capacitor + TroteBox UI
+  api/        API, auth, pagamentos, telefonia e webhooks
+packages/
+  contracts/  schemas/tipos compartilhados
+  db/         Prisma, migrations, seed e cliente PostgreSQL
 scripts/      setup, preview, smoke test e validações
 ```
 
@@ -67,16 +86,27 @@ O código-fonte é público para inspeção e colaboração. Segredos, ambientes
 
 ## Segurança
 
-- nunca commitar segredos reais;
-- `service_role` apenas no backend quando aplicável;
-- autenticação de desenvolvimento bloqueada em produção;
-- gravação desativada por padrão e condicionada a consentimento específico;
-- destinos de emergência e outros destinos restritos são bloqueados;
-- números em supressão não podem ser contatados;
-- limites por usuário e por destinatário protegem o uso do serviço;
-- callbacks de provedores são validados antes do processamento;
-- créditos são reservados e capturados/liberados transacionalmente;
-- seeds são destinados a desenvolvimento/homologação e recusam execução com `NODE_ENV=production`;
-- respostas públicas cacheáveis não recebem dados de usuário nem credenciais.
+- nunca publique `.env`, URLs de banco, tokens ou segredos;
+- `service_role` do Supabase nunca deve ir para o frontend;
+- autenticação de desenvolvimento deve ser desligada em produção;
+- gravação permanece desativada por padrão e só é habilitada com consentimento específico;
+- chamadas de emergência, padrões especiais bloqueados e destinos em supressão não devem ser processados;
+- o navegador não altera saldo diretamente;
+- pagamentos e telefonia são confirmados no backend por eventos assinados/idempotentes;
+- callbacks e gravações usam allowlists de origem e não devem seguir redirecionamentos inesperados;
+- dados desnecessários de webhooks não são persistidos como payload bruto;
+- limites de tamanho de requisição reduzem abuso e consumo desnecessário de recursos;
+- idempotência de chamadas é protegida também contra concorrência no banco;
+- `db:seed` é destinado a desenvolvimento/homologação e recusa execução quando `NODE_ENV=production`.
+
+Consulte `SECURITY.md`, `THREAT_MODEL.md`, `ARCHITECTURE.md` e `DEPLOY.md`.
+
+## Integridade de recovery
+
+Após mudanças versionadas, execute `npm run inventory` e `npm run inventory:verify`. Arquivos `.env*` reais e `next-env.d.ts` são locais/gerados e não entram nos manifests.
+
+## Catálogo público
+
+A página inicial apresenta experiências, preços, FAQ, práticas de segurança e orientação para bloqueio do próprio número. Exemplos em áudio só devem ser publicados depois da revisão e aprovação dos arquivos de demonstração.
 
 O serviço não deve ser usado para ameaça, perseguição, fraude, impersonação ou assédio.
