@@ -53,6 +53,28 @@ export function parseEnv(input: NodeJS.ProcessEnv) {
     if (!parsed.ALLOWED_ORIGINS?.trim()) throw new Error('ALLOWED_ORIGINS must be configured in production.');
     if (parsed.AUTH_DELIVERY === 'console') throw new Error('AUTH_DELIVERY cannot be console in production.');
     if (parsed.TWILIO_VALIDATE_SIGNATURES === false) throw new Error('TWILIO_VALIDATE_SIGNATURES must be true in production.');
+    if (!parsed.BREVO_API_KEY || !parsed.EMAIL_FROM_ADDRESS) throw new Error('BREVO_API_KEY and EMAIL_FROM_ADDRESS are required in production.');
+
+    if (parsed.VOICE_ENGINE === 'custom') {
+      if (!parsed.CUSTOM_TTS_URL || !parsed.CUSTOM_TTS_API_KEY) throw new Error('CUSTOM_TTS_URL and CUSTOM_TTS_API_KEY are required when VOICE_ENGINE=custom.');
+      if (new URL(parsed.CUSTOM_TTS_URL).protocol !== 'https:') throw new Error('CUSTOM_TTS_URL must use HTTPS in production.');
+      if (!parsed.CUSTOM_TTS_ALLOWED_HOSTS?.trim()) throw new Error('CUSTOM_TTS_ALLOWED_HOSTS is required when VOICE_ENGINE=custom.');
+    }
+
+    if (parsed.TELEPHONY_PROVIDER === 'twilio') {
+      if (!parsed.TWILIO_ACCOUNT_SID || !parsed.TWILIO_AUTH_TOKEN || !parsed.TWILIO_FROM_NUMBER) {
+        throw new Error('Twilio account credentials and from number are required in production.');
+      }
+    }
+
+    if (parsed.TELEPHONY_PROVIDER === 'vonage') {
+      if (!parsed.VONAGE_APPLICATION_ID || !parsed.VONAGE_API_KEY || !parsed.VONAGE_PRIVATE_KEY || !parsed.VONAGE_FROM_NUMBER || !parsed.VONAGE_SIGNATURE_SECRET) {
+        throw new Error('Vonage application, API key, private key, from number and signature secret are required in production.');
+      }
+    }
+
+    if (parsed.MERCADOPAGO_ACCESS_TOKEN && !parsed.MERCADOPAGO_WEBHOOK_SECRET) throw new Error('MERCADOPAGO_WEBHOOK_SECRET is required when Mercado Pago is configured.');
+    if (parsed.STRIPE_SECRET_KEY && !parsed.STRIPE_WEBHOOK_SECRET) throw new Error('STRIPE_WEBHOOK_SECRET is required when Stripe is configured.');
   }
   return parsed;
 }
