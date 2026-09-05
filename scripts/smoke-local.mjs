@@ -15,6 +15,14 @@ async function request(path, init = {}) {
   return payload;
 }
 
+async function expectError(path, expectedStatus, init, expectedCode) {
+  const response = await fetch(`${apiBase}${path}`, init);
+  const payload = await response.json().catch(() => null);
+  assert(response.status === expectedStatus, `Esperava HTTP ${expectedStatus} em ${path}, recebi ${response.status}: ${JSON.stringify(payload)}`);
+  assert(payload?.error?.code === expectedCode, `Esperava erro ${expectedCode}, recebi ${JSON.stringify(payload)}`);
+  return payload;
+}
+
 const timestamp = Date.now();
 const email = `smoke+${timestamp}@trotebox.local`;
 const phoneSuffix = String(timestamp).slice(-8).replace(/^0/, '8');
@@ -64,6 +72,12 @@ const duplicate = await request('/calls', {
   body: JSON.stringify(callBody)
 });
 assert(duplicate.call?.id === created.call.id, 'Idempotência não retornou a mesma chamada.');
+
+await expectError('/calls', 409, {
+  method: 'POST',
+  headers,
+  body: JSON.stringify({ ...callBody, recipientPhone: '+5511987654321' })
+}, 'IDEMPOTENCY_CONFLICT');
 
 const calls = await request('/calls', { headers });
 assert(calls.calls.some((call) => call.id === created.call.id), 'Chamada criada não apareceu no histórico.');
