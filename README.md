@@ -20,55 +20,35 @@ Monorepo autoral para uma plataforma de experiências de comédia por telefone, 
 - Twilio ou Vonage em produção; provedor mock somente em desenvolvimento/preview;
 - OTP/passwordless, idempotência, rate limit, auditoria e política antiabuso.
 
-## Caminho local adotado
+## Desenvolvimento local
 
-```text
-C:\Projetos\trote-box
-```
+Requer Node.js 22 e npm 10+.
 
-Repositório:
-
-```text
-https://github.com/Wpersoli/trotebox.git
-```
-
-## 1. Visualizar agora — sem infraestrutura
-
-Requer somente Node.js 22 e npm 10+.
+### Visualizar agora — sem infraestrutura
 
 ```powershell
-cd "C:\Projetos\trote-box"
 npm ci
 npm run preview:web
 ```
 
-Abra:
+Abra `http://127.0.0.1:3000`.
 
-```text
-http://127.0.0.1:3000
-```
+O preview usa dados simulados e permite navegar pela HOME com OTP simulado, dashboard, catálogo, novo trote, histórico, créditos e configurações. Não requer banco ou API.
 
-O preview usa dados simulados e permite navegar por HOME com OTP simulado, dashboard, catálogo, novo trote, histórico, créditos e configurações. Não requer banco ou API.
-
-## 2. Stack completa — mais tarde
-
-Quando Supabase/telefonia/pagamentos forem configurados:
+### Stack completa — quando a infraestrutura estiver configurada
 
 ```powershell
-cd "C:\Projetos\trote-box"
-Set-ExecutionPolicy -Scope Process Bypass -Force
 .\scripts\setup-local.ps1 -Database supabase -DatabaseUrl $DatabaseUrl -DirectUrl $DirectUrl -SkipInstall
 .\scripts\start-local.ps1
 ```
 
-Em outro PowerShell:
+Em outro terminal:
 
 ```powershell
-cd "C:\Projetos\trote-box"
 npm run smoke:local
 ```
 
-## URLs locais
+URLs padrão:
 
 - Web: `http://localhost:3000`
 - API: `http://localhost:3001/api/v1/health`
@@ -88,7 +68,6 @@ npm run quality
 
 `npm run quality` é a validação recomendada antes de commit: valida estrutura, domínio, lint, TypeScript, testes e o build real do frontend sem exigir Supabase. Para uma stack já configurada com banco/API, use `npm run quality:full`.
 
-
 ## Estrutura
 
 ```text
@@ -101,9 +80,9 @@ packages/
 scripts/      setup, preview, smoke test e validações
 ```
 
-## Git
+## Repositório
 
-O repositório deve permanecer privado durante o desenvolvimento. Consulte `GIT_FIRST_COMMIT.md` para os comandos exatos do primeiro commit no repositório `Wpersoli/trotebox`.
+O código-fonte é público para inspeção e colaboração. Segredos, ambientes de produção, bancos, tokens e credenciais permanecem fora do repositório.
 
 ## Segurança
 
