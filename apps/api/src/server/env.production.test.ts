@@ -21,7 +21,8 @@ const base = {
   TWILIO_FROM_NUMBER: '+5511000000000',
   TWILIO_VALIDATE_SIGNATURES: 'true',
   VOICE_ENGINE: 'provider',
-  RECORDING_ENABLED: 'false'
+  RECORDING_ENABLED: 'false',
+  CRON_SECRET: 'cron-secret-123456'
 } satisfies NodeJS.ProcessEnv;
 
 describe('production environment guards', () => {
@@ -57,5 +58,11 @@ describe('production environment guards', () => {
     expect(() => parseEnv({ ...base, TWILIO_AUTH_TOKEN: '' })).toThrow(
       'Twilio account credentials and from number are required in production.'
     );
+  });
+
+  it('requires cron authentication in production', () => {
+    expect(() => parseEnv({ ...base, CRON_SECRET: '' })).toThrow('CRON_SECRET is required in production.');
+    const parsed = parseEnv(base);
+    expect(parsed.CRON_SECRET).toBe('cron-secret-123456');
   });
 });
