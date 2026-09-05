@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     const xRequestId = request.headers.get('x-request-id') ?? '';
     if (!validateMercadoPagoSignature({ xSignature, xRequestId, dataId })) throw new AppError(401, 'INVALID_SIGNATURE', 'Assinatura Mercado Pago inválida.');
     const externalId = `${String(body.type ?? 'payment')}:${dataId}:${String(body.action ?? '')}:${String(body.id ?? '')}`;
-    const registered = await registerWebhook({ provider: WebhookProvider.MERCADOPAGO, externalEventId: externalId, signatureValid: true, rawBody, payload: body });
+    const registered = await registerWebhook({ provider: WebhookProvider.MERCADOPAGO, externalEventId: externalId, signatureValid: true, rawBody });
     if (registered.duplicate && registered.event.processedAt) return ok({ received: true, duplicate: true });
 
     try {
