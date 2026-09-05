@@ -60,6 +60,7 @@ export function parseEnv(input: NodeJS.ProcessEnv) {
     if (parsed.AUTH_DELIVERY === 'console') throw new Error('AUTH_DELIVERY cannot be console in production.');
     if (parsed.TWILIO_VALIDATE_SIGNATURES === false) throw new Error('TWILIO_VALIDATE_SIGNATURES must be true in production.');
     if (!parsed.BREVO_API_KEY || !parsed.EMAIL_FROM_ADDRESS) throw new Error('BREVO_API_KEY and EMAIL_FROM_ADDRESS are required in production.');
+    if (!parsed.CRON_SECRET) throw new Error('CRON_SECRET is required in production.');
 
     if (parsed.VOICE_ENGINE === 'custom') {
       if (!parsed.CUSTOM_TTS_URL || !parsed.CUSTOM_TTS_API_KEY) throw new Error('CUSTOM_TTS_URL and CUSTOM_TTS_API_KEY are required when VOICE_ENGINE=custom.');
