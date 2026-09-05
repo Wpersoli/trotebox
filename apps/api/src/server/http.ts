@@ -33,7 +33,7 @@ export function handleError(cause: unknown) {
     const isProductionServerError = process.env.NODE_ENV === 'production' && cause.status >= 500;
     return NextResponse.json({
       error: {
-        code: isProductionServerError ? 'INTERNAL_ERROR' : cause.code,
+        code: cause.code,
         message: isProductionServerError ? 'Erro interno inesperado.' : cause.message,
         ...(details !== undefined ? { details } : {}),
         requestId
