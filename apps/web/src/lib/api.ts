@@ -55,6 +55,7 @@ function friendlyMessageForCode(code: string) {
     case 'TELEPHONY_NOT_CONFIGURED': return 'Telefonia temporariamente indisponível. Nenhum crédito foi consumido.';
     case 'TWILIO_NOT_CONFIGURED':
     case 'VONAGE_NOT_CONFIGURED': return 'Telefonia ainda não configurada. Nenhum crédito foi consumido.';
+    case 'RATE_LIMITED': return 'Limite de uso atingido. Aguarde um pouco antes de tentar novamente.';
     default: return 'Não foi possível completar a solicitação.';
   }
 }
