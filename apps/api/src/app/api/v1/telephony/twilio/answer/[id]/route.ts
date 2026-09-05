@@ -25,16 +25,9 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
           throw new AppError(409, 'PROVIDER_CALL_CONFLICT', 'Identificador de chamada da operadora já vinculado a outro registro.');
         }
 
-        current = await tx.callOrder.update({
+        await tx.callOrder.update({
           where: { id: current.id },
           data: { providerCallId: callSid }
-        });
-        await tx.callEvent.create({
-          data: {
-            callId: current.id,
-            providerEventId: `start:${callSid}`,
-            status: current.status
-          }
         });
         current = await tx.callOrder.findUnique({ where: { id }, include: { script: true } });
         if (!current) throw new AppError(404, 'CALL_NOT_FOUND', 'Chamada não encontrada.');
