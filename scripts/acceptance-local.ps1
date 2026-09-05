@@ -61,7 +61,7 @@ function Wait-Http([string]$Url, [int]$TimeoutSeconds) {
       $httpFailure = Get-HttpFailureResult $_.Exception
       if ($null -ne $httpFailure) {
         if ($httpFailure.StatusCode -ge 500) {
-          throw "HTTP $($httpFailure.StatusCode) em $Url: $($httpFailure.Content)"
+          throw "HTTP $($httpFailure.StatusCode) em ${Url}: $($httpFailure.Content)"
         }
         return $httpFailure
       }
@@ -69,7 +69,7 @@ function Wait-Http([string]$Url, [int]$TimeoutSeconds) {
     }
     Start-Sleep -Seconds 2
   }
-  throw "Timeout aguardando $Url. Último erro: $lastError"
+  throw "Timeout aguardando ${Url}. Último erro: $lastError"
 }
 
 function Stop-ProcessTreeBestEffort([int]$RootProcessId) {
