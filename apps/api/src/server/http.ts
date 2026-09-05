@@ -2,6 +2,8 @@ import { randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 
+const MAX_JSON_BODY_BYTES = 32 * 1024;
+
 export class AppError extends Error {
   constructor(public status: number, public code: string, message: string, public details?: unknown) {
     super(message);
@@ -47,6 +49,19 @@ export function handleError(cause: unknown) {
 }
 
 export async function jsonBody(request: Request) {
-  try { return await request.json() as unknown; }
+  const contentLength = request.headers.get('content-length');
+  if (contentLength) {
+    const declaredBytes = Number.parseInt(contentLength, 10);
+    if (Number.isFinite(declaredBytes) && declaredBytes > MAX_JSON_BODY_BYTES) {
+      throw new AppError(413, 'REQUEST_BODY_TOO_LARGE', 'Corpo da requisição excede o limite permitido.');
+    }
+  }
+
+  const text = await request.text();
+  if (new TextEncoder().encode(text).byteLength > MAX_JSON_BODY_BYTES) {
+    throw new AppError(413, 'REQUEST_BODY_TOO_LARGE', 'Corpo da requisição excede o limite permitido.');
+  }
+
+  try { return JSON.parse(text) as unknown; }
   catch { throw new AppError(400, 'INVALID_JSON', 'Corpo JSON inválido.'); }
 }
