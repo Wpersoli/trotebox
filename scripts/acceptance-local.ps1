@@ -149,10 +149,12 @@ $acceptanceSucceeded = $false
 try {
   Write-Host ''
   Write-Host 'Iniciando Web + API em segundo plano...' -ForegroundColor Yellow
+  $nodeCommand = (Get-Command node.exe -ErrorAction Stop).Source
   $devProcess = Start-Process `
-    -FilePath 'cmd.exe' `
-    -ArgumentList '/d', '/s', '/c', 'npm run dev' `
+    -FilePath $nodeCommand `
+    -ArgumentList 'scripts/dev-all.mjs' `
     -WorkingDirectory $Root `
+    -WindowStyle Hidden `
     -RedirectStandardOutput $stdout `
     -RedirectStandardError $stderr `
     -PassThru
