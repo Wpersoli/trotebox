@@ -23,6 +23,17 @@ export function okPublic<T>(data: T, status = 200) {
   });
 }
 
+function isDatabaseConnectivityError(cause: unknown) {
+  if (!(cause instanceof Error)) return false;
+  const message = cause.message.toLowerCase();
+  return cause.name === 'PrismaClientInitializationError'
+    || message.includes('ecircuitbreaker')
+    || message.includes('too many authentication failures')
+    || message.includes('password authentication failed')
+    || message.includes('p1000')
+    || message.includes('p1001');
+}
+
 export function handleError(cause: unknown) {
   const requestId = randomUUID();
   if (cause instanceof AppError) {
@@ -43,8 +54,23 @@ export function handleError(cause: unknown) {
   if (cause instanceof ZodError) {
     return NextResponse.json({ error: { code: 'VALIDATION_ERROR', message: 'Dados inválidos.', details: cause.flatten(), requestId } }, { status: 400 });
   }
+
+  if (isDatabaseConnectivityError(cause)) {
+    const error = cause instanceof Error ? cause : new Error('Database unavailable');
+    console.error({ requestId, code: 'DATABASE_UNAVAILABLE', status: 503, name: error.name, message: error.message });
+    return NextResponse.json({
+      error: {
+        code: 'DATABASE_UNAVAILABLE',
+        message: process.env.NODE_ENV === 'production'
+          ? 'Dependência de banco de dados indisponível.'
+          : 'Banco de dados indisponível ou credenciais inválidas.',
+        requestId
+      }
+    }, { status: 503, headers: { 'Retry-After': '30' } });
+  }
+
   const error = cause instanceof Error ? cause : new Error('Unknown error');
-  console.error({ requestId, name: error.name, message: error.message, stack: error.stack });
+  console.error({ requestId, name: error.name, message: error.message });
   return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: 'Erro interno inesperado.', requestId } }, { status: 500 });
 }
 
