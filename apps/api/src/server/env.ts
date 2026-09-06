@@ -41,7 +41,8 @@ const schema = z.object({
   RECORDING_ENABLED: z.string().default('false').transform((v) => v === 'true'),
   RECORDING_RETENTION_DAYS: z.coerce.number().int().min(1).max(365).default(30),
   MAX_CALLS_PER_USER_PER_HOUR: z.coerce.number().int().min(1).max(100).default(5),
-  MAX_CALLS_PER_RECIPIENT_PER_DAY: z.coerce.number().int().min(1).max(20).default(2)
+  MAX_CALLS_PER_RECIPIENT_PER_DAY: z.coerce.number().int().min(1).max(20).default(2),
+  ALLOWED_RECIPIENT_PREFIXES: z.string().trim().min(2).default('+55')
 });
 
 export function parseEnv(input: NodeJS.ProcessEnv) {
@@ -61,6 +62,11 @@ export function parseEnv(input: NodeJS.ProcessEnv) {
     if (parsed.TWILIO_VALIDATE_SIGNATURES === false) throw new Error('TWILIO_VALIDATE_SIGNATURES must be true in production.');
     if (!parsed.BREVO_API_KEY || !parsed.EMAIL_FROM_ADDRESS) throw new Error('BREVO_API_KEY and EMAIL_FROM_ADDRESS are required in production.');
     if (!parsed.CRON_SECRET) throw new Error('CRON_SECRET is required in production.');
+
+    const recipientPrefixes = parsed.ALLOWED_RECIPIENT_PREFIXES.split(',').map((prefix) => prefix.trim()).filter(Boolean);
+    if (!recipientPrefixes.length || !recipientPrefixes.every((prefix) => /^\+[1-9]\d{0,2}$/.test(prefix))) {
+      throw new Error('ALLOWED_RECIPIENT_PREFIXES must contain comma-separated E.164 country calling prefixes such as +55 or +55,+1.');
+    }
 
     if (parsed.VOICE_ENGINE === 'custom') {
       if (!parsed.CUSTOM_TTS_URL || !parsed.CUSTOM_TTS_API_KEY) throw new Error('CUSTOM_TTS_URL and CUSTOM_TTS_API_KEY are required when VOICE_ENGINE=custom.');

@@ -23,6 +23,7 @@ const base = {
   TWILIO_VALIDATE_SIGNATURES: 'true',
   VOICE_ENGINE: 'provider',
   RECORDING_ENABLED: 'false',
+  ALLOWED_RECIPIENT_PREFIXES: '+55',
   CRON_SECRET: 'cron-secret-123456'
 } satisfies NodeJS.ProcessEnv;
 
@@ -65,6 +66,13 @@ describe('production environment guards', () => {
     expect(() => parseEnv({ ...base, TWILIO_TRIAL_MODE: 'true' })).toThrow(
       'TWILIO_TRIAL_MODE must be false in production.'
     );
+  });
+
+  it('validates outbound destination country-prefix allowlists', () => {
+    expect(() => parseEnv({ ...base, ALLOWED_RECIPIENT_PREFIXES: '55' })).toThrow(
+      'ALLOWED_RECIPIENT_PREFIXES must contain comma-separated E.164 country calling prefixes'
+    );
+    expect(parseEnv({ ...base, ALLOWED_RECIPIENT_PREFIXES: '+55,+1' }).ALLOWED_RECIPIENT_PREFIXES).toBe('+55,+1');
   });
 
   it('requires cron authentication in production', () => {

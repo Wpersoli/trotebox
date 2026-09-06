@@ -91,6 +91,7 @@ O código-fonte é público para inspeção e colaboração. Segredos, ambientes
 - autenticação de desenvolvimento deve ser desligada em produção;
 - gravação permanece desativada por padrão e só é habilitada com consentimento específico;
 - chamadas de emergência, padrões especiais bloqueados e destinos em supressão não devem ser processados;
+- destinos internacionais ficam bloqueados por padrão: `ALLOWED_RECIPIENT_PREFIXES=+55`; qualquer expansão de país deve ser deliberada e explícita;
 - o navegador não altera saldo diretamente;
 - pagamentos e telefonia são confirmados no backend por eventos assinados/idempotentes;
 - callbacks e gravações usam allowlists de origem e não devem seguir redirecionamentos inesperados;
