@@ -27,7 +27,7 @@ Execução local: 14 testes de domínio; 53 testes unitários (6 contratos, 44 A
 
 ## Gates ainda abertos
 
-1. ~~CI sobre o commit final e verificação da interface em navegador.~~ Concluído nesta candidata: `quality` e `CodeQL` verdes no commit remoto `5da31c0d854f5cb2bca1c353f7a0be6229f1c518`; preview Web/API `READY` e smoke check público concluído.
+1. ~~CI sobre o commit final e verificação da interface em navegador.~~ Concluído nesta candidata: `quality` e `CodeQL` verdes no commit remoto `94a57e8291b73ef40a44581ac6c06997285f601b`; preview Web/API `READY` e smoke check público concluído.
 2. Pagamento ponta a ponta com conta de teste/configuração apropriada: Pix, webhook assinado, crédito único e reconciliação.
 3. Telefonia controlada com destinatário autorizado e orçamento definidos, incluindo saldo/callbacks e falhas.
 4. Áudio aprovado, acessibilidade/mobile em dispositivo real, desempenho medido e divulgação com conteúdo real; a primeira camada visual e a acessibilidade estrutural do Web foram concluídas nesta candidata, mas a validação em dispositivo físico e com conteúdo final continua aberta.
@@ -45,6 +45,7 @@ Históricos de conversa ainda inacessíveis não bloqueiam estas correções de 
 
 ## Evidência de segurança e desempenho desta auditoria
 
+- Esta auditoria foi publicada no commit remoto `94a57e8291b73ef40a44581ac6c06997285f601b`; Web `dpl_A6AwXF8t7EzGBvRHhaD8jtet5Ruh` e API `dpl_4HBYjn1R8cGiCyqfi7cvabEQMoGY` terminaram `READY`, sem promoção dos aliases de produção.
 - No preview protegido, a navegação de smoke concluiu em aproximadamente 2,95 s incluindo o handshake temporário do Vercel; esse número não é LCP/INP/CLS e não substitui medição em dispositivo físico. O DOM final estava completo, o hero tinha 1500 px de largura natural e os preloads de ícone e hero estavam presentes.
 - O build local produziu 724,7 KiB de JavaScript e 48,4 KiB de CSS não comprimidos; o hero WebP tem 163,2 KiB. Esses números são inventário do artefato, não uma promessa de transferência de rede, e ficam registrados para a próxima medição real.
 - Web e API não apresentaram clusters de erro em runtime nas últimas 24 horas; os logs de erro/fatal de produção também não retornaram eventos.
