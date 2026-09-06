@@ -30,15 +30,15 @@ Execução local: 14 testes de domínio; 53 testes unitários (6 contratos, 44 A
 1. ~~CI sobre o commit final e verificação da interface em navegador.~~ Concluído nesta candidata: `quality` e `CodeQL` verdes no commit remoto `ad65776209f55b408c90cc725e0da29bbf4ce2d4`; preview Web/API `READY` e smoke check público concluído.
 2. Pagamento ponta a ponta com conta de teste/configuração apropriada: Pix, webhook assinado, crédito único e reconciliação.
 3. Telefonia controlada com destinatário autorizado e orçamento definidos, incluindo saldo/callbacks e falhas.
-4. Áudio aprovado, acessibilidade/mobile em dispositivo real, desempenho medido e divulgação com conteúdo real; a primeira camada visual da interface foi concluída nesta candidata.
+4. Áudio aprovado, acessibilidade/mobile em dispositivo real, desempenho medido e divulgação com conteúdo real; a primeira camada visual e a acessibilidade estrutural do Web foram concluídas nesta candidata, mas a validação em dispositivo físico e com conteúdo final continua aberta.
 5. Configuração de produção e rollback conferidos antes da promoção. Nenhum novo merge em main ou promoção de produção integra esta etapa.
 
 Históricos de conversa ainda inacessíveis não bloqueiam estas correções de código; a auditoria de decisões permanece parcial.
 
 ## Evidência da candidata visual
 
-- Branch `audit/sniper-10of10-2026-09`; código visual no commit remoto `86d70056d6ccc3b7a1ec613fb986f3c12a2c3ab2`; esta evidência no commit `ad65776209f55b408c90cc725e0da29bbf4ce2d4`.
+- Branch `audit/sniper-10of10-2026-09`; código visual no commit remoto `86d70056d6ccc3b7a1ec613fb986f3c12a2c3ab2`; candidata final de acessibilidade no commit `bf2c1c70f819a42aff950e64f5a845d762bf9d8a`.
 - Vercel Web e API geraram deployments `READY` para o commit de evidência; o healthcheck da API retornou HTTP 200 com banco `ok` e `cache-control: no-store`.
 - CI do commit de evidência: workflows `quality` e `CodeQL` concluídos com sucesso.
-- Preview público conferido em desktop: assets carregados após hidratação, contraste do cartão de acesso corrigido, FAQ expandindo normalmente e nenhum erro da aplicação no console (os únicos registros foram mensagens de uma extensão do navegador).
+- Preview público conferido em desktop: assets carregados após hidratação, contraste do cartão de acesso corrigido, skip-link moveu o foco por teclado para o conteúdo principal, FAQ expandiu normalmente e nenhum erro da aplicação apareceu no console (os únicos registros foram mensagens de uma extensão do navegador).
 - A rota autenticada não foi simulada no navegador sem uma conta/OTP real; o build, contratos, testes e estados do código foram verificados sem transmitir credenciais.
