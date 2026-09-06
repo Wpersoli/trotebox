@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { Brand } from '@/components/Brand';
 import { HomeAccess } from '@/components/HomeAccess';
+import { SkipLink } from '@/components/SkipLink';
 
 const publicScripts = [
   { title: 'Entrega impossível', category: 'Comédia leve', description: 'Uma entrega completamente absurda vira o centro de uma conversa divertida, com encerramento claramente humorístico.', credits: 3, duration: '1m05s' },
@@ -33,7 +34,7 @@ const faq = [
 export default function HomePage() {
   return (
     <>
-      <a className="skip-link" href="#home-content">Pular para o conteúdo principal</a>
+      <SkipLink targetId="home-content">Pular para o conteúdo principal</SkipLink>
       <header className="hero-nav home-nav">
         <div className="container hero-nav-inner">
           <Brand priority dark />

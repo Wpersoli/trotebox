@@ -113,14 +113,15 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `apps/web/src/app/layout.tsx` | 1173 | `d6d76a87cd92abc5a625e344b9c1498ffa6f3e559a82c460a42006ea5476bd83` |
 | `apps/web/src/app/login/page.tsx` | 463 | `fe57a0c01c1a011a15c758421be102bc6470e31a31637c2de460e1bd6eeb422f` |
 | `apps/web/src/app/not-found.tsx` | 983 | `c4c79c338d6cbab8fa60c129435515e5703fb0de2c0f2eefe5900a7e3c0e7223` |
-| `apps/web/src/app/page.tsx` | 11953 | `3ed9f9926e3e5554d919442691a90b320f5543faa7c584c83fa53d538a0df117` |
+| `apps/web/src/app/page.tsx` | 11998 | `89d1677d1cec5029b545115418b8ea086cbea26191eac530627ede6f947aed9b` |
 | `apps/web/src/app/settings/page.tsx` | 1229 | `7ca66e13f3d08391858eb19c4c30a2ec5eead880dc2ad10acb0fe72b86b4241f` |
 | `apps/web/src/app/wallet/page.tsx` | 20433 | `05012a8b907eab114a8e9d4eb4a491346cdcf1de2c0ccfa4dd085974594025b5` |
-| `apps/web/src/components/AppShell.tsx` | 3744 | `bbae250c6b7f0335648794f6ac06b47a867a7a017573d8f7582b22d8ccf5a576` |
+| `apps/web/src/components/AppShell.tsx` | 3778 | `21ec52b906c4185a77b2a357e2239566bb0dc7666ecff0f0ed7fd9575ec57e7b` |
 | `apps/web/src/components/AuthProvider.tsx` | 2408 | `ed68f26ca40c1116e6e2edea33d3e509f55ae3cb5594e7525cd074dbe31b4ad4` |
 | `apps/web/src/components/Brand.tsx` | 1088 | `699e7320f583877e262c8592f4f839a453c573a0cf8817ef6535d7bcc11dc7f0` |
 | `apps/web/src/components/HomeAccess.css` | 12711 | `dba07d2c89a3bd79999ff8d30bcb343ebecbd14e4fc094a742814cb7893df438` |
 | `apps/web/src/components/HomeAccess.tsx` | 7185 | `aacb74bffd8dc2709bd07833bc04cd14f3c183ce0cc331f0b8940eb3d1562db5` |
+| `apps/web/src/components/SkipLink.tsx` | 579 | `84ec2ca8c500d4c4326e4e1aa7846837933b0a6435ac11aafb89aaa4790a8449` |
 | `apps/web/src/lib/api.test.ts` | 2053 | `0c2b8bc75fee26893813d7c49a8585164033b78845bc0941ffe0a62cbe5178d7` |
 | `apps/web/src/lib/api.ts` | 10952 | `06ef0fa8f82d68c790bfd2e275b64471077aa9f019383b9f81dd981550d07c90` |
 | `apps/web/tsconfig.json` | 380 | `1a564353bec19c7296e901979f5f38cea3476e588043813d58de185b5472c6e4` |

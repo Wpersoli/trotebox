@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from './AuthProvider';
 import { useEffect, useState } from 'react';
 import { api, isPreviewMode } from '@/lib/api';
+import { SkipLink } from './SkipLink';
 
 const links = [
   { href: '/dashboard/', label: 'Visão geral', icon: '⌂' },
@@ -46,7 +47,7 @@ export function AppShell({ title, children }: { title: string; children: React.R
 
   return (
     <div className="app-layout">
-      <a className="skip-link" href="#app-content">Pular para o conteúdo principal</a>
+      <SkipLink targetId="app-content">Pular para o conteúdo principal</SkipLink>
       <aside className="sidebar">
         <Link href="/" className="app-brand" aria-label="TroteBox — página inicial">
           <span className="app-brand-mark" aria-hidden="true">TB</span>
