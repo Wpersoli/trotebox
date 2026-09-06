@@ -41,7 +41,12 @@ const previewCalls: Array<Record<string, unknown>> = [
 ];
 
 export class ApiError extends Error {
-  constructor(public status: number, message: string, public code = 'API_ERROR') {
+  constructor(
+    public status: number,
+    message: string,
+    public code = 'API_ERROR',
+    public retryAfterSeconds?: number
+  ) {
     super(message);
     this.name = 'ApiError';
   }
@@ -49,13 +54,35 @@ export class ApiError extends Error {
 
 type ErrorPayload = { error?: { code?: string } } | null;
 
-function friendlyMessageForCode(code: string) {
+export function parseRetryAfterSeconds(value: string | null, nowMs = Date.now()) {
+  if (!value) return undefined;
+  const trimmed = value.trim();
+  if (!trimmed) return undefined;
+
+  const seconds = Number(trimmed);
+  if (Number.isFinite(seconds) && seconds >= 0) return Math.max(1, Math.ceil(seconds));
+
+  const retryAtMs = Date.parse(trimmed);
+  if (!Number.isFinite(retryAtMs)) return undefined;
+  return Math.max(1, Math.ceil((retryAtMs - nowMs) / 1000));
+}
+
+function rateLimitMessage(retryAfterSeconds?: number) {
+  if (!retryAfterSeconds) return 'Limite de uso atingido. Aguarde um pouco antes de tentar novamente.';
+  if (retryAfterSeconds < 60) {
+    return `Limite de uso atingido. Tente novamente em ${retryAfterSeconds} ${retryAfterSeconds === 1 ? 'segundo' : 'segundos'}.`;
+  }
+  const minutes = Math.ceil(retryAfterSeconds / 60);
+  return `Limite de uso atingido. Tente novamente em cerca de ${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}.`;
+}
+
+function friendlyMessageForCode(code: string, retryAfterSeconds?: number) {
   switch (code) {
     case 'MERCADOPAGO_NOT_CONFIGURED': return 'Pix temporariamente indisponível. Nenhuma cobrança foi criada.';
     case 'TELEPHONY_NOT_CONFIGURED': return 'Telefonia temporariamente indisponível. Nenhum crédito foi consumido.';
     case 'TWILIO_NOT_CONFIGURED':
     case 'VONAGE_NOT_CONFIGURED': return 'Telefonia ainda não configurada. Nenhum crédito foi consumido.';
-    case 'RATE_LIMITED': return 'Limite de uso atingido. Aguarde um pouco antes de tentar novamente.';
+    case 'RATE_LIMITED': return rateLimitMessage(retryAfterSeconds);
     default: return 'Não foi possível completar a solicitação.';
   }
 }
@@ -80,7 +107,13 @@ async function request<T>(path: string, init: RequestInit = {}, timeoutMs = requ
     if (!response.ok) {
       const errorPayload = payload as ErrorPayload;
       const code = errorPayload?.error?.code ?? 'API_ERROR';
-      throw new ApiError(response.status, friendlyMessageForCode(code), code);
+      const retryAfterSeconds = parseRetryAfterSeconds(response.headers.get('Retry-After'));
+      throw new ApiError(
+        response.status,
+        friendlyMessageForCode(code, retryAfterSeconds),
+        code,
+        retryAfterSeconds
+      );
     }
     return payload as T;
   } catch (cause) {
