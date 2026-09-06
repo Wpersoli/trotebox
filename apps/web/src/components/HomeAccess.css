@@ -223,6 +223,17 @@
   .home-nav .brand { max-width: 56vw; }
   .home-login-button { min-width: 94px; }
 }
+@media (max-width: 420px) {
+  .home-nav .hero-nav-inner { gap: 8px; }
+  .home-nav .brand { max-width: calc(100% - 88px); }
+  .home-login-button { min-width: 76px; min-height: 40px; padding-inline: 10px; font-size: .82rem; }
+  .home-access-column > .access-card { padding-inline: 16px; }
+  .access-card h1 { font-size: clamp(1.8rem, 10vw, 2.2rem); }
+  .access-hero-mascot { width: 60px; height: 60px; right: 10px; }
+  .access-card-kicker { max-width: calc(100% - 64px); letter-spacing: .08em; }
+  .home-access-assurance { justify-content: stretch; }
+  .home-access-assurance span { width: 100%; text-align: center; }
+}
 @media (prefers-reduced-motion: reduce) {
   .home-step-card, .button, .home-nav .nav-links a::after { transition: none !important; }
   .home-step-card:hover, .button:hover { transform: none !important; }
