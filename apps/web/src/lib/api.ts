@@ -119,7 +119,7 @@ async function request<T>(path: string, init: RequestInit = {}, timeoutMs = requ
   } catch (cause) {
     if (cause instanceof ApiError) throw cause;
     if (cause instanceof DOMException && cause.name === 'AbortError') {
-      throw new ApiError(408, 'A solicitação demorou demais e foi cancelada.', 'REQUEST_TIMEOUT');
+      throw new ApiError(408, 'A confirmação demorou mais que o esperado. A operação pode ter sido recebida; tente consultar novamente.', 'REQUEST_TIMEOUT');
     }
     throw new ApiError(0, 'Falha de conexão com o servidor.', 'NETWORK_ERROR');
   } finally {
@@ -172,9 +172,9 @@ export const api = {
     ? { checkoutUrl: `/wallet/?preview=stripe&pack=${encodeURIComponent(packCode)}` }
     : request<{ checkoutUrl: string }>('/payments/stripe/checkout', { method: 'POST', body: JSON.stringify({ packCode, idempotencyKey: crypto.randomUUID() }) }),
 
-  pix: async (packCode: string) => isPreviewMode
+  pix: async (packCode: string, idempotencyKey: string) => isPreviewMode
     ? { internalPaymentId: 'preview-internal-pix', paymentId: 'preview-pix', qrCode: `00020126TROTEBOX-PREVIEW-${packCode}`, expiresAt: new Date(Date.now() + 1800000).toISOString() }
-    : request<{ internalPaymentId: string; paymentId: string; qrCode: string; qrCodeBase64?: string; ticketUrl?: string; expiresAt?: string }>('/payments/mercadopago/pix', { method: 'POST', body: JSON.stringify({ packCode, idempotencyKey: crypto.randomUUID() }) }),
+    : request<{ internalPaymentId: string; paymentId: string; qrCode: string; qrCodeBase64?: string; ticketUrl?: string; expiresAt?: string }>('/payments/mercadopago/pix', { method: 'POST', body: JSON.stringify({ packCode, idempotencyKey }) }, 30000),
 
   mercadoPagoStatus: async (internalPaymentId: string) => isPreviewMode
     ? { status: 'PENDING', reconciled: false }

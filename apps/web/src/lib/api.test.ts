@@ -40,3 +40,19 @@ describe('Retry-After handling', () => {
     });
   });
 });
+
+describe('Pix recovery', () => {
+  it('reuses the caller payment key after an uncertain network failure', async () => {
+    const fetchMock = vi.fn()
+      .mockRejectedValueOnce(new TypeError('network disconnected'))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ internalPaymentId: 'same-payment', qrCode: 'pix' })));
+    vi.stubGlobal('fetch', fetchMock);
+    await expect(api.pix('starter', 'stable-payment-key')).rejects.toMatchObject({ code: 'NETWORK_ERROR' });
+    await expect(api.pix('starter', 'stable-payment-key')).resolves.toMatchObject({ internalPaymentId: 'same-payment' });
+    const bodies = fetchMock.mock.calls.map((call) => JSON.parse(call[1].body));
+    expect(bodies).toEqual([
+      { packCode: 'starter', idempotencyKey: 'stable-payment-key' },
+      { packCode: 'starter', idempotencyKey: 'stable-payment-key' }
+    ]);
+  });
+});

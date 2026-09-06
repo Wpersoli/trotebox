@@ -24,7 +24,13 @@ export function AppShell({ title, children }: { title: string; children: React.R
 
   useEffect(() => {
     if (ready && !user) router.replace('/#acesso');
-    if (user) api.wallet().then((data) => setBalance(data.balanceCredits)).catch(() => undefined);
+    let active = true;
+    const refresh = () => {
+      if (user) void api.wallet().then((data) => { if (active) setBalance(data.balanceCredits); }).catch(() => undefined);
+    };
+    refresh();
+    window.addEventListener('trotebox:wallet-updated', refresh);
+    return () => { active = false; window.removeEventListener('trotebox:wallet-updated', refresh); };
   }, [ready, user, router]);
 
   if (!ready || !user) return null;

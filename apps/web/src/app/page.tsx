@@ -122,7 +122,7 @@ export default function HomePage() {
             <div className="home-step-grid">
               {publicPacks.map((pack) => (
                 <article className="home-step-card" key={pack.name}>
-                  <b>{pack.highlight ? 'MAIS ESCOLHIDO' : 'PACOTE'}</b>
+                  <b>{pack.highlight ? 'EM DESTAQUE' : 'PACOTE'}</b>
                   <h3>{pack.name}</h3>
                   <p><strong>{pack.credits} créditos</strong></p>
                   <p><strong>{pack.price}</strong></p>
