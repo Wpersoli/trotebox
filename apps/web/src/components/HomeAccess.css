@@ -202,6 +202,53 @@
   outline: 3px solid rgba(91,33,199,.35);
   outline-offset: 3px;
 }
+
+/* Cards de vitrine e preços reutilizam home-step-card, mas seus rótulos não
+   são marcadores numéricos. Mantemos o badge legível e restauramos o quadrado
+   apenas no bloco "Como funciona". */
+.home-step-card > b {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: auto;
+  min-height: 28px;
+  max-width: 100%;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f1eaff;
+  color: var(--purple);
+  font-size: .72rem;
+  font-weight: 900;
+  line-height: 1.2;
+  text-align: center;
+}
+.home-step-card > h3 {
+  margin: 13px 0 9px;
+  color: var(--text);
+  font-size: 1.05rem;
+  letter-spacing: -.025em;
+}
+.home-step-card > small {
+  display: block;
+  margin-top: 12px;
+  color: #817a91;
+  font-size: .72rem;
+  line-height: 1.45;
+}
+#como-funciona .home-step-card > b {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0;
+  border-radius: 11px;
+  color: #fff;
+}
+#como-funciona .orange-step > b { background: linear-gradient(145deg, #ffac1e, var(--orange)); }
+#como-funciona .purple-step > b { background: linear-gradient(145deg, var(--purple-soft), var(--purple)); }
+#como-funciona .green-step > b { background: linear-gradient(145deg, #78c980, var(--green)); }
+
 @media (max-width: 980px) {
   .home-access-grid { grid-template-columns: 1fr; }
   .home-access-column { position: static; }
