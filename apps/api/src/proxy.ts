@@ -35,6 +35,10 @@ export function proxy(request: NextRequest) {
   headers.forEach((value, key) => response.headers.set(key, value));
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'no-referrer');
+  response.headers.set('Content-Security-Policy', "default-src 'none'; base-uri 'none'; frame-ancestors 'none'");
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
+  response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
   response.headers.set('Cache-Control', 'no-store');
   return response;
 }

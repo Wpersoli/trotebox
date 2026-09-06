@@ -27,7 +27,7 @@ Execução local: 14 testes de domínio; 53 testes unitários (6 contratos, 44 A
 
 ## Gates ainda abertos
 
-1. ~~CI sobre o commit final e verificação da interface em navegador.~~ Concluído nesta candidata: `quality` e `CodeQL` verdes no commit remoto `ad65776209f55b408c90cc725e0da29bbf4ce2d4`; preview Web/API `READY` e smoke check público concluído.
+1. ~~CI sobre o commit final e verificação da interface em navegador.~~ Concluído nesta candidata: `quality` e `CodeQL` verdes no commit remoto `5da31c0d854f5cb2bca1c353f7a0be6229f1c518`; preview Web/API `READY` e smoke check público concluído.
 2. Pagamento ponta a ponta com conta de teste/configuração apropriada: Pix, webhook assinado, crédito único e reconciliação.
 3. Telefonia controlada com destinatário autorizado e orçamento definidos, incluindo saldo/callbacks e falhas.
 4. Áudio aprovado, acessibilidade/mobile em dispositivo real, desempenho medido e divulgação com conteúdo real; a primeira camada visual e a acessibilidade estrutural do Web foram concluídas nesta candidata, mas a validação em dispositivo físico e com conteúdo final continua aberta.
@@ -42,3 +42,12 @@ Históricos de conversa ainda inacessíveis não bloqueiam estas correções de 
 - CI do commit de evidência: workflows `quality` e `CodeQL` concluídos com sucesso.
 - Preview público conferido em desktop: assets carregados após hidratação, contraste do cartão de acesso corrigido, skip-link moveu o foco por teclado para o conteúdo principal, FAQ expandiu normalmente e nenhum erro da aplicação apareceu no console (os únicos registros foram mensagens de uma extensão do navegador).
 - A rota autenticada não foi simulada no navegador sem uma conta/OTP real; o build, contratos, testes e estados do código foram verificados sem transmitir credenciais.
+
+## Evidência de segurança e desempenho desta auditoria
+
+- No preview protegido, a navegação de smoke concluiu em aproximadamente 2,95 s incluindo o handshake temporário do Vercel; esse número não é LCP/INP/CLS e não substitui medição em dispositivo físico. O DOM final estava completo, o hero tinha 1500 px de largura natural e os preloads de ícone e hero estavam presentes.
+- O build local produziu 724,7 KiB de JavaScript e 48,4 KiB de CSS não comprimidos; o hero WebP tem 163,2 KiB. Esses números são inventário do artefato, não uma promessa de transferência de rede, e ficam registrados para a próxima medição real.
+- Web e API não apresentaram clusters de erro em runtime nas últimas 24 horas; os logs de erro/fatal de produção também não retornaram eventos.
+- A API agora envia CSP mínima (`default-src 'none'`), `X-Frame-Options`, `Permissions-Policy` e COOP além de `nosniff`, referrer restrito e `no-store`.
+- O preview não falha quando localStorage é bloqueado ou corrompido: o usuário armazenado é validado antes da restauração e a sessão corrente continua utilizável. QR Codes só aceitam base64 de imagem permitido; links de pagamento só são expostos quando usam HTTPS.
+- `npm audit --omit=dev --audit-level=high` continuou retornando zero vulnerabilidades após as alterações. A validação integral local permaneceu verde: 14 testes de domínio, 53 testes unitários, lint, tipos e build Web.

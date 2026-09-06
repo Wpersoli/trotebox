@@ -11,6 +11,10 @@ const commerceMode = process.env.NEXT_PUBLIC_COMMERCE_MODE ?? 'web';
 
 const RECONCILE_INTERVAL_MS = 10_000;
 const MAX_RECONCILE_ATTEMPTS = 90;
+const brlFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL'
+});
 
 const failedPaymentStatuses = [
   'REJECTED',
@@ -32,6 +36,30 @@ type PixIntent = {
   code: string;
   key: string;
 };
+
+function qrCodeImageSource(value?: string) {
+  const trimmed = value?.trim() ?? '';
+  if (!trimmed || trimmed.length > 2_000_000) return '';
+
+  if (/^data:image\/(?:png|jpeg|webp);base64,[a-z0-9+/]+={0,2}$/i.test(trimmed)) {
+    return trimmed;
+  }
+
+  return /^[a-z0-9+/]+={0,2}$/i.test(trimmed)
+    ? `data:image/png;base64,${trimmed}`
+    : '';
+}
+
+function safePaymentUrl(value?: string) {
+  if (!value) return '';
+
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' ? url.toString() : '';
+  } catch {
+    return '';
+  }
+}
 
 function readPixIntent(storageKey: string): PixIntent | null {
   try {
@@ -289,11 +317,8 @@ export default function WalletPage() {
 
   const pixPending = pix?.status === 'PENDING';
 
-  const qrImageSrc = pix?.qrCodeBase64
-    ? pix.qrCodeBase64.startsWith('data:')
-      ? pix.qrCodeBase64
-      : `data:image/png;base64,${pix.qrCodeBase64}`
-    : '';
+  const qrImageSrc = qrCodeImageSource(pix?.qrCodeBase64);
+  const paymentUrl = safePaymentUrl(pix?.ticketUrl);
 
   return (
     <AppShell title="Créditos">
@@ -483,14 +508,14 @@ export default function WalletPage() {
                         Copiar código Pix
                       </button>
 
-                      {pix.ticketUrl && (
+                      {paymentUrl && (
                         <>
                           <button
                             type="button"
                             className="button"
                             onClick={() =>
                               copyText(
-                                pix.ticketUrl!,
+                                paymentUrl,
                                 'Link de pagamento copiado!'
                               )
                             }
@@ -503,7 +528,7 @@ export default function WalletPage() {
                             className="button"
                             onClick={() =>
                               window.open(
-                                pix.ticketUrl,
+                                paymentUrl,
                                 '_blank',
                                 'noopener,noreferrer'
                               )
@@ -618,10 +643,7 @@ export default function WalletPage() {
 
                   <div className="pack-price">
                     créditos ·{' '}
-                    {new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL'
-                    }).format(pack.priceCents / 100)}
+                    {brlFormatter.format(pack.priceCents / 100)}
                   </div>
 
                   <div className="payment-options payment-options-single">

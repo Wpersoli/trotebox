@@ -40,7 +40,7 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `apps/api/src/app/api/v1/webhooks/vonage/status/route.ts` | 2301 | `d68d09871f6d721d63cc357ec867639ae431fc3db739fb5027b3bb6909dfd3bb` |
 | `apps/api/src/app/layout.tsx` | 154 | `b6409c401754850064f9bb42ca5d3da2ce01a122dd3153fea9268a7af65a87b0` |
 | `apps/api/src/app/page.tsx` | 172 | `d50b7db0da6130b0c6b17da390b4aaeee61ab70a2341cf9b5cbab982e153b54d` |
-| `apps/api/src/proxy.ts` | 2034 | `816029d7e3fd6fd16203b9c6c9c40b12c9d2fa38581465aa7586c36d521c3cd5` |
+| `apps/api/src/proxy.ts` | 2378 | `2ae99fdf12f7cf5f23cc126435669950859ef23de55e6f7c16fe69b251cf35da` |
 | `apps/api/src/server/audit.ts` | 1262 | `8e21c715b216031b4e33c12247999cd23484dce68827ba51359ebdeac6160fb3` |
 | `apps/api/src/server/auth-code.ts` | 4340 | `a351783b246c10a59b22d24e2629015187b6bac1abf175a2ef091a0a60059a91` |
 | `apps/api/src/server/auth.ts` | 4618 | `456f47252e9ef3ce2f92d377d61c56b04df555cac6d54c558e7f470757fd7ab6` |
@@ -115,9 +115,9 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `apps/web/src/app/not-found.tsx` | 983 | `c4c79c338d6cbab8fa60c129435515e5703fb0de2c0f2eefe5900a7e3c0e7223` |
 | `apps/web/src/app/page.tsx` | 11998 | `89d1677d1cec5029b545115418b8ea086cbea26191eac530627ede6f947aed9b` |
 | `apps/web/src/app/settings/page.tsx` | 1229 | `7ca66e13f3d08391858eb19c4c30a2ec5eead880dc2ad10acb0fe72b86b4241f` |
-| `apps/web/src/app/wallet/page.tsx` | 20433 | `05012a8b907eab114a8e9d4eb4a491346cdcf1de2c0ccfa4dd085974594025b5` |
+| `apps/web/src/app/wallet/page.tsx` | 20893 | `5aee204559e09aa588d1c6ea9ae6521a0bde256e8dfbf3d3e868356adcc040bd` |
 | `apps/web/src/components/AppShell.tsx` | 3778 | `21ec52b906c4185a77b2a357e2239566bb0dc7666ecff0f0ed7fd9575ec57e7b` |
-| `apps/web/src/components/AuthProvider.tsx` | 2408 | `ed68f26ca40c1116e6e2edea33d3e509f55ae3cb5594e7525cd074dbe31b4ad4` |
+| `apps/web/src/components/AuthProvider.tsx` | 3521 | `fd9c44b91663deb7e9dcb7a97d7465bcc431b1c0b1dc8f01f265228a5f051459` |
 | `apps/web/src/components/Brand.tsx` | 1088 | `699e7320f583877e262c8592f4f839a453c573a0cf8817ef6535d7bcc11dc7f0` |
 | `apps/web/src/components/HomeAccess.css` | 12711 | `dba07d2c89a3bd79999ff8d30bcb343ebecbd14e4fc094a742814cb7893df438` |
 | `apps/web/src/components/HomeAccess.tsx` | 7185 | `aacb74bffd8dc2709bd07833bc04cd14f3c183ce0cc331f0b8940eb3d1562db5` |
@@ -160,7 +160,7 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `packages/db/src/client.ts` | 540 | `3974bdecdbe6694600e26ba9adc2fd32da95e0529d014fd9f3fb3ea31121b9c4` |
 | `packages/db/src/seed.ts` | 4264 | `25341cdeef00d56f31df36e4d2929f58d38a8d9d515fadb6e24dcefe1c67d442` |
 | `packages/db/tsconfig.json` | 121 | `9e388ea60852028037c4fd8a6e0311c02d4ff1703d66e5f9b22276b07dcb82d2` |
-| `QUALITY_PROGRESS.md` | 5271 | `5505dc155fd6a8b111bae529227941c59b9ae100831b52c567a115cbfba1441e` |
+| `QUALITY_PROGRESS.md` | 6722 | `c9ba1adc784ace9c8ac0738a76007cc980f7f48a75faeeb7349838c965c12ddf` |
 | `README.md` | 4806 | `7ed7795ae11686383194774bb43623ee5a0fac610d262c604d954e1ad014a992` |
 | `REBRAND_0.3.1.md` | 955 | `6b3ed821a4728b042385a18b2782fa22f47cf2f9578b20204e71d7d40bf66c9f` |
 | `RELEASE_NOTES_0.3.4.md` | 639 | `1768bf5455ad80873d59a3a79e7055cf249e880c15be3fbb74d7597bd186ac76` |
