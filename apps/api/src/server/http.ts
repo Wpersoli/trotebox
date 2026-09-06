@@ -6,7 +6,13 @@ const MAX_JSON_BODY_BYTES = 32 * 1024;
 export const MAX_WEBHOOK_BODY_BYTES = 256 * 1024;
 
 export class AppError extends Error {
-  constructor(public status: number, public code: string, message: string, public details?: unknown) {
+  constructor(
+    public status: number,
+    public code: string,
+    message: string,
+    public details?: unknown,
+    public headers?: Record<string, string>
+  ) {
     super(message);
   }
 }
@@ -69,7 +75,7 @@ export function handleError(cause: unknown) {
         ...(details !== undefined ? { details } : {}),
         requestId
       }
-    }, { status: cause.status });
+    }, { status: cause.status, headers: cause.headers });
   }
   if (cause instanceof ZodError) {
     return NextResponse.json({ error: { code: 'VALIDATION_ERROR', message: 'Dados inválidos.', details: cause.flatten(), requestId } }, { status: 400 });

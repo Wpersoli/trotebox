@@ -37,6 +37,22 @@ describe('HTTP error handling', () => {
     expect(body.error.message).toBe('Conflito de idempotência.');
   });
 
+  it('propagates safe application response headers', async () => {
+    const response = handleError(new AppError(
+      429,
+      'RATE_LIMITED',
+      'Limite de uso atingido.',
+      undefined,
+      { 'Retry-After': '17' }
+    ));
+
+    expect(response.status).toBe(429);
+    expect(response.headers.get('Retry-After')).toBe('17');
+    const body = await response.json();
+    expect(body.error.code).toBe('RATE_LIMITED');
+    expect(body.error).not.toHaveProperty('details');
+  });
+
   it('never returns the underlying error object for unknown failures', async () => {
     const error = new Error('connection secret should never reach the client');
     const response = handleError(error);
