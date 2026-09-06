@@ -285,3 +285,62 @@
   .home-step-card, .button, .home-nav .nav-links a::after { transition: none !important; }
   .home-step-card:hover, .button:hover { transform: none !important; }
 }
+
+/* v0.4.0 — public surface aligned with the studio references */
+.brand-dark-lockup { display: grid; gap: 3px; min-width: 0; }
+.brand-dark-lockup strong { color: #fff; font-size: 1.24rem; line-height: 1; letter-spacing: -.055em; }
+.brand-dark-lockup strong span { color: #ff8e3e; }
+.brand-dark-lockup small { overflow: hidden; color: #a99dbf; font-size: .58rem; font-weight: 800; letter-spacing: .07em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.home-nav {
+  border-bottom-color: rgba(181, 137, 255, .14);
+  background: rgba(11, 8, 23, .84);
+}
+.home-nav .nav-links { color: #b7accb; }
+.home-nav .nav-links a:hover { color: #fff; }
+.home-nav .home-login-button { color: #f8f4ff; border-color: rgba(181, 137, 255, .30); background: rgba(255,255,255,.06); box-shadow: none; }
+.home-nav .home-login-button:hover { border-color: rgba(255, 145, 62, .65); background: rgba(255, 145, 62, .10); }
+.home-nav .nav-links a::after { background: #ff923d; }
+.home-access-hero {
+  color: #f8f4ff;
+  background:
+    radial-gradient(circle at 4% 15%, rgba(255, 162, 71, .12), transparent 24rem),
+    radial-gradient(circle at 95% 10%, rgba(113, 64, 233, .24), transparent 30rem),
+    linear-gradient(145deg, #0b0917 0%, #100b21 53%, #190b2c 100%);
+}
+.home-access-hero::before { background: radial-gradient(circle at 90% 34%, rgba(181, 124, 255, .10), transparent 30rem); }
+.home-hero-image-wrap { border-color: rgba(188, 147, 255, .25); background: #17112f; box-shadow: 0 30px 78px rgba(0,0,0,.38); }
+.home-hero-copy-overlay { border-top-color: rgba(188, 147, 255, .18); color: #b9aecb; background: rgba(17, 12, 34, .96); }
+.home-showcase-actions .button.secondary { color: #efe9fc; border-color: rgba(188, 147, 255, .26); background: rgba(255,255,255,.05); box-shadow: none; }
+.home-showcase-actions .button.secondary:hover { border-color: rgba(255, 148, 63, .55); background: rgba(255, 148, 63, .10); }
+.home-trust-row span { color: #bfb3d0; border-color: rgba(188, 147, 255, .19); background: rgba(255,255,255,.045); box-shadow: none; }
+.home-step-card { border-color: rgba(188, 147, 255, .17); background: linear-gradient(145deg, rgba(30, 22, 57, .94), rgba(19, 14, 38, .96)); box-shadow: 0 17px 38px rgba(0,0,0,.24); }
+.home-step-card:hover { box-shadow: 0 21px 45px rgba(0,0,0,.32); }
+.home-step-card h2, .home-step-card > h3 { color: #fbf9ff; }
+.home-step-card p { color: #b6abc9; }
+.home-step-card > small { color: #8d81a2; }
+.home-access-assurance span { color: #a99dbd; border-color: rgba(188, 147, 255, .17); background: rgba(255,255,255,.045); }
+.home-access-assurance span b { color: #c29bff; }
+.home-info-section, .home-platform-section {
+  color: #f8f4ff;
+  border-top-color: rgba(188, 147, 255, .12);
+  background: #100c20;
+}
+.home-info-section:nth-of-type(even) { background: #0d0a19; }
+.home-info-grid h2, .home-platform-row h2 { color: #fff; }
+.home-info-grid p, .home-platform-row > p { color: #b7acc9; }
+.home-info-points span { color: #ddd4eb; border-color: rgba(188, 147, 255, .16); background: rgba(255,255,255,.045); }
+.home-info-points b { color: #c19aff; background: rgba(121, 73, 218, .20); }
+.home-info-points details { border: 1px solid rgba(188, 147, 255, .16); border-radius: 16px; background: rgba(255,255,255,.035); }
+.home-info-points summary { padding: 15px 17px; color: #f5f0ff; cursor: pointer; list-style-position: inside; }
+.home-info-points summary b { display: inline; padding: 0; color: #f5f0ff; background: transparent; }
+.home-info-points details p { margin: 0; padding: 0 17px 16px 37px; color: #aea2c1; font-size: .86rem; line-height: 1.6; }
+.platform-row span { color: #d8cfea; border-color: rgba(188, 147, 255, .16); background: rgba(255,255,255,.045); box-shadow: none; }
+.home-footer { color: #9d91b2; border-top-color: rgba(188, 147, 255, .14); background: #0a0814; }
+.home-footer p { color: #d9d0e9; }
+.home-footer a:hover { color: #fff; }
+.home-footer small { color: #7d718f; }
+
+@media (max-width: 680px) {
+  .home-nav .nav-links { display: none; }
+  .home-showcase-actions .button.secondary { color: #efe9fc; }
+}

@@ -35,7 +35,7 @@ export default function HomePage() {
     <>
       <header className="hero-nav home-nav">
         <div className="container hero-nav-inner">
-          <Brand priority />
+          <Brand priority dark />
           <nav className="nav-links" aria-label="Navegação da página inicial">
             <a href="#como-funciona">Como funciona</a>
             <a href="#experiencias">Experiências</a>
@@ -184,7 +184,7 @@ export default function HomePage() {
 
       <footer className="footer home-footer">
         <div className="container">
-          <Brand />
+          <Brand dark />
           <p>TroteBox — Riso na linha. Surpresa na caixa.</p>
           <nav aria-label="Links de confiança">
             <a href="#precos">Preços</a>{' · '}

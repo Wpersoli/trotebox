@@ -108,13 +108,13 @@ path,bytes,lines,sha256
 "apps/web/src/app/layout.tsx",1173,38,d6d76a87cd92abc5a625e344b9c1498ffa6f3e559a82c460a42006ea5476bd83
 "apps/web/src/app/login/page.tsx",463,21,fe57a0c01c1a011a15c758421be102bc6470e31a31637c2de460e1bd6eeb422f
 "apps/web/src/app/not-found.tsx",983,17,c4c79c338d6cbab8fa60c129435515e5703fb0de2c0f2eefe5900a7e3c0e7223
-"apps/web/src/app/page.tsx",11822,201,d8e61f32db4ad20f9f8dc251b8fd9ece1fa2f9444809065004118d06447a9de5
+"apps/web/src/app/page.tsx",11832,201,7480bafa23ea618cc8dbede96d222ef0c61c4411afcc41843187c29eb3cb894f
 "apps/web/src/app/settings/page.tsx",1229,24,7ca66e13f3d08391858eb19c4c30a2ec5eead880dc2ad10acb0fe72b86b4241f
 "apps/web/src/app/wallet/page.tsx",20214,658,a15dceedb9b8691b675c969b4a4f8e33356cfc35f8a82ac427a20e580fa2e2b2
 "apps/web/src/components/AppShell.tsx",3414,78,f53770fb9f14fd7a5e00bc2a98d52a6b459cf71eaa197dfddca6b536c137dbf2
 "apps/web/src/components/AuthProvider.tsx",2408,71,ed68f26ca40c1116e6e2edea33d3e509f55ae3cb5594e7525cd074dbe31b4ad4
-"apps/web/src/components/Brand.tsx",828,29,d89851a992635d9a0c261a416a224a3e611ea5787f67594ba110ce79a485641f
-"apps/web/src/components/HomeAccess.css",8420,288,c39ea8d5aed95ffd65d547fdd99ce29d3899d059540139a41893625a2efc9884
+"apps/web/src/components/Brand.tsx",1088,34,699e7320f583877e262c8592f4f839a453c573a0cf8817ef6535d7bcc11dc7f0
+"apps/web/src/components/HomeAccess.css",12506,347,c2990414b1d2a5bbce422056da05241ad9b27b55fb6dc731443ad1ada6c82f26
 "apps/web/src/components/HomeAccess.tsx",7137,182,0d3f25764d76b2db15fca3441676b53cc08abad3628fa20919724f8a0018c521
 "apps/web/src/lib/api.test.ts",2053,59,0c2b8bc75fee26893813d7c49a8585164033b78845bc0941ffe0a62cbe5178d7
 "apps/web/src/lib/api.ts",10952,183,06ef0fa8f82d68c790bfd2e275b64471077aa9f019383b9f81dd981550d07c90
