@@ -119,7 +119,7 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `apps/web/src/components/AppShell.tsx` | 3414 | `f53770fb9f14fd7a5e00bc2a98d52a6b459cf71eaa197dfddca6b536c137dbf2` |
 | `apps/web/src/components/AuthProvider.tsx` | 2408 | `ed68f26ca40c1116e6e2edea33d3e509f55ae3cb5594e7525cd074dbe31b4ad4` |
 | `apps/web/src/components/Brand.tsx` | 1088 | `699e7320f583877e262c8592f4f839a453c573a0cf8817ef6535d7bcc11dc7f0` |
-| `apps/web/src/components/HomeAccess.css` | 12506 | `c2990414b1d2a5bbce422056da05241ad9b27b55fb6dc731443ad1ada6c82f26` |
+| `apps/web/src/components/HomeAccess.css` | 12711 | `dba07d2c89a3bd79999ff8d30bcb343ebecbd14e4fc094a742814cb7893df438` |
 | `apps/web/src/components/HomeAccess.tsx` | 7137 | `0d3f25764d76b2db15fca3441676b53cc08abad3628fa20919724f8a0018c521` |
 | `apps/web/src/lib/api.test.ts` | 2053 | `0c2b8bc75fee26893813d7c49a8585164033b78845bc0941ffe0a62cbe5178d7` |
 | `apps/web/src/lib/api.ts` | 10952 | `06ef0fa8f82d68c790bfd2e275b64471077aa9f019383b9f81dd981550d07c90` |

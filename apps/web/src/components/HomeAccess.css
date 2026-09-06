@@ -312,12 +312,15 @@
 .home-hero-copy-overlay { border-top-color: rgba(188, 147, 255, .18); color: #b9aecb; background: rgba(17, 12, 34, .96); }
 .home-showcase-actions .button.secondary { color: #efe9fc; border-color: rgba(188, 147, 255, .26); background: rgba(255,255,255,.05); box-shadow: none; }
 .home-showcase-actions .button.secondary:hover { border-color: rgba(255, 148, 63, .55); background: rgba(255, 148, 63, .10); }
+.home-trust-row { background: transparent; }
 .home-trust-row span { color: #bfb3d0; border-color: rgba(188, 147, 255, .19); background: rgba(255,255,255,.045); box-shadow: none; }
 .home-step-card { border-color: rgba(188, 147, 255, .17); background: linear-gradient(145deg, rgba(30, 22, 57, .94), rgba(19, 14, 38, .96)); box-shadow: 0 17px 38px rgba(0,0,0,.24); }
 .home-step-card:hover { box-shadow: 0 21px 45px rgba(0,0,0,.32); }
 .home-step-card h2, .home-step-card > h3 { color: #fbf9ff; }
 .home-step-card p { color: #b6abc9; }
 .home-step-card > small { color: #8d81a2; }
+.home-access-column > .access-card { color: var(--text); }
+.home-access-column > .access-card h1, .home-access-column > .access-card h2 { color: var(--text); }
 .home-access-assurance span { color: #a99dbd; border-color: rgba(188, 147, 255, .17); background: rgba(255,255,255,.045); }
 .home-access-assurance span b { color: #c29bff; }
 .home-info-section, .home-platform-section {
