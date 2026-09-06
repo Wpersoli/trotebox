@@ -75,7 +75,10 @@ export function handleError(cause: unknown) {
         ...(details !== undefined ? { details } : {}),
         requestId
       }
-    }, { status: cause.status, headers: cause.headers });
+    }, {
+      status: cause.status,
+      ...(cause.headers ? { headers: cause.headers } : {})
+    });
   }
   if (cause instanceof ZodError) {
     return NextResponse.json({ error: { code: 'VALIDATION_ERROR', message: 'Dados inválidos.', details: cause.flatten(), requestId } }, { status: 400 });
