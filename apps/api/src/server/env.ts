@@ -41,7 +41,8 @@ const schema = z.object({
   RECORDING_ENABLED: z.string().default('false').transform((v) => v === 'true'),
   RECORDING_RETENTION_DAYS: z.coerce.number().int().min(1).max(365).default(30),
   MAX_CALLS_PER_USER_PER_HOUR: z.coerce.number().int().min(1).max(100).default(5),
-  MAX_CALLS_PER_RECIPIENT_PER_DAY: z.coerce.number().int().min(1).max(20).default(2)
+  MAX_CALLS_PER_RECIPIENT_PER_DAY: z.coerce.number().int().min(1).max(20).default(2),
+  ALLOWED_RECIPIENT_PREFIXES: z.string().trim().min(2).default('+55')
 });
 
 export function parseEnv(input: NodeJS.ProcessEnv) {
@@ -51,8 +52,43 @@ export function parseEnv(input: NodeJS.ProcessEnv) {
     if (parsed.MOCK_CALL_AUTO_COMPLETE) throw new Error('MOCK_CALL_AUTO_COMPLETE must be false in production.');
     if (parsed.TELEPHONY_PROVIDER === 'mock') throw new Error('TELEPHONY_PROVIDER cannot be mock in production.');
     if (!parsed.ALLOWED_ORIGINS?.trim()) throw new Error('ALLOWED_ORIGINS must be configured in production.');
+    if (!parsed.ALLOWED_ORIGINS.split(',').map((origin) => origin.trim()).filter(Boolean).every((origin) => new URL(origin).protocol === 'https:')) {
+      throw new Error('All ALLOWED_ORIGINS entries must use HTTPS in production.');
+    }
+    if (new URL(parsed.PUBLIC_WEB_URL).protocol !== 'https:' || new URL(parsed.PUBLIC_API_URL).protocol !== 'https:') {
+      throw new Error('PUBLIC_WEB_URL and PUBLIC_API_URL must use HTTPS in production.');
+    }
     if (parsed.AUTH_DELIVERY === 'console') throw new Error('AUTH_DELIVERY cannot be console in production.');
     if (parsed.TWILIO_VALIDATE_SIGNATURES === false) throw new Error('TWILIO_VALIDATE_SIGNATURES must be true in production.');
+    if (!parsed.BREVO_API_KEY || !parsed.EMAIL_FROM_ADDRESS) throw new Error('BREVO_API_KEY and EMAIL_FROM_ADDRESS are required in production.');
+    if (!parsed.CRON_SECRET) throw new Error('CRON_SECRET is required in production.');
+
+    const recipientPrefixes = parsed.ALLOWED_RECIPIENT_PREFIXES.split(',').map((prefix) => prefix.trim()).filter(Boolean);
+    if (!recipientPrefixes.length || !recipientPrefixes.every((prefix) => /^\+[1-9]\d{0,2}$/.test(prefix))) {
+      throw new Error('ALLOWED_RECIPIENT_PREFIXES must contain comma-separated E.164 country calling prefixes such as +55 or +55,+1.');
+    }
+
+    if (parsed.VOICE_ENGINE === 'custom') {
+      if (!parsed.CUSTOM_TTS_URL || !parsed.CUSTOM_TTS_API_KEY) throw new Error('CUSTOM_TTS_URL and CUSTOM_TTS_API_KEY are required when VOICE_ENGINE=custom.');
+      if (new URL(parsed.CUSTOM_TTS_URL).protocol !== 'https:') throw new Error('CUSTOM_TTS_URL must use HTTPS in production.');
+      if (!parsed.CUSTOM_TTS_ALLOWED_HOSTS?.trim()) throw new Error('CUSTOM_TTS_ALLOWED_HOSTS is required when VOICE_ENGINE=custom.');
+    }
+
+    if (parsed.TELEPHONY_PROVIDER === 'twilio') {
+      if (parsed.TWILIO_TRIAL_MODE) throw new Error('TWILIO_TRIAL_MODE must be false in production.');
+      if (!parsed.TWILIO_ACCOUNT_SID || !parsed.TWILIO_AUTH_TOKEN || !parsed.TWILIO_FROM_NUMBER) {
+        throw new Error('Twilio account credentials and from number are required in production.');
+      }
+    }
+
+    if (parsed.TELEPHONY_PROVIDER === 'vonage') {
+      if (!parsed.VONAGE_APPLICATION_ID || !parsed.VONAGE_API_KEY || !parsed.VONAGE_PRIVATE_KEY || !parsed.VONAGE_FROM_NUMBER || !parsed.VONAGE_SIGNATURE_SECRET) {
+        throw new Error('Vonage application, API key, private key, from number and signature secret are required in production.');
+      }
+    }
+
+    if (parsed.MERCADOPAGO_ACCESS_TOKEN && !parsed.MERCADOPAGO_WEBHOOK_SECRET) throw new Error('MERCADOPAGO_WEBHOOK_SECRET is required when Mercado Pago is configured.');
+    if (parsed.STRIPE_SECRET_KEY && !parsed.STRIPE_WEBHOOK_SECRET) throw new Error('STRIPE_WEBHOOK_SECRET is required when Stripe is configured.');
   }
   return parsed;
 }

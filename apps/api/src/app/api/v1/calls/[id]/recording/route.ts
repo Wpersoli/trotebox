@@ -51,7 +51,8 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     const authorization = Buffer.from(`${config.TWILIO_ACCOUNT_SID}:${config.TWILIO_AUTH_TOKEN}`).toString('base64');
     const upstream = await fetch(source, {
       headers: { Authorization: `Basic ${authorization}` },
-      cache: 'no-store'
+      cache: 'no-store',
+      redirect: 'error'
     });
 
     if (!upstream.ok || !upstream.body) {

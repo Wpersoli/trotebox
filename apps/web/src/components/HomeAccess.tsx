@@ -1,7 +1,9 @@
 'use client';
 
+import Image from 'next/image';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import './HomeAccess.css';
 import { Brand } from './Brand';
 import { useAuth } from './AuthProvider';
 import { api, isPreviewMode } from '@/lib/api';
@@ -88,21 +90,27 @@ export function HomeAccess() {
     setResendIn(0);
   }
 
-  if (ready && user) {
-    return (
-      <section className="card access-card access-card-authenticated" id="acesso" aria-labelledby="access-title">
-        <Brand />
-        <span className="access-kicker">Área exclusiva</span>
-        <h1 id="access-title">Seu acesso está ativo</h1>
-        <p>Você já confirmou este e-mail nesta sessão.</p>
-        <button className="button access-primary" onClick={() => router.push('/dashboard/')}>Entrar no meu espaço</button>
-      </section>
-    );
-  }
-
-  return (
-    <section className="card access-card" id="acesso" aria-labelledby="access-title">
+  const accessChrome = (
+    <>
+      <div className="access-hero-mascot" aria-hidden="true">
+        <Image src="/brand/trotebox-mascot.webp" alt="" width={160} height={160} sizes="(max-width: 680px) 68px, 92px" />
+      </div>
+      <span className="access-card-kicker">ACESSO SEGURO · SEM SENHA</span>
       <Brand />
+    </>
+  );
+
+  const accessContent = ready && user ? (
+    <section className="card access-card access-card-authenticated" aria-labelledby="access-title">
+      {accessChrome}
+      <span className="access-kicker">Área exclusiva</span>
+      <h1 id="access-title">Seu acesso está ativo</h1>
+      <p>Você já confirmou este e-mail nesta sessão.</p>
+      <button className="button access-primary" onClick={() => router.push('/dashboard/')}>Entrar no meu espaço</button>
+    </section>
+  ) : (
+    <section className="card access-card" aria-labelledby="access-title">
+      {accessChrome}
       {isPreviewMode && <div className="preview-badge inline">Preview local</div>}
       <h1 id="access-title">{step === 'identity' ? 'Entre na TroteBox' : 'Confirme seu acesso'}</h1>
       <p>
@@ -168,4 +176,6 @@ export function HomeAccess() {
       )}
     </section>
   );
+
+  return accessContent;
 }

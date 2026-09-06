@@ -1,9 +1,10 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { CreditPackSummary, WalletSummary } from '@trotebox/contracts';
 import { AppShell } from '@/components/AppShell';
+import { useAuth } from '@/components/AuthProvider';
 import { api, isPreviewMode } from '@/lib/api';
 
 const commerceMode = process.env.NEXT_PUBLIC_COMMERCE_MODE ?? 'web';
@@ -28,6 +29,8 @@ type PixState = {
 };
 
 export default function WalletPage() {
+  const { user } = useAuth();
+  const intentStorageKey = user ? `trotebox:pix-intent:v1:${user.id}` : null;
   const [wallet, setWallet] = useState<WalletSummary | null>(null);
   const [packs, setPacks] = useState<CreditPackSummary[]>([]);
   const [pix, setPix] = useState<PixState | null>(null);
@@ -35,18 +38,22 @@ export default function WalletPage() {
   const [creatingPix, setCreatingPix] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState('');
   const [error, setError] = useState('');
+  const pendingRequest = useRef<{ code: string; key: string } | null>(null);
+  const createLock = useRef(false);
+  const [reconcilePaused, setReconcilePaused] = useState(false);
+  const [reconcileRevision, setReconcileRevision] = useState(0);
 
   useEffect(() => {
     api.wallet()
       .then(setWallet)
-      .catch(() => undefined);
+      .catch(() => setError('Não foi possível carregar seu saldo. Atualize a página para tentar novamente.'));
 
     api.catalog()
       .then((data) => {
         setPacks(data.packs);
         setPixAvailable(data.capabilities.pixPayments);
       })
-      .catch(() => undefined);
+      .catch(() => setError('Não foi possível carregar os pacotes. Atualize a página para tentar novamente.'));
   }, []);
 
   const pixPaymentId = pix?.internalPaymentId;
@@ -69,6 +76,21 @@ export default function WalletPage() {
 
         if (!active) return;
 
+        if (result.status === 'APPROVED' || failedPaymentStatuses.includes(result.status)) {
+          if (intentStorageKey) {
+            try { sessionStorage.removeItem(intentStorageKey); } catch { /* O estado confirmado continua visível. */ }
+          }
+          pendingRequest.current = null;
+        }
+
+        if (result.status === 'APPROVED') {
+          const updatedWallet = await api.wallet().catch(() => null);
+          if (!active) return;
+          if (updatedWallet) setWallet(updatedWallet);
+          else setError('Pagamento confirmado. Não foi possível atualizar o saldo; atualize a página para consultar seus créditos.');
+          window.dispatchEvent(new Event('trotebox:wallet-updated'));
+        }
+
         setPix((current) => {
           if (
             !current ||
@@ -85,12 +107,6 @@ export default function WalletPage() {
         });
 
         if (result.status === 'APPROVED') {
-          const updatedWallet = await api.wallet().catch(() => null);
-
-          if (active && updatedWallet) {
-            setWallet(updatedWallet);
-          }
-
           return;
         }
 
@@ -107,6 +123,8 @@ export default function WalletPage() {
           () => void reconcile(),
           RECONCILE_INTERVAL_MS
         );
+      } else if (active) {
+        setReconcilePaused(true);
       }
     };
 
@@ -119,7 +137,7 @@ export default function WalletPage() {
         window.clearTimeout(timer);
       }
     };
-  }, [pixPaymentId, pixStatus]);
+  }, [pixPaymentId, pixStatus, reconcileRevision, intentStorageKey]);
 
   async function copyText(value: string, message: string) {
     setError('');
@@ -139,14 +157,37 @@ export default function WalletPage() {
   }
 
   async function mercadoPago(code: string) {
-    if (creatingPix || pix?.status === 'PENDING') return;
+    if (createLock.current || pix?.status === 'PENDING') return;
+    if (!intentStorageKey) return;
+    try {
+      const stored = sessionStorage.getItem(intentStorageKey);
+      if (stored) {
+        const intent: unknown = JSON.parse(stored);
+        if (!intent || typeof intent !== 'object' || !('code' in intent) || !('key' in intent)
+          || typeof intent.code !== 'string' || typeof intent.key !== 'string') {
+          setError('Não foi possível recuperar a solicitação anterior. Consulte o histórico de pagamentos antes de iniciar outra recarga.');
+          return;
+        }
+        pendingRequest.current = { code: intent.code, key: intent.key };
+      }
+    } catch {
+      setError('Não foi possível acessar a recuperação de pagamento neste navegador. Habilite o armazenamento da sessão antes de continuar.');
+      return;
+    }
+    if (pendingRequest.current && pendingRequest.current.code !== code) {
+      setError('Existe uma solicitação sem confirmação. Tente novamente o mesmo pacote para recuperar o Pix antes de escolher outro.');
+      return;
+    }
+    createLock.current = true;
 
     setError('');
     setCopyFeedback('');
     setCreatingPix(true);
 
     try {
-      const result = await api.pix(code);
+      pendingRequest.current ??= { code, key: crypto.randomUUID() };
+      sessionStorage.setItem(intentStorageKey, JSON.stringify(pendingRequest.current));
+      const result = await api.pix(code, pendingRequest.current.key);
 
       const nextPix: PixState = {
         internalPaymentId: result.internalPaymentId,
@@ -170,6 +211,7 @@ export default function WalletPage() {
       };
 
       setPix(nextPix);
+      setReconcilePaused(false);
     } catch (cause) {
       setError(
         cause instanceof Error
@@ -177,6 +219,7 @@ export default function WalletPage() {
           : 'Falha ao criar o Pix.'
       );
     } finally {
+      createLock.current = false;
       setCreatingPix(false);
     }
   }
@@ -247,6 +290,7 @@ export default function WalletPage() {
           {error && (
             <div
               className="error-box"
+              role="alert"
               style={{ marginBottom: 18 }}
             >
               {error}
@@ -343,6 +387,7 @@ export default function WalletPage() {
                     </span>
 
                     <textarea
+                      aria-label="Código Pix Copia e Cola"
                       className="input"
                       style={{
                         minHeight: 120,
@@ -422,9 +467,18 @@ export default function WalletPage() {
                         className="status-pill warn"
                         style={{ marginTop: 16 }}
                       >
-                        Confirmação automática ativada · verificando
-                        pagamento
+                        {reconcilePaused
+                          ? 'Consulta automática pausada. Se já pagou, consulte o status antes de fazer outro pagamento.'
+                          : 'Confirmação automática ativada · verificando pagamento'}
                       </div>
+                    )}
+                    {reconcilePaused && (
+                      <button className="button" type="button" onClick={() => { setReconcilePaused(false); setReconcileRevision((value) => value + 1); }}>
+                        Consultar pagamento novamente
+                      </button>
+                    )}
+                    {pix.expiresAt && Number.isFinite(Date.parse(pix.expiresAt)) && (
+                      <p className="muted">Validade informada pelo provedor: {new Date(pix.expiresAt).toLocaleString('pt-BR')}.</p>
                     )}
                   </div>
                 </div>
@@ -451,7 +505,7 @@ export default function WalletPage() {
           )}
 
           <div className="pack-grid">
-            {packs.map((pack, index) => {
+            {packs.map((pack) => {
               const blocked =
                 !pixAvailable ||
                 creatingPix ||
@@ -472,13 +526,13 @@ export default function WalletPage() {
               return (
                 <article
                   className={`card pack-card ${
-                    index === 1 ? 'highlight' : ''
+                    pack.highlight ? 'highlight' : ''
                   }`}
                   key={pack.code}
                 >
-                  {index === 1 && (
+                  {pack.highlight && (
                     <span className="popular-tag">
-                      Mais escolhido
+                      Em destaque
                     </span>
                   )}
 

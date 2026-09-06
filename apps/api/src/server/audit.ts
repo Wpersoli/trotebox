@@ -1,6 +1,14 @@
 import { Prisma, prisma } from '@trotebox/db';
 import { hashSubject } from './crypto';
 
+function safeAuditFailure(cause: unknown) {
+  if (cause instanceof Prisma.PrismaClientKnownRequestError) {
+    return { name: cause.name, code: cause.code };
+  }
+  if (cause instanceof Error) return { name: cause.name };
+  return { name: 'UnknownError' };
+}
+
 export async function audit(input: {
   request?: Request;
   userId?: string;
@@ -20,5 +28,7 @@ export async function audit(input: {
     ...(forwarded ? { ipHash: hashSubject(forwarded) } : {}),
     ...(input.metadata !== undefined ? { metadata: input.metadata as Prisma.InputJsonValue } : {})
   };
-  await prisma.auditLog.create({ data }).catch((cause) => console.error('audit_failed', cause));
+  await prisma.auditLog.create({ data }).catch((cause) => {
+    console.error('audit_failed', safeAuditFailure(cause));
+  });
 }
