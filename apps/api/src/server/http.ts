@@ -30,6 +30,12 @@ export function okPublic<T>(data: T, status = 200) {
   });
 }
 
+function noStoreHeaders(extra?: HeadersInit) {
+  const headers = new Headers(extra);
+  headers.set('Cache-Control', 'no-store');
+  return headers;
+}
+
 function isDatabaseConnectivityError(cause: unknown) {
   if (!(cause instanceof Error)) return false;
   const errorCode = 'errorCode' in cause && typeof cause.errorCode === 'string' ? cause.errorCode : '';
@@ -77,11 +83,14 @@ export function handleError(cause: unknown) {
       }
     }, {
       status: cause.status,
-      ...(cause.headers ? { headers: cause.headers } : {})
+      headers: noStoreHeaders(cause.headers)
     });
   }
   if (cause instanceof ZodError) {
-    return NextResponse.json({ error: { code: 'VALIDATION_ERROR', message: 'Dados inválidos.', details: cause.flatten(), requestId } }, { status: 400 });
+    return NextResponse.json(
+      { error: { code: 'VALIDATION_ERROR', message: 'Dados inválidos.', details: cause.flatten(), requestId } },
+      { status: 400, headers: noStoreHeaders() }
+    );
   }
 
   if (isDatabaseConnectivityError(cause)) {
@@ -95,12 +104,15 @@ export function handleError(cause: unknown) {
           : 'Banco de dados indisponível ou credenciais inválidas.',
         requestId
       }
-    }, { status: 503, headers: { 'Retry-After': '30' } });
+    }, { status: 503, headers: noStoreHeaders({ 'Retry-After': '30' }) });
   }
 
   const error = cause instanceof Error ? cause : new Error('Unknown error');
   console.error({ requestId, ...safeErrorLog(error) });
-  return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: 'Erro interno inesperado.', requestId } }, { status: 500 });
+  return NextResponse.json(
+    { error: { code: 'INTERNAL_ERROR', message: 'Erro interno inesperado.', requestId } },
+    { status: 500, headers: noStoreHeaders() }
+  );
 }
 
 function assertDeclaredBodySize(request: Request, maxBytes: number) {

@@ -9,6 +9,7 @@ describe('HTTP error handling', () => {
     const response = handleError(error);
     expect(response.status).toBe(503);
     expect(response.headers.get('Retry-After')).toBe('30');
+    expect(response.headers.get('Cache-Control')).toBe('no-store');
 
     const body = await response.json();
     expect(body.error.code).toBe('DATABASE_UNAVAILABLE');
@@ -22,6 +23,7 @@ describe('HTTP error handling', () => {
 
     const response = handleError(error);
     expect(response.status).toBe(500);
+    expect(response.headers.get('Cache-Control')).toBe('no-store');
 
     const body = await response.json();
     expect(body.error.code).toBe('INTERNAL_ERROR');
@@ -31,6 +33,7 @@ describe('HTTP error handling', () => {
   it('keeps application errors and their status codes intact', async () => {
     const response = handleError(new AppError(409, 'IDEMPOTENCY_CONFLICT', 'Conflito de idempotência.'));
     expect(response.status).toBe(409);
+    expect(response.headers.get('Cache-Control')).toBe('no-store');
 
     const body = await response.json();
     expect(body.error.code).toBe('IDEMPOTENCY_CONFLICT');
@@ -48,6 +51,7 @@ describe('HTTP error handling', () => {
 
     expect(response.status).toBe(429);
     expect(response.headers.get('Retry-After')).toBe('17');
+    expect(response.headers.get('Cache-Control')).toBe('no-store');
     const body = await response.json();
     expect(body.error.code).toBe('RATE_LIMITED');
     expect(body.error).not.toHaveProperty('details');
@@ -57,6 +61,7 @@ describe('HTTP error handling', () => {
     const error = new Error('connection secret should never reach the client');
     const response = handleError(error);
     expect(response.status).toBe(500);
+    expect(response.headers.get('Cache-Control')).toBe('no-store');
 
     const body = await response.json();
     expect(body.error.code).toBe('INTERNAL_ERROR');
