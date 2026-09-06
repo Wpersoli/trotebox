@@ -69,6 +69,7 @@ export function parseEnv(input: NodeJS.ProcessEnv) {
     }
 
     if (parsed.TELEPHONY_PROVIDER === 'twilio') {
+      if (parsed.TWILIO_TRIAL_MODE) throw new Error('TWILIO_TRIAL_MODE must be false in production.');
       if (!parsed.TWILIO_ACCOUNT_SID || !parsed.TWILIO_AUTH_TOKEN || !parsed.TWILIO_FROM_NUMBER) {
         throw new Error('Twilio account credentials and from number are required in production.');
       }

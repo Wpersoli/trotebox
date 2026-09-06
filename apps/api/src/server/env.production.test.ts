@@ -19,6 +19,7 @@ const base = {
   TWILIO_ACCOUNT_SID: 'AC123',
   TWILIO_AUTH_TOKEN: 'auth-token',
   TWILIO_FROM_NUMBER: '+5511000000000',
+  TWILIO_TRIAL_MODE: 'false',
   TWILIO_VALIDATE_SIGNATURES: 'true',
   VOICE_ENGINE: 'provider',
   RECORDING_ENABLED: 'false',
@@ -57,6 +58,12 @@ describe('production environment guards', () => {
   it('requires complete Twilio production configuration', () => {
     expect(() => parseEnv({ ...base, TWILIO_AUTH_TOKEN: '' })).toThrow(
       'Twilio account credentials and from number are required in production.'
+    );
+  });
+
+  it('forbids Twilio trial call routing in production', () => {
+    expect(() => parseEnv({ ...base, TWILIO_TRIAL_MODE: 'true' })).toThrow(
+      'TWILIO_TRIAL_MODE must be false in production.'
     );
   });
 
