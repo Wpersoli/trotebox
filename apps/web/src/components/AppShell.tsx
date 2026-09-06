@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Brand } from './Brand';
 import { useAuth } from './AuthProvider';
 import { useEffect, useState } from 'react';
 import { api, isPreviewMode } from '@/lib/api';
@@ -40,11 +39,14 @@ export function AppShell({ title, children }: { title: string; children: React.R
   return (
     <div className="app-layout">
       <aside className="sidebar">
-        <Brand />
+        <Link href="/" className="app-brand" aria-label="TroteBox — página inicial">
+          <span className="app-brand-mark" aria-hidden="true">TB</span>
+          <span className="app-brand-copy"><strong>Trote<span>Box</span></strong><small>Central de trotes</small></span>
+        </Link>
         {isPreviewMode && <div className="preview-badge">Preview local</div>}
         <nav className="sidebar-nav" aria-label="Navegação principal">
           {nav.map((item) => (
-            <Link key={item.href} href={item.href} className={`sidebar-link ${item.active ? 'active' : ''}`}>
+            <Link key={item.href} href={item.href} className={`sidebar-link ${item.active ? 'active' : ''}`} aria-current={item.active ? 'page' : undefined}>
               <span aria-hidden="true">{item.icon}</span>{item.label}
             </Link>
           ))}
@@ -57,7 +59,12 @@ export function AppShell({ title, children }: { title: string; children: React.R
       <main className="main">
         <header className="topbar">
           <div><span className="eyebrow">TroteBox</span><h1>{title}</h1></div>
-          <Link href="/wallet/" className="credit-chip"><span>Créditos</span><strong>{balance ?? '—'}</strong></Link>
+          <Link href="/wallet/" className="credit-chip" aria-label={`Abrir créditos. Saldo atual: ${balance ?? 'indisponível'}`}>
+            <span className="credit-chip-icon" aria-hidden="true">◈</span>
+            <span className="credit-chip-label">Saldo</span>
+            <strong>{balance ?? '—'}</strong>
+            <small>créditos</small>
+          </Link>
         </header>
         {children}
       </main>

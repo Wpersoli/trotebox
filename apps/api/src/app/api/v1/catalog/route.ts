@@ -13,7 +13,9 @@ export async function GET() {
     ]);
     return okPublic({
       scripts: scripts.map(({ id, slug, title, category, description, creditCost, durationSeconds, accent }) => ({ id, slug, title, category, description, creditCost, durationSeconds, accent })),
-      packs: packs.map(({ code, name, credits, priceCents, currency }, index) => ({ code, name, credits, priceCents, currency, highlight: index === 1 })),
+      // The highlighted pack is an explicit commercial choice, not an
+      // accidental consequence of the current sort order.
+      packs: packs.map(({ code, name, credits, priceCents, currency }) => ({ code, name, credits, priceCents, currency, ...(code === 'plus' ? { highlight: true } : {}) })),
       capabilities: platformCapabilities()
     });
   } catch (cause) { return handleError(cause); }

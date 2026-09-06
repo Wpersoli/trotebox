@@ -28,6 +28,52 @@ type PixState = {
   status: string;
 };
 
+type PixIntent = {
+  code: string;
+  key: string;
+};
+
+function readPixIntent(storageKey: string): PixIntent | null {
+  try {
+    const stored = sessionStorage.getItem(storageKey);
+    if (!stored) return null;
+
+    const parsed: unknown = JSON.parse(stored);
+    if (
+      !parsed ||
+      typeof parsed !== 'object' ||
+      !('code' in parsed) ||
+      !('key' in parsed) ||
+      typeof parsed.code !== 'string' ||
+      typeof parsed.key !== 'string'
+    ) {
+      sessionStorage.removeItem(storageKey);
+      return null;
+    }
+
+    return { code: parsed.code, key: parsed.key };
+  } catch {
+    return null;
+  }
+}
+
+function toPixState(result: {
+  internalPaymentId: string;
+  qrCode: string;
+  qrCodeBase64?: string;
+  ticketUrl?: string;
+  expiresAt?: string;
+}): PixState {
+  return {
+    internalPaymentId: result.internalPaymentId,
+    qrCode: result.qrCode,
+    status: 'PENDING',
+    ...(result.qrCodeBase64 ? { qrCodeBase64: result.qrCodeBase64 } : {}),
+    ...(result.ticketUrl ? { ticketUrl: result.ticketUrl } : {}),
+    ...(result.expiresAt ? { expiresAt: result.expiresAt } : {})
+  };
+}
+
 export default function WalletPage() {
   const { user } = useAuth();
   const intentStorageKey = user ? `trotebox:pix-intent:v1:${user.id}` : null;
@@ -36,6 +82,7 @@ export default function WalletPage() {
   const [pix, setPix] = useState<PixState | null>(null);
   const [pixAvailable, setPixAvailable] = useState(isPreviewMode);
   const [creatingPix, setCreatingPix] = useState(false);
+  const [recoveringPix, setRecoveringPix] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState('');
   const [error, setError] = useState('');
   const pendingRequest = useRef<{ code: string; key: string } | null>(null);
@@ -55,6 +102,45 @@ export default function WalletPage() {
       })
       .catch(() => setError('Não foi possível carregar os pacotes. Atualize a página para tentar novamente.'));
   }, []);
+
+  useEffect(() => {
+    if (!intentStorageKey || pix || createLock.current) return;
+
+    const intent = readPixIntent(intentStorageKey);
+    if (!intent) return;
+
+    let active = true;
+    pendingRequest.current = intent;
+
+    Promise.resolve()
+      .then(() => {
+        if (active) {
+          setRecoveringPix(true);
+          setError('');
+        }
+        return api.pix(intent.code, intent.key);
+      })
+      .then((result) => {
+        if (!active) return;
+        setPix(toPixState(result));
+        setReconcilePaused(false);
+      })
+      .catch((cause) => {
+        if (!active) return;
+        setError(
+          cause instanceof Error
+            ? `Não foi possível recuperar o Pix anterior. ${cause.message}`
+            : 'Não foi possível recuperar o Pix anterior. Tente novamente usando o mesmo pacote.'
+        );
+      })
+      .finally(() => {
+        if (active) setRecoveringPix(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [intentStorageKey, pix]);
 
   const pixPaymentId = pix?.internalPaymentId;
   const pixStatus = pix?.status;
@@ -160,16 +246,8 @@ export default function WalletPage() {
     if (createLock.current || pix?.status === 'PENDING') return;
     if (!intentStorageKey) return;
     try {
-      const stored = sessionStorage.getItem(intentStorageKey);
-      if (stored) {
-        const intent: unknown = JSON.parse(stored);
-        if (!intent || typeof intent !== 'object' || !('code' in intent) || !('key' in intent)
-          || typeof intent.code !== 'string' || typeof intent.key !== 'string') {
-          setError('Não foi possível recuperar a solicitação anterior. Consulte o histórico de pagamentos antes de iniciar outra recarga.');
-          return;
-        }
-        pendingRequest.current = { code: intent.code, key: intent.key };
-      }
+      const intent = readPixIntent(intentStorageKey);
+      if (intent) pendingRequest.current = intent;
     } catch {
       setError('Não foi possível acessar a recuperação de pagamento neste navegador. Habilite o armazenamento da sessão antes de continuar.');
       return;
@@ -189,28 +267,7 @@ export default function WalletPage() {
       sessionStorage.setItem(intentStorageKey, JSON.stringify(pendingRequest.current));
       const result = await api.pix(code, pendingRequest.current.key);
 
-      const nextPix: PixState = {
-        internalPaymentId: result.internalPaymentId,
-        qrCode: result.qrCode,
-        status: 'PENDING',
-        ...(
-          'qrCodeBase64' in result && result.qrCodeBase64
-            ? { qrCodeBase64: result.qrCodeBase64 }
-            : {}
-        ),
-        ...(
-          'ticketUrl' in result && result.ticketUrl
-            ? { ticketUrl: result.ticketUrl }
-            : {}
-        ),
-        ...(
-          result.expiresAt
-            ? { expiresAt: result.expiresAt }
-            : {}
-        )
-      };
-
-      setPix(nextPix);
+      setPix(toPixState(result));
       setReconcilePaused(false);
     } catch (cause) {
       setError(
@@ -271,6 +328,12 @@ export default function WalletPage() {
         >
           <strong>Preview local:</strong> os pacotes e o Pix abaixo
           são demonstrativos. Nenhuma cobrança real é criada.
+        </div>
+      )}
+
+      {recoveringPix && !pix && (
+        <div className="notice" role="status" style={{ marginBottom: 18 }}>
+          <strong>Recuperando seu Pix:</strong> encontramos uma solicitação pendente nesta sessão e estamos restaurando o mesmo pagamento com segurança.
         </div>
       )}
 
@@ -509,6 +572,7 @@ export default function WalletPage() {
               const blocked =
                 !pixAvailable ||
                 creatingPix ||
+                recoveringPix ||
                 pixPending;
 
               let buttonText =
@@ -519,6 +583,8 @@ export default function WalletPage() {
                   'Pix temporariamente indisponível';
               } else if (creatingPix) {
                 buttonText = 'Gerando Pix...';
+              } else if (recoveringPix) {
+                buttonText = 'Recuperando Pix...';
               } else if (pixPending) {
                 buttonText = 'Pagamento em andamento';
               }
