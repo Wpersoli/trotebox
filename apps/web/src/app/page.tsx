@@ -33,6 +33,7 @@ const faq = [
 export default function HomePage() {
   return (
     <>
+      <a className="skip-link" href="#home-content">Pular para o conteúdo principal</a>
       <header className="hero-nav home-nav">
         <div className="container hero-nav-inner">
           <Brand priority dark />
@@ -47,7 +48,7 @@ export default function HomePage() {
         </div>
       </header>
 
-      <main>
+      <main id="home-content" tabIndex={-1}>
         <section className="home-access-hero" aria-label="Apresentação e acesso TroteBox">
           <div className="container home-access-grid">
             <div className="home-showcase">

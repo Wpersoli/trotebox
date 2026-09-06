@@ -22,18 +22,37 @@ function statusLabel(status: unknown) {
 export default function DashboardPage() {
   const [wallet, setWallet] = useState<{ balanceCredits: number; reservedCredits: number } | null>(null);
   const [calls, setCalls] = useState<Array<Record<string, unknown>>>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    api.wallet().then(setWallet).catch(() => undefined);
-    api.calls().then((data) => setCalls(data.calls)).catch(() => undefined);
+    let active = true;
+
+    Promise.allSettled([api.wallet(), api.calls()]).then(([walletResult, callsResult]) => {
+      if (!active) return;
+
+      const failures: string[] = [];
+      if (walletResult.status === 'fulfilled') setWallet(walletResult.value);
+      else failures.push('saldo');
+      if (callsResult.status === 'fulfilled') setCalls(callsResult.value.calls);
+      else failures.push('histórico');
+
+      if (failures.length) {
+        setError(`Não foi possível carregar ${failures.join(' e ')}. Atualize a página para tentar novamente.`);
+      }
+      setLoading(false);
+    });
+
+    return () => { active = false; };
   }, []);
 
   return (
     <AppShell title="Visão geral">
+      {error && <div className="error-box" role="alert" style={{ marginBottom: 18 }}>{error}</div>}
       <section className="dashboard-grid">
-        <article className="card stat-card"><span className="stat-card-label"><i aria-hidden="true">◈</i> Créditos disponíveis</span><strong>{wallet?.balanceCredits ?? '—'}</strong><small>Prontos para a próxima surpresa</small></article>
-        <article className="card stat-card"><span className="stat-card-label"><i aria-hidden="true">↗</i> Créditos reservados</span><strong>{wallet?.reservedCredits ?? '—'}</strong><small>Em chamadas ativas</small></article>
-        <article className="card stat-card"><span className="stat-card-label"><i aria-hidden="true">↺</i> Trotes recentes</span><strong>{calls.length}</strong><small>Chamadas no seu histórico</small></article>
+        <article className="card stat-card"><span className="stat-card-label"><i aria-hidden="true">◈</i> Créditos disponíveis</span><strong>{loading ? '—' : wallet?.balanceCredits ?? '—'}</strong><small>Prontos para a próxima surpresa</small></article>
+        <article className="card stat-card"><span className="stat-card-label"><i aria-hidden="true">↗</i> Créditos reservados</span><strong>{loading ? '—' : wallet?.reservedCredits ?? '—'}</strong><small>Em chamadas ativas</small></article>
+        <article className="card stat-card"><span className="stat-card-label"><i aria-hidden="true">↺</i> Trotes recentes</span><strong>{loading ? '—' : calls.length}</strong><small>Chamadas no seu histórico</small></article>
         <article className="card hero-panel">
           <div className="hero-panel-copy">
             <span className="eyebrow">Próxima surpresa</span>
@@ -50,7 +69,8 @@ export default function DashboardPage() {
           <div className="activity-heading"><span className="eyebrow">Últimos trotes</span><Link href="/calls/">Ver tudo</Link></div>
           <div className="activity-list">
             {calls.slice(0, 4).map((call, index) => <div className="activity-item" key={String(call.id ?? index)}><div className="activity-dot" aria-hidden="true">☎</div><div><strong>{String(call.scriptTitle ?? 'Trote')}</strong><span>{statusLabel(call.status)}</span></div></div>)}
-            {!calls.length && <p className="muted">Nenhum trote criado ainda.</p>}
+            {loading && <p className="muted" role="status">Carregando histórico…</p>}
+            {!loading && !calls.length && !error && <p className="muted">Nenhum trote criado ainda.</p>}
           </div>
         </aside>
       </section>

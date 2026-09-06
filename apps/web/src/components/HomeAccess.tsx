@@ -120,7 +120,7 @@ export function HomeAccess() {
       </p>
 
       {step === 'identity' ? (
-        <form className="form-stack access-form" onSubmit={submitIdentity} noValidate>
+        <form className="form-stack access-form" onSubmit={submitIdentity} noValidate aria-busy={busy}>
           <div className="field">
             <label htmlFor="access-email">E-mail</label>
             <input
@@ -146,8 +146,8 @@ export function HomeAccess() {
           <div className="access-security-note"><span aria-hidden="true">✓</span> Código de uso único · sessão protegida · sem senha</div>
         </form>
       ) : (
-        <form className="form-stack access-form" onSubmit={submitCode}>
-          {developmentCode && <div className="notice"><strong>Preview:</strong> use o código {developmentCode}.</div>}
+        <form className="form-stack access-form" onSubmit={submitCode} aria-busy={busy}>
+          {developmentCode && <div className="notice" role="status"><strong>Preview:</strong> use o código {developmentCode}.</div>}
           <div className="field">
             <label htmlFor="access-code">Código de seis dígitos</label>
             <input

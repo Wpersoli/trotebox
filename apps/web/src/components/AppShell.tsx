@@ -32,12 +32,21 @@ export function AppShell({ title, children }: { title: string; children: React.R
     return () => { active = false; window.removeEventListener('trotebox:wallet-updated', refresh); };
   }, [ready, user, router]);
 
-  if (!ready || !user) return null;
+  if (!ready) {
+    return (
+      <main className="app-loading" aria-live="polite">
+        Carregando seu espaço TroteBox…
+      </main>
+    );
+  }
+
+  if (!user) return null;
 
   const nav = links.map((item) => ({ ...item, active: pathname === item.href || pathname.startsWith(item.href.replace(/\/$/, '') + '/') }));
 
   return (
     <div className="app-layout">
+      <a className="skip-link" href="#app-content">Pular para o conteúdo principal</a>
       <aside className="sidebar">
         <Link href="/" className="app-brand" aria-label="TroteBox — página inicial">
           <span className="app-brand-mark" aria-hidden="true">TB</span>
@@ -56,7 +65,7 @@ export function AppShell({ title, children }: { title: string; children: React.R
         </div>
       </aside>
 
-      <main className="main">
+      <main id="app-content" className="main" tabIndex={-1}>
         <header className="topbar">
           <div><span className="eyebrow">TroteBox</span><h1>{title}</h1></div>
           <Link href="/wallet/" className="credit-chip" aria-label={`Abrir créditos. Saldo atual: ${balance ?? 'indisponível'}`}>
@@ -70,7 +79,7 @@ export function AppShell({ title, children }: { title: string; children: React.R
       </main>
 
       <nav className="mobile-nav" aria-label="Navegação móvel">
-        {nav.slice(0, 5).map((item) => <Link key={item.href} className={item.active ? 'active' : ''} href={item.href}><span>{item.icon}</span><span>{item.label.split(' ')[0]}</span></Link>)}
+        {nav.slice(0, 5).map((item) => <Link key={item.href} className={item.active ? 'active' : ''} href={item.href} aria-current={item.active ? 'page' : undefined}><span aria-hidden="true">{item.icon}</span><span>{item.label.split(' ')[0]}</span></Link>)}
       </nav>
     </div>
   );

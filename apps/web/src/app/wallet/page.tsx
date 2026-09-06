@@ -529,6 +529,8 @@ export default function WalletPage() {
                       <div
                         className="status-pill warn"
                         style={{ marginTop: 16 }}
+                        role="status"
+                        aria-live="polite"
                       >
                         {reconcilePaused
                           ? 'Consulta automática pausada. Se já pagou, consulte o status antes de fazer outro pagamento.'
@@ -551,6 +553,8 @@ export default function WalletPage() {
                 <div
                   className="status-pill ok"
                   style={{ marginTop: 12 }}
+                  role="status"
+                  aria-live="polite"
                 >
                   Pagamento confirmado · créditos liberados
                 </div>
@@ -560,6 +564,8 @@ export default function WalletPage() {
                 <div
                   className="status-pill fail"
                   style={{ marginTop: 12 }}
+                  role="status"
+                  aria-live="polite"
                 >
                   Pagamento encerrado sem liberação de créditos
                 </div>
