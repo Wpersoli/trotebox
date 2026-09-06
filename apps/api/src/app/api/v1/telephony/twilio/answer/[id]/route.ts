@@ -1,7 +1,7 @@
 import { prisma } from '@trotebox/db';
 import { env } from '@/server/env';
 import { escapeXml } from '@/server/xml';
-import { AppError, handleError } from '@/server/http';
+import { AppError, handleError, urlEncodedWebhookBody } from '@/server/http';
 import { validateTwilioRequest } from '@/server/provider-signatures';
 
 export const runtime = 'nodejs';
@@ -9,8 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   try {
-    const form = await request.formData();
-    const params = Object.fromEntries([...form.entries()].map(([key, value]) => [key, String(value)]));
+    const { params } = await urlEncodedWebhookBody(request);
     if (!await validateTwilioRequest(request, params)) throw new AppError(401, 'INVALID_SIGNATURE', 'Assinatura Twilio inválida.');
 
     const { id } = await context.params;

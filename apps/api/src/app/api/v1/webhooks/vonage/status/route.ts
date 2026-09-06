@@ -1,7 +1,7 @@
 import { WebhookProvider } from '@trotebox/db';
 import { applyCallStatus } from '@/server/calls';
 import { sha256 } from '@/server/crypto';
-import { AppError, handleError, ok } from '@/server/http';
+import { AppError, handleError, ok, webhookBody } from '@/server/http';
 import { validateVonageRequest } from '@/server/provider-signatures';
 import { mapVonageStatus } from '@/server/provider-status';
 import { markWebhookProcessed, registerWebhook } from '@/server/webhook-events';
@@ -10,8 +10,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
-  const rawBody = await request.text();
   try {
+    const rawBody = await webhookBody(request);
     if (!await validateVonageRequest(request, rawBody)) throw new AppError(401, 'INVALID_SIGNATURE', 'Assinatura Vonage inválida.');
     const body = JSON.parse(rawBody) as Record<string, any>;
     const uuid = String(body.uuid ?? '');

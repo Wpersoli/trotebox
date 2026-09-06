@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { AppError, handleError } from './http';
+import { AppError, handleError, jsonBody, urlEncodedWebhookBody, webhookBody } from './http';
 
 describe('HTTP error handling', () => {
   it('maps database authentication/circuit-breaker failures to a retryable dependency error', async () => {
@@ -46,5 +46,52 @@ describe('HTTP error handling', () => {
     expect(body.error.code).toBe('INTERNAL_ERROR');
     expect(body.error.message).toBe('Erro interno inesperado.');
     expect(JSON.stringify(body)).not.toContain('connection secret should never reach the client');
+  });
+});
+
+describe('bounded request bodies', () => {
+  it('parses normal JSON bodies', async () => {
+    const request = new Request('http://localhost/api/test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ok: true })
+    });
+    await expect(jsonBody(request)).resolves.toEqual({ ok: true });
+  });
+
+  it('rejects JSON bodies over the 32 KiB application limit', async () => {
+    const request = new Request('http://localhost/api/test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ value: 'x'.repeat(33 * 1024) })
+    });
+    await expect(jsonBody(request)).rejects.toMatchObject({ status: 413, code: 'REQUEST_BODY_TOO_LARGE' });
+  });
+
+  it('rejects webhook bodies over the 256 KiB hard limit', async () => {
+    const request = new Request('http://localhost/api/webhook', {
+      method: 'POST',
+      body: 'x'.repeat(257 * 1024)
+    });
+    await expect(webhookBody(request)).rejects.toMatchObject({ status: 413, code: 'REQUEST_BODY_TOO_LARGE' });
+  });
+
+  it('parses bounded urlencoded provider callbacks and rejects unexpected media types', async () => {
+    const request = new Request('http://localhost/api/webhook', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+      body: 'CallSid=CA123&CallStatus=completed'
+    });
+    await expect(urlEncodedWebhookBody(request)).resolves.toEqual({
+      rawBody: 'CallSid=CA123&CallStatus=completed',
+      params: { CallSid: 'CA123', CallStatus: 'completed' }
+    });
+
+    const invalid = new Request('http://localhost/api/webhook', {
+      method: 'POST',
+      headers: { 'Content-Type': 'multipart/form-data; boundary=test' },
+      body: 'test'
+    });
+    await expect(urlEncodedWebhookBody(invalid)).rejects.toMatchObject({ status: 415, code: 'UNSUPPORTED_MEDIA_TYPE' });
   });
 });

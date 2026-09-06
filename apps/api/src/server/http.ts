@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 
 const MAX_JSON_BODY_BYTES = 32 * 1024;
+export const MAX_WEBHOOK_BODY_BYTES = 256 * 1024;
 
 export class AppError extends Error {
   constructor(public status: number, public code: string, message: string, public details?: unknown) {
@@ -76,20 +77,60 @@ export function handleError(cause: unknown) {
   return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: 'Erro interno inesperado.', requestId } }, { status: 500 });
 }
 
-export async function jsonBody(request: Request) {
+function assertDeclaredBodySize(request: Request, maxBytes: number) {
   const contentLength = request.headers.get('content-length');
-  if (contentLength) {
-    const declaredBytes = Number.parseInt(contentLength, 10);
-    if (Number.isFinite(declaredBytes) && declaredBytes > MAX_JSON_BODY_BYTES) {
-      throw new AppError(413, 'REQUEST_BODY_TOO_LARGE', 'Corpo da requisição excede o limite permitido.');
-    }
-  }
-
-  const text = await request.text();
-  if (new TextEncoder().encode(text).byteLength > MAX_JSON_BODY_BYTES) {
+  if (!contentLength) return;
+  const declaredBytes = Number.parseInt(contentLength, 10);
+  if (Number.isFinite(declaredBytes) && declaredBytes > maxBytes) {
     throw new AppError(413, 'REQUEST_BODY_TOO_LARGE', 'Corpo da requisição excede o limite permitido.');
   }
+}
 
+export async function textBody(request: Request, maxBytes: number) {
+  assertDeclaredBodySize(request, maxBytes);
+  if (!request.body) return '';
+
+  const reader = request.body.getReader();
+  const decoder = new TextDecoder();
+  let totalBytes = 0;
+  let text = '';
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      totalBytes += value.byteLength;
+      if (totalBytes > maxBytes) {
+        await reader.cancel('request body too large').catch(() => undefined);
+        throw new AppError(413, 'REQUEST_BODY_TOO_LARGE', 'Corpo da requisição excede o limite permitido.');
+      }
+      text += decoder.decode(value, { stream: true });
+    }
+    text += decoder.decode();
+    return text;
+  } finally {
+    reader.releaseLock();
+  }
+}
+
+export async function webhookBody(request: Request) {
+  return textBody(request, MAX_WEBHOOK_BODY_BYTES);
+}
+
+export async function urlEncodedWebhookBody(request: Request) {
+  const mediaType = (request.headers.get('content-type') ?? '').split(';', 1)[0]?.trim().toLowerCase();
+  if (mediaType && mediaType !== 'application/x-www-form-urlencoded') {
+    throw new AppError(415, 'UNSUPPORTED_MEDIA_TYPE', 'Formato de webhook não suportado.');
+  }
+  const rawBody = await webhookBody(request);
+  return {
+    rawBody,
+    params: Object.fromEntries(new URLSearchParams(rawBody).entries())
+  };
+}
+
+export async function jsonBody(request: Request) {
+  const text = await textBody(request, MAX_JSON_BODY_BYTES);
   try { return JSON.parse(text) as unknown; }
   catch { throw new AppError(400, 'INVALID_JSON', 'Corpo JSON inválido.'); }
 }

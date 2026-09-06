@@ -94,6 +94,15 @@ export async function getMercadoPagoPayment(id: string) {
   return payload;
 }
 
+export function mercadoPagoSignedDataId(url: URL) {
+  const dotted = url.searchParams.get('data.id')?.trim() ?? '';
+  const underscored = url.searchParams.get('data_id')?.trim() ?? '';
+  if (dotted && underscored && dotted.toLowerCase() !== underscored.toLowerCase()) {
+    throw new AppError(400, 'AMBIGUOUS_WEBHOOK_RESOURCE_ID', 'Identificador de recurso ambíguo no webhook Mercado Pago.');
+  }
+  return dotted || underscored;
+}
+
 export function validateMercadoPagoSignature(input: { xSignature: string; xRequestId: string; dataId: string }) {
   const secret = env().MERCADOPAGO_WEBHOOK_SECRET;
   if (!secret) throw new AppError(503, 'MERCADOPAGO_WEBHOOK_NOT_CONFIGURED', 'Webhook Mercado Pago não configurado.');

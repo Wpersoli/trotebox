@@ -2,16 +2,17 @@ import { PaymentProvider, PaymentStatus, WebhookProvider, prisma } from '@troteb
 import type Stripe from 'stripe';
 import { constructStripeEvent } from '@/server/payments/stripe';
 import { approvePaymentByInternalId, revokePaymentCredits } from '@/server/payment-events';
-import { handleError, ok, AppError } from '@/server/http';
+import { handleError, ok, AppError, webhookBody } from '@/server/http';
 import { markWebhookProcessed, registerWebhook } from '@/server/webhook-events';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
-  const rawBody = await request.text();
   let event: Stripe.Event;
+  let rawBody: string;
   try {
+    rawBody = await webhookBody(request);
     const signature = request.headers.get('stripe-signature');
     if (!signature) throw new AppError(401, 'MISSING_SIGNATURE', 'Assinatura Stripe ausente.');
     event = constructStripeEvent(rawBody, signature);
