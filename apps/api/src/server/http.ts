@@ -37,12 +37,29 @@ function isDatabaseConnectivityError(cause: unknown) {
     || message.includes('timed out');
 }
 
+function safeErrorLog(error: Error) {
+  const fields: { name: string; errorCode?: string; message?: string } = { name: error.name };
+  const errorCode = 'errorCode' in error && typeof error.errorCode === 'string'
+    ? error.errorCode
+    : 'code' in error && typeof error.code === 'string'
+      ? error.code
+      : undefined;
+  if (errorCode) fields.errorCode = errorCode;
+  if (process.env.NODE_ENV !== 'production') fields.message = error.message;
+  return fields;
+}
+
 export function handleError(cause: unknown) {
   const requestId = randomUUID();
   if (cause instanceof AppError) {
     const details = process.env.NODE_ENV === 'production' ? undefined : cause.details;
     if (cause.status >= 500) {
-      console.error({ requestId, code: cause.code, status: cause.status, message: cause.message });
+      console.error({
+        requestId,
+        code: cause.code,
+        status: cause.status,
+        ...(process.env.NODE_ENV === 'production' ? {} : { message: cause.message })
+      });
     }
     const isProductionServerError = process.env.NODE_ENV === 'production' && cause.status >= 500;
     return NextResponse.json({
@@ -60,7 +77,7 @@ export function handleError(cause: unknown) {
 
   if (isDatabaseConnectivityError(cause)) {
     const error = cause instanceof Error ? cause : new Error('Database unavailable');
-    console.error({ requestId, code: 'DATABASE_UNAVAILABLE', status: 503, name: error.name, message: error.message });
+    console.error({ requestId, code: 'DATABASE_UNAVAILABLE', status: 503, ...safeErrorLog(error) });
     return NextResponse.json({
       error: {
         code: 'DATABASE_UNAVAILABLE',
@@ -73,7 +90,7 @@ export function handleError(cause: unknown) {
   }
 
   const error = cause instanceof Error ? cause : new Error('Unknown error');
-  console.error({ requestId, name: error.name, message: error.message });
+  console.error({ requestId, ...safeErrorLog(error) });
   return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: 'Erro interno inesperado.', requestId } }, { status: 500 });
 }
 

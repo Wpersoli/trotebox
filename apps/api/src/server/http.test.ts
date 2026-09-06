@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { AppError, handleError, jsonBody, urlEncodedWebhookBody, webhookBody } from './http';
 
 describe('HTTP error handling', () => {
@@ -46,6 +46,25 @@ describe('HTTP error handling', () => {
     expect(body.error.code).toBe('INTERNAL_ERROR');
     expect(body.error.message).toBe('Erro interno inesperado.');
     expect(JSON.stringify(body)).not.toContain('connection secret should never reach the client');
+  });
+
+  it('does not write raw infrastructure messages to production logs', () => {
+    const previousNodeEnv = process.env.NODE_ENV;
+    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    process.env.NODE_ENV = 'production';
+
+    try {
+      const error = new Error('postgresql://user:top-secret@example.invalid/database');
+      error.name = 'PrismaClientInitializationError';
+      handleError(error);
+
+      expect(JSON.stringify(log.mock.calls)).not.toContain('top-secret');
+      expect(JSON.stringify(log.mock.calls)).not.toContain('example.invalid');
+      expect(JSON.stringify(log.mock.calls)).toContain('PrismaClientInitializationError');
+    } finally {
+      process.env.NODE_ENV = previousNodeEnv;
+      log.mockRestore();
+    }
   });
 });
 
