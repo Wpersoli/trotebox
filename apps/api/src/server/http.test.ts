@@ -49,9 +49,8 @@ describe('HTTP error handling', () => {
   });
 
   it('does not write raw infrastructure messages to production logs', () => {
-    const previousNodeEnv = process.env.NODE_ENV;
     const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('NODE_ENV', 'production');
 
     try {
       const error = new Error('postgresql://user:top-secret@example.invalid/database');
@@ -62,7 +61,7 @@ describe('HTTP error handling', () => {
       expect(JSON.stringify(log.mock.calls)).not.toContain('example.invalid');
       expect(JSON.stringify(log.mock.calls)).toContain('PrismaClientInitializationError');
     } finally {
-      process.env.NODE_ENV = previousNodeEnv;
+      vi.unstubAllEnvs();
       log.mockRestore();
     }
   });
