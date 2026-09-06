@@ -14,7 +14,7 @@ export function Brand({ compact = false, priority = false }: BrandProps) {
       </span>
       {!compact && (
         <Image
-          src="/brand/logo-wordmark.png"
+          src="/brand/trotebox-wordmark.webp"
           alt="TroteBox"
           width={975}
           height={325}
