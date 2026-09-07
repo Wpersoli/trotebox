@@ -32,7 +32,7 @@ Execução local: 14 testes de domínio; 64 testes unitários (6 contratos, 55 A
 
 ## Gates ainda abertos
 
-1. ~~CI sobre o commit final e verificação da interface em navegador.~~ Concluído nesta candidata: `quality` (run 175) e `CodeQL` (run 43) verdes no commit remoto `390076eb60bc31a9c5d405f960c3adbc1e64a17e`; preview Web/API `READY` e smoke check público concluído.
+1. ~~CI sobre o commit final e verificação da interface em navegador.~~ Concluído nesta candidata: `quality` (run 177) e `CodeQL` (run 45) verdes no commit remoto `fbee1ad90c5320739d9b88f35c742b3382b704f7`; preview Web/API `READY` e smoke check público concluído.
 2. Pagamento ponta a ponta com conta de teste/configuração apropriada: Pix, webhook assinado, crédito único e reconciliação.
 3. Telefonia controlada com destinatário autorizado e orçamento definidos, incluindo saldo/callbacks e falhas.
 4. Áudio aprovado, acessibilidade/mobile em dispositivo real, desempenho medido e divulgação com conteúdo real; a primeira camada visual e a acessibilidade estrutural do Web foram concluídas nesta candidata, mas a validação em dispositivo físico e com conteúdo final continua aberta.
@@ -50,7 +50,7 @@ Históricos de conversa ainda inacessíveis não bloqueiam estas correções de 
 
 ## Evidência de segurança e desempenho desta auditoria
 
-- A candidata atual de checkout, liquidação, formulário e I/O de telefonia foi publicada no commit remoto `390076eb60bc31a9c5d405f960c3adbc1e64a17e`; Web `dpl_4FbyFwz7oDTRt6vtgjvVXpF4RT2m` e API `dpl_GmEaFwCVhAHkzD1XXPGA1mZDSZJR` terminaram `READY`, sem promoção dos aliases de produção. O healthcheck da API retornou HTTP 200 com banco `ok` e os cabeçalhos de segurança esperados.
+- A candidata atual de checkout, liquidação, formulário, I/O de telefonia e validação de assinaturas foi publicada no commit remoto `fbee1ad90c5320739d9b88f35c742b3382b704f7`; Web `dpl_6W7Rm2xemGeb3FpapeFaCtCSEd8S` e API `dpl_AkXvhnN1chkgkMwBT5fvgcj7GTzp` terminaram `READY`, sem promoção dos aliases de produção. O healthcheck e os cabeçalhos de segurança da API já haviam sido confirmados na candidata imediatamente anterior; esta alteração não toca a rota de saúde nem sua configuração.
 - Esta auditoria foi publicada no commit remoto `94a57e8291b73ef40a44581ac6c06997285f601b`; Web `dpl_A6AwXF8t7EzGBvRHhaD8jtet5Ruh` e API `dpl_4HBYjn1R8cGiCyqfi7cvabEQMoGY` terminaram `READY`, sem promoção dos aliases de produção.
 - No preview protegido, a navegação de smoke concluiu em aproximadamente 2,95 s incluindo o handshake temporário do Vercel; esse número não é LCP/INP/CLS e não substitui medição em dispositivo físico. O DOM final estava completo, o hero tinha 1500 px de largura natural e os preloads de ícone e hero estavam presentes.
 - O build local produziu 724,7 KiB de JavaScript e 48,4 KiB de CSS não comprimidos; o hero WebP tem 163,2 KiB. Esses números são inventário do artefato, não uma promessa de transferência de rede, e ficam registrados para a próxima medição real.
