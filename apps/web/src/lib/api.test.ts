@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ApiError, api, parseRetryAfterSeconds } from './api';
+import { ApiError, api, parseRetryAfterSeconds, previewModeEnabled } from './api';
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -38,6 +38,18 @@ describe('Retry-After handling', () => {
       retryAfterSeconds: 17,
       message: 'Limite de uso atingido. Tente novamente em 17 segundos.'
     });
+  });
+});
+
+describe('preview mode safety', () => {
+  it('allows simulated data during local development', () => {
+    expect(previewModeEnabled('true', 'development')).toBe(true);
+    expect(previewModeEnabled('true', 'test')).toBe(true);
+  });
+
+  it('ignores simulated data in production builds', () => {
+    expect(previewModeEnabled('true', 'production')).toBe(false);
+    expect(previewModeEnabled('false', 'production')).toBe(false);
   });
 });
 

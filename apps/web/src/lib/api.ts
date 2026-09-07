@@ -6,7 +6,18 @@ const baseUrl = configuredBaseUrl
   || (process.env.NODE_ENV === 'production' && clientPlatform === 'web' ? '/api/v1' : 'http://localhost:3001/api/v1');
 const requestTimeoutMs = Number(process.env.NEXT_PUBLIC_API_TIMEOUT_MS ?? 10000);
 const createCallTimeoutMs = 30000;
-export const isPreviewMode = process.env.NEXT_PUBLIC_PREVIEW_MODE === 'true';
+
+export function previewModeEnabled(
+  configuredValue = process.env.NEXT_PUBLIC_PREVIEW_MODE,
+  nodeEnv = process.env.NODE_ENV
+) {
+  // Preview data must never replace real auth/commerce in a production build.
+  // The local preview script runs under next dev, so it remains available for
+  // visual review without creating a production bypass.
+  return configuredValue === 'true' && nodeEnv !== 'production';
+}
+
+export const isPreviewMode = previewModeEnabled();
 
 const previewScripts: ScriptSummary[] = [
   { id: 'cm0trotebox0001preview', slug: 'entrega-impossivel', title: 'Entrega impossível', category: 'Comédia leve', description: 'Uma entrega completamente absurda vira o centro de uma conversa divertida, com encerramento claramente humorístico.', creditCost: 3, durationSeconds: 65, accent: 'orange' },

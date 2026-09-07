@@ -63,6 +63,8 @@ NEXT_PUBLIC_APP_NAME=TroteBox
 NEXT_PUBLIC_COMMERCE_MODE=web
 ```
 
+`NEXT_PUBLIC_PREVIEW_MODE` deve permanecer `false` em qualquer ambiente publicado. O frontend só aceita o modo simulado durante `next dev`; para revisar a interface localmente, use `npm run preview:web`.
+
 Para `NEXT_PUBLIC_CLIENT_PLATFORM=web`, build de produção usa `/api/v1` quando `NEXT_PUBLIC_API_BASE_URL` estiver vazio/ausente. O `apps/web/vercel.json` encaminha essa rota, sem alterar a URL no navegador, para:
 
 ```text
