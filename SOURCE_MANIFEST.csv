@@ -50,8 +50,8 @@ path,bytes,lines,sha256
 "apps/api/src/server/env.ts",6103,101,bdb2025a2b3054a6896d2872079831bb759c1e9005b0f369fefb199e7a1294ef
 "apps/api/src/server/http.test.ts",5718,137,646144b6f4fd8229c73f3cde8dc255c339415bbf066d6b9d529c1317c48d39c7
 "apps/api/src/server/http.ts",6057,175,d027198b5f3a18c979770112625784b7860331d8a7c2811944aceb6208a4ca59
-"apps/api/src/server/payment-events.test.ts",2023,56,278463e5fd1b0ef44eaab718512721f30e778f555d1673470595d24c2113b20d
-"apps/api/src/server/payment-events.ts",7487,129,64936621f9edce92ff03b38aa31a2f8b4252b14cf2dc041257bf65c168a34379
+"apps/api/src/server/payment-events.test.ts",2727,75,db727d0f30881ac3642288ad4e7860fa232334cb604da2a8fa4cb3c3d6740c23
+"apps/api/src/server/payment-events.ts",7704,132,30c6d8907f9e9145f96b688373ad4b94f311b10f1df7044b7d1c61075c8e8278
 "apps/api/src/server/payments/mercadopago.test.ts",783,18,cefac8538c96c483fc57507ad596ff83ac583e250a12cb96a1974abed6a12cee
 "apps/api/src/server/payments/mercadopago.ts",6675,132,d2797b830bf2c1b916a66b3fa3e1b98539c09520dcfebe7b743f66bee03fbdef
 "apps/api/src/server/payments/pix-recovery.test.ts",2729,46,4bec2fe36dc67a25ef0cfc22487121ca343109a98bf38161fc4acef48258dc10
@@ -156,7 +156,7 @@ path,bytes,lines,sha256
 "packages/db/src/client.ts",540,21,3974bdecdbe6694600e26ba9adc2fd32da95e0529d014fd9f3fb3ea31121b9c4
 "packages/db/src/seed.ts",4264,109,25341cdeef00d56f31df36e4d2929f58d38a8d9d515fadb6e24dcefe1c67d442
 "packages/db/tsconfig.json",121,8,9e388ea60852028037c4fd8a6e0311c02d4ff1703d66e5f9b22276b07dcb82d2
-"QUALITY_PROGRESS.md",7989,59,8211d3f2b8f37276a8ea23deda62d8dadd75299fb37c6b9855ff4b6402fcb699
+"QUALITY_PROGRESS.md",8135,59,7fc6a29818ac8e00c0a1f333135e539a70a8d26cf2eb2682fa1ed6b24b7d369c
 "README.md",4806,114,7ed7795ae11686383194774bb43623ee5a0fac610d262c604d954e1ad014a992
 "REBRAND_0.3.1.md",955,34,6b3ed821a4728b042385a18b2782fa22f47cf2f9578b20204e71d7d40bf66c9f
 "RELEASE_NOTES_0.3.4.md",639,21,1768bf5455ad80873d59a3a79e7055cf249e880c15be3fbb74d7597bd186ac76

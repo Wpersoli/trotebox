@@ -52,4 +52,23 @@ describe('payment settlement state transitions', () => {
     expect(findUnique).toHaveBeenCalledWith({ where: { id: 'payment' } });
     expect(update).not.toHaveBeenCalled();
   });
+
+  it('rejects a provider event whose payment id differs from the internal record', async () => {
+    const payment = {
+      id: 'payment',
+      provider: PaymentProvider.MERCADOPAGO,
+      status: PaymentStatus.PENDING,
+      providerPaymentId: 'expected-provider-payment'
+    };
+    vi.spyOn(prisma.payment, 'findUnique').mockResolvedValue(payment as never);
+    const update = vi.spyOn(prisma.payment, 'update');
+
+    await expect(updatePaymentFromMercadoPago({
+      external_reference: 'payment',
+      id: 'different-provider-payment',
+      status: 'pending'
+    })).rejects.toMatchObject({ status: 409, code: 'PAYMENT_PROVIDER_ID_MISMATCH' });
+
+    expect(update).not.toHaveBeenCalled();
+  });
 });

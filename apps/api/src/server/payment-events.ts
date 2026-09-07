@@ -110,6 +110,9 @@ export async function updatePaymentFromMercadoPago(
   const current = await prisma.payment.findUnique({ where: { id: internalId } });
   if (!current) throw new AppError(404, 'PAYMENT_NOT_FOUND', 'Pagamento não encontrado.');
   if (current.provider !== PaymentProvider.MERCADOPAGO) throw new AppError(409, 'PAYMENT_PROVIDER_MISMATCH', 'Pagamento não pertence ao Mercado Pago.');
+  if (current.providerPaymentId && providerId && current.providerPaymentId !== providerId) {
+    throw new AppError(409, 'PAYMENT_PROVIDER_ID_MISMATCH', 'Identificador do pagamento divergente na conciliação.');
+  }
   if ((status === 'refunded' || status === 'charged_back') && current.providerPaymentId) {
     return revokePaymentCredits(current.providerPaymentId, status === 'refunded' ? 'REFUND' : 'CHARGEBACK');
   }
