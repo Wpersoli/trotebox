@@ -20,6 +20,7 @@ Quatro referências fornecidas pelo usuário: roxo/laranja, mascote, catálogo c
 - Ao abrir a carteira, uma intenção Pix pendente da sessão é recuperada automaticamente com a mesma chave idempotente, evitando duplicidade depois de recarregar a página.
 - A liquidação interna agora só aprova pagamentos pendentes ou já aprovados; aprovações tardias não reabrem pagamentos rejeitados, cancelados, reembolsados ou contestados. Notificações Mercado Pago fora de ordem também não rebaixam pagamentos já liquidados ou encerrados.
 - O formulário de novo trote valida telefone em formato E.164 e apelido opcional antes da requisição, reduzindo chamadas inválidas e deixando a orientação de erro clara para o usuário.
+- Callbacks Vonage passaram a usar o mesmo limite de corpo de 256 KiB dos demais webhooks; o proxy de reprodução Twilio ganhou timeout de 15 segundos e erro de dependência explícito para evitar espera indefinida.
 
 ## Evidência e limites
 

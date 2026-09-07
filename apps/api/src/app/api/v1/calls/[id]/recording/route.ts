@@ -49,11 +49,17 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
 
     const source = twilioRecordingUrl(decrypt(recording.providerDownloadUrlEncrypted));
     const authorization = Buffer.from(`${config.TWILIO_ACCOUNT_SID}:${config.TWILIO_AUTH_TOKEN}`).toString('base64');
-    const upstream = await fetch(source, {
-      headers: { Authorization: `Basic ${authorization}` },
-      cache: 'no-store',
-      redirect: 'error'
-    });
+    let upstream: Response;
+    try {
+      upstream = await fetch(source, {
+        headers: { Authorization: `Basic ${authorization}` },
+        cache: 'no-store',
+        redirect: 'error',
+        signal: AbortSignal.timeout(15_000)
+      });
+    } catch {
+      throw new AppError(502, 'RECORDING_PROVIDER_UNAVAILABLE', 'O provedor demorou para disponibilizar a gravação.');
+    }
 
     if (!upstream.ok || !upstream.body) {
       throw new AppError(502, 'RECORDING_PROVIDER_ERROR', 'Não foi possível obter a gravação do provedor.');

@@ -14,7 +14,7 @@ b36ba09f8d01e1ca1526348fceb9835c845a7b50a7529bac37cdf0ba3bf3ac5e  apps/api/src/a
 b77a5b550f443078b888ab4053ced874903cdd39440e8c77a89a38a1e01c708d  apps/api/src/app/api/v1/auth/request-code/route.ts
 f6957ad13e2916366d349a8287fa01d3d236c3fedd4fa4006d8215d4109c88d2  apps/api/src/app/api/v1/auth/session/route.ts
 5adfbf871b76df43ab67dfc13ed64b12a9ee71c8f38660d4665a90ad156a72ec  apps/api/src/app/api/v1/auth/verify-code/route.ts
-5b557abd516dc40bc0b3b54d07fd7bd7a62da8bf5717f951ea411fd75a5a9225  apps/api/src/app/api/v1/calls/[id]/recording/route.ts
+babedb3372c8cb2f444fe45cf949fb015760ec70f43e57d6a2e6cc4471c6a27d  apps/api/src/app/api/v1/calls/[id]/recording/route.ts
 974e91e0d8997d057b315515f64f305420955f30857ca24f45e72ed6208907d6  apps/api/src/app/api/v1/calls/[id]/route.ts
 38ef5c436fdbbf3f46453c84e8d1137b2808f8c7140f1f5cdad68a366c630e88  apps/api/src/app/api/v1/calls/route.ts
 d3bb0467740c4038b8d773b9f6bf04b4f4cc5d47e145ce3049b74faf117b0ffd  apps/api/src/app/api/v1/catalog/route.ts
@@ -24,13 +24,13 @@ cbe078098b79eaae637fd4f65b6d258a58b549bfb92314d5b6da82df39b06a4b  apps/api/src/a
 2686ae56d2de9e72332c662ae761cf4d5dcdd1afcfcbf7b962ec4dfbceb91d71  apps/api/src/app/api/v1/payments/mercadopago/pix/route.ts
 c2ad6218e04b27993eb4bbe789e83a036f603e2f4a7bc5d5d41d7903c7db4b17  apps/api/src/app/api/v1/payments/stripe/checkout/route.ts
 89f5dc477aa86d51e19d40965f2a15448906262f95261e910380dd5bf1bd9e68  apps/api/src/app/api/v1/telephony/twilio/answer/[id]/route.ts
-5420b743a6030de43da572ca6a28e7f8a15178d034b74e617e4c7560f126b560  apps/api/src/app/api/v1/telephony/vonage/answer/[id]/route.ts
+feb1da0e2443abfec20032ce57e004d643d1f7f9f10b5c21fafe21888e8c9eef  apps/api/src/app/api/v1/telephony/vonage/answer/[id]/route.ts
 e2747a9e6336dfba4d1d971b658bba44bde65fe2261f16c307734cf08414eee6  apps/api/src/app/api/v1/wallet/route.ts
 03a984f7ea39165fb3dc7d4da22588bdf913257afd19fe24a9508a38a52e2624  apps/api/src/app/api/v1/webhooks/mercadopago/route.ts
 029b889640d3c29949e399548b2ff0a66d28c8a2ca8cbfb2b0f50c1f4615a760  apps/api/src/app/api/v1/webhooks/stripe/route.ts
 521a76e6dbe07559af1cf6ac09034e8df91a46000ce21816d9505ee9ab02277d  apps/api/src/app/api/v1/webhooks/twilio/recording/route.ts
 a3eaa0c7e746dcd88c0ce3aa1ddcd6401eb8e31270131048addbca79a505d064  apps/api/src/app/api/v1/webhooks/twilio/status/route.ts
-5721ab87a46fbe80031c97575098a399c2c7f442ffd9f5018d08b6f74f51718c  apps/api/src/app/api/v1/webhooks/vonage/recording/route.ts
+c7eee3b95826603632f7b79eb68e71958e48e94d48bb923f1dd49b981ff602b2  apps/api/src/app/api/v1/webhooks/vonage/recording/route.ts
 d68d09871f6d721d63cc357ec867639ae431fc3db739fb5027b3bb6909dfd3bb  apps/api/src/app/api/v1/webhooks/vonage/status/route.ts
 b6409c401754850064f9bb42ca5d3da2ce01a122dd3153fea9268a7af65a87b0  apps/api/src/app/layout.tsx
 d50b7db0da6130b0c6b17da390b4aaeee61ab70a2341cf9b5cbab982e153b54d  apps/api/src/app/page.tsx
@@ -155,7 +155,7 @@ afcd99f974c1b7483dc00da74acb1244fe5ab747eca08df22a398103ada3944d  packages/db/pr
 3974bdecdbe6694600e26ba9adc2fd32da95e0529d014fd9f3fb3ea31121b9c4  packages/db/src/client.ts
 25341cdeef00d56f31df36e4d2929f58d38a8d9d515fadb6e24dcefe1c67d442  packages/db/src/seed.ts
 9e388ea60852028037c4fd8a6e0311c02d4ff1703d66e5f9b22276b07dcb82d2  packages/db/tsconfig.json
-600485c56e7b5d11f6ae5edd83171aa497a3e780c390dc178827d433d0066137  QUALITY_PROGRESS.md
+1694866ffc1aabb8bcbc3c7255ce263956e4fab76a8787cdf337109d35b9e459  QUALITY_PROGRESS.md
 7ed7795ae11686383194774bb43623ee5a0fac610d262c604d954e1ad014a992  README.md
 6b3ed821a4728b042385a18b2782fa22f47cf2f9578b20204e71d7d40bf66c9f  REBRAND_0.3.1.md
 1768bf5455ad80873d59a3a79e7055cf249e880c15be3fbb74d7597bd186ac76  RELEASE_NOTES_0.3.4.md
