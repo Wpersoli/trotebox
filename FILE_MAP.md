@@ -41,8 +41,8 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `apps/api/src/app/layout.tsx` | 154 | `b6409c401754850064f9bb42ca5d3da2ce01a122dd3153fea9268a7af65a87b0` |
 | `apps/api/src/app/page.tsx` | 172 | `d50b7db0da6130b0c6b17da390b4aaeee61ab70a2341cf9b5cbab982e153b54d` |
 | `apps/api/src/proxy.ts` | 2378 | `2ae99fdf12f7cf5f23cc126435669950859ef23de55e6f7c16fe69b251cf35da` |
-| `apps/api/src/server/audit.ts` | 1262 | `8e21c715b216031b4e33c12247999cd23484dce68827ba51359ebdeac6160fb3` |
-| `apps/api/src/server/auth-code.ts` | 4340 | `a351783b246c10a59b22d24e2629015187b6bac1abf175a2ef091a0a60059a91` |
+| `apps/api/src/server/audit.ts` | 1239 | `62392efc83e43efb5a9c179a7b617a2047883d3e6e8264a27e02dd85b011e8fc` |
+| `apps/api/src/server/auth-code.ts` | 4229 | `1c6bef3c1151fba54ff2de6f87ec4deed2a51c16ac6643c92dfc172ba8f1a5b2` |
 | `apps/api/src/server/auth.ts` | 4618 | `456f47252e9ef3ce2f92d377d61c56b04df555cac6d54c558e7f470757fd7ab6` |
 | `apps/api/src/server/calls.ts` | 11144 | `51f900a96d377e251d2de2bcd2a08b3eac21b9485ea6a9e770a077b51bb2961d` |
 | `apps/api/src/server/capabilities.test.ts` | 2661 | `5c2d13a0f6dcb776d61d711f431fc904bc355f9c67fb3f9b5a240e96d60aa45d` |
@@ -71,6 +71,8 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `apps/api/src/server/rate-limit.ts` | 2305 | `f05aa1bf38a559629e22bcc0331e5d8d119db43f8f0efd567ce7447ca253637b` |
 | `apps/api/src/server/recordings.test.ts` | 616 | `1ed78c480bf1496e30240d296985fe20407762b59b16d5ffcbe86b32c18bb2a8` |
 | `apps/api/src/server/recordings.ts` | 5211 | `d27335ecb56dfda47b429a49974e8a0f84aeb58f8b99dd39eab24af0b931a6a3` |
+| `apps/api/src/server/request-ip.test.ts` | 1731 | `ce85f7ce29a811a65fda7fd9698596e5aa4681e9b61c26551d3d6a8c0b8af072` |
+| `apps/api/src/server/request-ip.ts` | 1158 | `35d9fe53735e8cfcb1e18f7b5af9c246bb0486f8ec7043ef81bc729948df51d6` |
 | `apps/api/src/server/telephony/index.ts` | 823 | `0208b33ecbacb31d299ce2f54cb3899338f5d752cce86b24f461e0a35a693367` |
 | `apps/api/src/server/telephony/mock.ts` | 298 | `6eeaf6b5e12f0c57d507b44957295feab3d678f94dbf387039f899b66452098c` |
 | `apps/api/src/server/telephony/twilio.ts` | 1826 | `7ee215c37b0bb6d8b10de017fa026ccce953f1115308e789265f94719d373612` |
@@ -163,7 +165,7 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `packages/db/src/client.ts` | 540 | `3974bdecdbe6694600e26ba9adc2fd32da95e0529d014fd9f3fb3ea31121b9c4` |
 | `packages/db/src/seed.ts` | 4264 | `25341cdeef00d56f31df36e4d2929f58d38a8d9d515fadb6e24dcefe1c67d442` |
 | `packages/db/tsconfig.json` | 121 | `9e388ea60852028037c4fd8a6e0311c02d4ff1703d66e5f9b22276b07dcb82d2` |
-| `QUALITY_PROGRESS.md` | 8821 | `4b265ee65bc2a7121ee3d8472de9ecb110c5010524e46501157c4b9ad4f7504c` |
+| `QUALITY_PROGRESS.md` | 9113 | `07d1c63d3c711e6f14835c5f483a0c3911871d92ab2a9685bee8942ae89adf29` |
 | `README.md` | 4806 | `7ed7795ae11686383194774bb43623ee5a0fac610d262c604d954e1ad014a992` |
 | `REBRAND_0.3.1.md` | 955 | `6b3ed821a4728b042385a18b2782fa22f47cf2f9578b20204e71d7d40bf66c9f` |
 | `RELEASE_NOTES_0.3.4.md` | 639 | `1768bf5455ad80873d59a3a79e7055cf249e880c15be3fbb74d7597bd186ac76` |

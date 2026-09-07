@@ -6,6 +6,7 @@ import { hashSubject, safeEqualHex } from './crypto';
 import { AppError } from './http';
 import { enforceRateLimits } from './rate-limit';
 import { deliverAuthCode } from './email-delivery';
+import { requestIp } from './request-ip';
 
 const DEFAULT_DISPLAY_NAME = 'Cliente TroteBox';
 
@@ -13,15 +14,9 @@ function codeHash(email: string, code: string) {
   return createHmac('sha256', env().AUTH_CODE_PEPPER).update(`${email}:${code}`).digest('hex');
 }
 
-function requestIp(request: Request) {
-  return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-    ?? request.headers.get('x-real-ip')?.trim()
-    ?? 'unknown';
-}
-
 export async function requestAuthCode(input: RequestAuthCodeInput, request: Request) {
   const email = input.email.toLowerCase();
-  const ip = requestIp(request);
+  const ip = requestIp(request) ?? 'unknown';
 
   // Anti-spam e anti-enumeração. As três cotas são avaliadas e registradas na
   // mesma transação serializável para evitar consumo parcial de quota quando
@@ -61,7 +56,7 @@ export async function requestAuthCode(input: RequestAuthCodeInput, request: Requ
 
 export async function verifyAuthCode(input: VerifyAuthCodeInput, request: Request) {
   const email = input.email.toLowerCase();
-  const ip = requestIp(request);
+  const ip = requestIp(request) ?? 'unknown';
 
   await enforceRateLimits([
     { bucket: 'auth:verify:email:15m', subjectHash: hashSubject(email), limit: 10, windowMs: 15 * 60 * 1000 },
