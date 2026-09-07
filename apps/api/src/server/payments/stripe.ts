@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { PaymentProvider, PaymentStatus, prisma } from '@trotebox/db';
+import { PaymentProvider, PaymentStatus, Prisma, prisma } from '@trotebox/db';
 import { env } from '../env';
 import { AppError } from '../http';
 
@@ -17,13 +17,28 @@ export async function createStripeCheckout(userId: string, packCode: string, ide
     if (session.url) return { checkoutUrl: session.url, payment: existing };
   }
 
-  const pack = await prisma.creditPack.findFirst({ where: { code: packCode, active: true } });
+  // An existing idempotency record owns its original price snapshot even if
+  // the catalog package was later deactivated or edited.
+  const pack = existing?.creditPack ?? await prisma.creditPack.findFirst({ where: { code: packCode, active: true } });
   if (!pack) throw new AppError(404, 'PACK_NOT_FOUND', 'Pacote de créditos não encontrado.');
   const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
   const payment = existing ?? await prisma.payment.create({ data: {
     userId, creditPackId: pack.id, provider: PaymentProvider.STRIPE, status: PaymentStatus.PENDING,
     amountCents: pack.priceCents, currency: pack.currency, credits: pack.credits, idempotencyKey
-  }});
+  }}).catch(async (cause: unknown) => {
+    if (!(cause instanceof Prisma.PrismaClientKnownRequestError) || cause.code !== 'P2002') throw cause;
+    const winner = await prisma.payment.findUnique({ where: { idempotencyKey }, include: { creditPack: true } });
+    if (!winner) throw cause;
+    if (winner.userId !== userId || winner.creditPack.code !== packCode || winner.provider !== PaymentProvider.STRIPE) {
+      throw new AppError(409, 'IDEMPOTENCY_CONFLICT', 'Chave idempotente já usada em outra operação.');
+    }
+    return winner;
+  });
+
+  if (payment.providerCheckoutId) {
+    const session = await stripeClient().checkout.sessions.retrieve(payment.providerCheckoutId);
+    if (session.url) return { checkoutUrl: session.url, payment };
+  }
 
   const metadata = { paymentId: payment.id, userId, packCode: pack.code };
   const configuredPrice = pack.stripePriceId || process.env[`STRIPE_PRICE_PACK_${pack.code.toUpperCase()}`];

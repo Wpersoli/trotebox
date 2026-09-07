@@ -60,7 +60,8 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `apps/api/src/server/payments/mercadopago.test.ts` | 783 | `cefac8538c96c483fc57507ad596ff83ac583e250a12cb96a1974abed6a12cee` |
 | `apps/api/src/server/payments/mercadopago.ts` | 6675 | `d2797b830bf2c1b916a66b3fa3e1b98539c09520dcfebe7b743f66bee03fbdef` |
 | `apps/api/src/server/payments/pix-recovery.test.ts` | 2729 | `4bec2fe36dc67a25ef0cfc22487121ca343109a98bf38161fc4acef48258dc10` |
-| `apps/api/src/server/payments/stripe.ts` | 3055 | `89c73413e6aef6ff1da2a1e5021f6f2dc37d87a57cd243aee337e977f0df16b5` |
+| `apps/api/src/server/payments/stripe.test.ts` | 3429 | `1f176698e80a47c3b95c3720049b965604310fb917333d0e0bdbe3d1473aa714` |
+| `apps/api/src/server/payments/stripe.ts` | 3968 | `42325107682e5012c243e138f682e85ba74dc65e1ae85f8beef1f224f7625801` |
 | `apps/api/src/server/phone-policy-core.ts` | 1608 | `a79a959b32d9bc6ce21fd990781eb2a5e4448bb080e6244eaef268a49fb1baa1` |
 | `apps/api/src/server/phone-policy.test.ts` | 1741 | `d470775290a316deaec12dfd9491c58d9bf693e020dce82c9d3431a797dc5f21` |
 | `apps/api/src/server/phone-policy.ts` | 1164 | `7242a55645fa6bda695be9c7ba703966af0cf71f245a4fb16f3ee1b1bac721ae` |
@@ -161,7 +162,7 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `packages/db/src/client.ts` | 540 | `3974bdecdbe6694600e26ba9adc2fd32da95e0529d014fd9f3fb3ea31121b9c4` |
 | `packages/db/src/seed.ts` | 4264 | `25341cdeef00d56f31df36e4d2929f58d38a8d9d515fadb6e24dcefe1c67d442` |
 | `packages/db/tsconfig.json` | 121 | `9e388ea60852028037c4fd8a6e0311c02d4ff1703d66e5f9b22276b07dcb82d2` |
-| `QUALITY_PROGRESS.md` | 8135 | `7fc6a29818ac8e00c0a1f333135e539a70a8d26cf2eb2682fa1ed6b24b7d369c` |
+| `QUALITY_PROGRESS.md` | 8398 | `59ab55154c4ff64df65747f197b5cc05a988ba089c019037b54ffc45eae77e1d` |
 | `README.md` | 4806 | `7ed7795ae11686383194774bb43623ee5a0fac610d262c604d954e1ad014a992` |
 | `REBRAND_0.3.1.md` | 955 | `6b3ed821a4728b042385a18b2782fa22f47cf2f9578b20204e71d7d40bf66c9f` |
 | `RELEASE_NOTES_0.3.4.md` | 639 | `1768bf5455ad80873d59a3a79e7055cf249e880c15be3fbb74d7597bd186ac76` |
