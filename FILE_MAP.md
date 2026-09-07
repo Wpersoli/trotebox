@@ -47,7 +47,8 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `apps/api/src/server/calls.ts` | 11144 | `51f900a96d377e251d2de2bcd2a08b3eac21b9485ea6a9e770a077b51bb2961d` |
 | `apps/api/src/server/capabilities.test.ts` | 2661 | `5c2d13a0f6dcb776d61d711f431fc904bc355f9c67fb3f9b5a240e96d60aa45d` |
 | `apps/api/src/server/capabilities.ts` | 803 | `d827a9c6517d00cc3c99f7c428998c6c3c7093785ead41b85eb1e0416f3cbca9` |
-| `apps/api/src/server/crypto.ts` | 1412 | `3f71dc0928a53cdfdd6d0b6a639948c838da5673c41238e8fc920a86c6b7bfbb` |
+| `apps/api/src/server/crypto.test.ts` | 632 | `efd9a77a781bb57a574d000d48880465e33c8b306818eac618f25d0768bb90fc` |
+| `apps/api/src/server/crypto.ts` | 1526 | `bf1b48c5d2bc0868bc4790f1725d5eb9f38c8f21f1049d50f92089ba8a04ef93` |
 | `apps/api/src/server/email-delivery.test.ts` | 911 | `afeec84dc966ba0af0066d360d2d3e09be1e07f032829520b69c9544ed815558` |
 | `apps/api/src/server/email-delivery.ts` | 3733 | `b091e6feef00e927ddaaeef46a26f54cc5699b5a5f6946ef64803caecbba3458` |
 | `apps/api/src/server/env.production.test.ts` | 3249 | `4df85bae9aedad9f3bc71c9a020db879c1a23ee185efac0ffb8beb6d7042435f` |
@@ -162,7 +163,7 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `packages/db/src/client.ts` | 540 | `3974bdecdbe6694600e26ba9adc2fd32da95e0529d014fd9f3fb3ea31121b9c4` |
 | `packages/db/src/seed.ts` | 4264 | `25341cdeef00d56f31df36e4d2929f58d38a8d9d515fadb6e24dcefe1c67d442` |
 | `packages/db/tsconfig.json` | 121 | `9e388ea60852028037c4fd8a6e0311c02d4ff1703d66e5f9b22276b07dcb82d2` |
-| `QUALITY_PROGRESS.md` | 8468 | `2f9176d7e9603ad99f4de51ab4d09558fe9de6afa4fc11eb28ca5d2d14719145` |
+| `QUALITY_PROGRESS.md` | 8704 | `d2578837ffc2da9bf5c3ee9ec7993e74a251ee72ac91f6b241f5298952360feb` |
 | `README.md` | 4806 | `7ed7795ae11686383194774bb43623ee5a0fac610d262c604d954e1ad014a992` |
 | `REBRAND_0.3.1.md` | 955 | `6b3ed821a4728b042385a18b2782fa22f47cf2f9578b20204e71d7d40bf66c9f` |
 | `RELEASE_NOTES_0.3.4.md` | 639 | `1768bf5455ad80873d59a3a79e7055cf249e880c15be3fbb74d7597bd186ac76` |

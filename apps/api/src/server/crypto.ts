@@ -28,6 +28,13 @@ export function decrypt(value: string) {
 export function sha256(value: string | Buffer) { return createHash('sha256').update(value).digest('hex'); }
 
 export function safeEqualHex(left: string, right: string) {
-  if (!left || !right || left.length !== right.length) return false;
+  if (
+    !left
+    || !right
+    || left.length !== right.length
+    || left.length % 2 !== 0
+    || !/^[0-9a-f]+$/i.test(left)
+    || !/^[0-9a-f]+$/i.test(right)
+  ) return false;
   return timingSafeEqual(Buffer.from(left, 'hex'), Buffer.from(right, 'hex'));
 }

@@ -20,14 +20,15 @@ Quatro referências fornecidas pelo usuário: roxo/laranja, mascote, catálogo c
 - Ao abrir a carteira, uma intenção Pix pendente da sessão é recuperada automaticamente com a mesma chave idempotente, evitando duplicidade depois de recarregar a página.
 - A liquidação interna agora só aprova pagamentos pendentes ou já aprovados; aprovações tardias não reabrem pagamentos rejeitados, cancelados, reembolsados ou contestados. Eventos Mercado Pago fora de ordem ou com identificador de provedor divergente são ignorados/rejeitados sem alterar o pagamento interno.
 - O checkout Stripe agora recupera uma inserção concorrente pela mesma chave idempotente, preserva o snapshot original quando o pacote sai do catálogo e rejeita a chave se pertencer a outra conta antes de chamar o provedor.
+- Comparações de assinaturas/hash em hexadecimal agora rejeitam entradas malformadas sem lançar erro de infraestrutura; isso mantém webhooks e códigos de autenticação em falha fechada.
 - O formulário de novo trote valida telefone em formato E.164 e apelido opcional antes da requisição, reduzindo chamadas inválidas e deixando a orientação de erro clara para o usuário.
 - Callbacks Vonage passaram a usar o mesmo limite de corpo de 256 KiB dos demais webhooks; o proxy de reprodução Twilio ganhou timeout de 15 segundos e erro de dependência explícito para evitar espera indefinida.
 
 ## Evidência e limites
 
-Testes adicionados: recuperação de chave após falha de rede, conservação de preço/créditos, concorrência de inserção, rejeição de chave pertencente a outra conta, transições de liquidação Mercado Pago (aprovação tardia, evento fora de ordem e identificador divergente) e recuperação/idempotência Stripe. Testes do banco/provedor usam mocks; não demonstram concorrência real em PostgreSQL nem pagamento real.
+Testes adicionados: recuperação de chave após falha de rede, conservação de preço/créditos, concorrência de inserção, rejeição de chave pertencente a outra conta, transições de liquidação Mercado Pago (aprovação tardia, evento fora de ordem e identificador divergente), recuperação/idempotência Stripe e comparação segura de hashes hexadecimais. Testes do banco/provedor usam mocks; não demonstram concorrência real em PostgreSQL nem pagamento real.
 
-Execução local: 14 testes de domínio; 62 testes unitários (6 contratos, 53 API, 3 Web); lint, tipos e build Web aprovados na revisão. npm audit --omit=dev --audit-level=high retornou zero vulnerabilidades reportadas em 06/09/2026. Runtime local Node 24; projeto exige Node 22, portanto a execução no CI Node 22 continua sendo gate.
+Execução local: 14 testes de domínio; 64 testes unitários (6 contratos, 55 API, 3 Web); lint, tipos e build Web aprovados na revisão. npm audit --omit=dev --audit-level=high retornou zero vulnerabilidades reportadas em 06/09/2026. Runtime local Node 24; projeto exige Node 22, portanto a execução no CI Node 22 continua sendo gate.
 
 ## Gates ainda abertos
 
@@ -56,4 +57,4 @@ Históricos de conversa ainda inacessíveis não bloqueiam estas correções de 
 - Web e API não apresentaram clusters de erro em runtime nas últimas 24 horas; os logs de erro/fatal de produção também não retornaram eventos.
 - A API agora envia CSP mínima (`default-src 'none'`), `X-Frame-Options`, `Permissions-Policy` e COOP além de `nosniff`, referrer restrito e `no-store`.
 - O preview não falha quando localStorage é bloqueado ou corrompido: o usuário armazenado é validado antes da restauração e a sessão corrente continua utilizável. QR Codes só aceitam base64 de imagem permitido; links de pagamento só são expostos quando usam HTTPS.
-- `npm audit --omit=dev --audit-level=high` continuou retornando zero vulnerabilidades após as alterações. A validação integral local permaneceu verde: 14 testes de domínio, 62 testes unitários, lint, tipos e build Web.
+- `npm audit --omit=dev --audit-level=high` continuou retornando zero vulnerabilidades após as alterações. A validação integral local permaneceu verde: 14 testes de domínio, 64 testes unitários, lint, tipos e build Web.
