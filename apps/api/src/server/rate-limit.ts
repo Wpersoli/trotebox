@@ -18,20 +18,31 @@ export async function enforceRateLimits(rules: RateLimitRule[]) {
       await prisma.$transaction(async (tx) => {
         for (const rule of rules) {
           const since = new Date(now - rule.windowMs);
+          const where = {
+            bucket: rule.bucket,
+            subjectHash: rule.subjectHash,
+            createdAt: { gte: since }
+          };
 
-          const count = await tx.rateLimitEvent.count({
-            where: {
-              bucket: rule.bucket,
-              subjectHash: rule.subjectHash,
-              createdAt: { gte: since }
-            }
-          });
+          const count = await tx.rateLimitEvent.count({ where });
 
           if (count >= rule.limit) {
+            const oldest = await tx.rateLimitEvent.findFirst({
+              where,
+              orderBy: { createdAt: 'asc' },
+              select: { createdAt: true }
+            });
+            const fallbackSeconds = Math.max(1, Math.ceil(rule.windowMs / 1000));
+            const retryAfterSeconds = oldest
+              ? Math.max(1, Math.ceil((oldest.createdAt.getTime() + rule.windowMs - now) / 1000))
+              : fallbackSeconds;
+
             throw new AppError(
               429,
               'RATE_LIMITED',
-              'Limite de uso atingido. Tente novamente mais tarde.'
+              'Limite de uso atingido. Tente novamente mais tarde.',
+              undefined,
+              { 'Retry-After': String(retryAfterSeconds) }
             );
           }
         }

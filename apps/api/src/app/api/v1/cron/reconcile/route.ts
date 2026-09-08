@@ -4,6 +4,7 @@ import { AppError, handleError, ok } from '@/server/http';
 import { releaseCreditsInTransaction } from '@/server/wallet';
 import { getMercadoPagoPayment } from '@/server/payments/mercadopago';
 import { updatePaymentFromMercadoPago } from '@/server/payment-events';
+import { purgeExpiredRecordings } from '@/server/recordings';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -53,11 +54,13 @@ export async function GET(request: Request) {
       }
     }
 
+    const recordingCleanup = await purgeExpiredRecordings();
+
     await prisma.rateLimitEvent.deleteMany({ where: { createdAt: { lt: new Date(Date.now() - 48 * 60 * 60 * 1000) } } });
     await prisma.idempotencyRecord.deleteMany({ where: { expiresAt: { lt: new Date() } } });
     await prisma.authCode.deleteMany({ where: { expiresAt: { lt: new Date(Date.now() - 24 * 60 * 60 * 1000) } } });
     await prisma.$executeRaw`DELETE FROM "Session" WHERE "expiresAt" < NOW() - INTERVAL '24 hours'`;
-    return ok({ reconciledCalls, reconciledPayments });
+    return ok({ reconciledCalls, reconciledPayments, ...recordingCleanup });
   } catch (cause) {
     if (cause instanceof Prisma.PrismaClientKnownRequestError && cause.code === 'P2034') {
       return handleError(new AppError(409, 'RECONCILIATION_RETRY', 'Conflito transitório; a próxima execução tentará novamente.'));

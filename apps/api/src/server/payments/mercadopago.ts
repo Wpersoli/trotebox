@@ -1,5 +1,5 @@
 import { createHmac } from 'node:crypto';
-import { PaymentProvider, PaymentStatus, prisma } from '@trotebox/db';
+import { PaymentProvider, PaymentStatus, Prisma, prisma } from '@trotebox/db';
 import { env } from '../env';
 import { safeEqualHex } from '../crypto';
 import { AppError } from '../http';
@@ -24,12 +24,20 @@ export async function createPix(userId: string, packCode: string, payerEmail: st
     return pixResponse(payment, existing.id);
   }
 
-  const pack = await prisma.creditPack.findFirst({ where: { code: packCode, active: true } });
+  const pack = existing?.creditPack ?? await prisma.creditPack.findFirst({ where: { code: packCode, active: true } });
   if (!pack) throw new AppError(404, 'PACK_NOT_FOUND', 'Pacote de créditos não encontrado.');
   const payment = existing ?? await prisma.payment.create({ data: {
     userId, creditPackId: pack.id, provider: PaymentProvider.MERCADOPAGO, status: PaymentStatus.PENDING,
     amountCents: pack.priceCents, currency: pack.currency, credits: pack.credits, idempotencyKey
-  }});
+  }}).catch(async (cause: unknown) => {
+    if (!(cause instanceof Prisma.PrismaClientKnownRequestError) || cause.code !== 'P2002') throw cause;
+    const winner = await prisma.payment.findUnique({ where: { idempotencyKey }, include: { creditPack: true } });
+    if (!winner) throw cause;
+    if (winner.userId !== userId || winner.creditPack.code !== packCode || winner.provider !== PaymentProvider.MERCADOPAGO) {
+      throw new AppError(409, 'IDEMPOTENCY_CONFLICT', 'Chave idempotente já usada em outra operação.');
+    }
+    return winner;
+  });
 
   let response: Response;
   try {
@@ -41,8 +49,8 @@ export async function createPix(userId: string, packCode: string, payerEmail: st
         'X-Idempotency-Key': idempotencyKey
       },
       body: JSON.stringify({
-        transaction_amount: pack.priceCents / 100,
-        description: `${pack.name} — ${pack.credits} créditos`,
+        transaction_amount: payment.amountCents / 100,
+        description: `TroteBox — ${payment.credits} créditos`,
         payment_method_id: 'pix',
         external_reference: payment.id,
         // Data minimization: the payment is bound to the authenticated e-mail.
@@ -92,6 +100,15 @@ export async function getMercadoPagoPayment(id: string) {
     throw new AppError(502, 'MERCADOPAGO_INVALID_RESPONSE', 'Mercado Pago retornou uma resposta inválida.');
   }
   return payload;
+}
+
+export function mercadoPagoSignedDataId(url: URL) {
+  const dotted = url.searchParams.get('data.id')?.trim() ?? '';
+  const underscored = url.searchParams.get('data_id')?.trim() ?? '';
+  if (dotted && underscored && dotted.toLowerCase() !== underscored.toLowerCase()) {
+    throw new AppError(400, 'AMBIGUOUS_WEBHOOK_RESOURCE_ID', 'Identificador de recurso ambíguo no webhook Mercado Pago.');
+  }
+  return dotted || underscored;
 }
 
 export function validateMercadoPagoSignature(input: { xSignature: string; xRequestId: string; dataId: string }) {

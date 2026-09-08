@@ -15,6 +15,51 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 const PREVIEW_USER_KEY = 'trotebox_preview_user';
 
+function isPreviewUser(value: unknown): value is User {
+  if (!value || typeof value !== 'object') return false;
+
+  const candidate = value as Partial<User>;
+  return [candidate.id, candidate.email, candidate.displayName].every(
+    (field) => typeof field === 'string' && field.length > 0 && field.length <= 256
+  );
+}
+
+export function parsePreviewUser(raw: string | null): User | null {
+  if (!raw) return null;
+
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    return isPreviewUser(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function readPreviewUser() {
+  try {
+    return parsePreviewUser(window.localStorage.getItem(PREVIEW_USER_KEY));
+  } catch {
+    // Private browsing and restrictive WebViews can deny storage access.
+    return null;
+  }
+}
+
+function writePreviewUser(user: User) {
+  try {
+    window.localStorage.setItem(PREVIEW_USER_KEY, JSON.stringify(user));
+  } catch {
+    // Preview remains usable for the current session even without storage.
+  }
+}
+
+function clearPreviewUser() {
+  try {
+    window.localStorage.removeItem(PREVIEW_USER_KEY);
+  } catch {
+    // Storage may be unavailable; React state is still cleared below.
+  }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
@@ -24,8 +69,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async function restore() {
       try {
         if (isPreviewMode) {
-          const raw = localStorage.getItem(PREVIEW_USER_KEY);
-          if (raw && active) setUser(JSON.parse(raw) as User);
+          const storedUser = readPreviewUser();
+          if (storedUser && active) setUser(storedUser);
           return;
         }
         const result = await api.session();
@@ -41,7 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const acceptSession = useCallback((result: { user: User }) => {
-    if (isPreviewMode) localStorage.setItem(PREVIEW_USER_KEY, JSON.stringify(result.user));
+    if (isPreviewMode) writePreviewUser(result.user);
     setUser(result.user);
   }, []);
 
@@ -55,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     try { await api.logout(); } catch { /* sessão local será encerrada de qualquer forma */ }
-    localStorage.removeItem(PREVIEW_USER_KEY);
+    if (isPreviewMode) clearPreviewUser();
     setUser(null);
   }, []);
 

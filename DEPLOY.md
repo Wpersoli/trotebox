@@ -63,6 +63,8 @@ NEXT_PUBLIC_APP_NAME=TroteBox
 NEXT_PUBLIC_COMMERCE_MODE=web
 ```
 
+`NEXT_PUBLIC_PREVIEW_MODE` deve permanecer `false` em qualquer ambiente publicado. O frontend só aceita o modo simulado durante `next dev`; para revisar a interface localmente, use `npm run preview:web`.
+
 Para `NEXT_PUBLIC_CLIENT_PLATFORM=web`, build de produção usa `/api/v1` quando `NEXT_PUBLIC_API_BASE_URL` estiver vazio/ausente. O `apps/web/vercel.json` encaminha essa rota, sem alterar a URL no navegador, para:
 
 ```text
@@ -122,6 +124,23 @@ A 0.3.9 não anuncia nem inicia recursos incompletos:
 - Twilio exige SID, auth token e número de origem;
 - Vonage exige application id, API key, private key, número de origem e signature secret;
 - `TELEPHONY_PROVIDER=mock` é apenas desenvolvimento/preview e retorna indisponibilidade em produção.
+
+Durante o teste gratuito da Twilio, defina `TWILIO_TRIAL_MODE=true` somente fora de
+produção. A própria Twilio limita a criação da chamada a URLs de template, portanto o
+destinatário ouvirá a saudação/conteúdo de teste da Twilio; o roteiro do TroteBox e a
+gravação não são executados nesse modo. Para validar o fluxo real:
+
+1. verifique o destinatário no Console da Twilio (o Trial só liga para números verificados);
+2. faça upgrade da conta e compre/configure o número de origem;
+3. defina `TWILIO_TRIAL_MODE=false`, `TWILIO_VALIDATE_SIGNATURES=true` e, quando houver
+   consentimento legal, `RECORDING_ENABLED=true`;
+4. confirme `PUBLIC_API_URL` como o domínio HTTPS que a Twilio realmente acessará e
+   mantenha as URLs de status/gravação sob `/api/v1/webhooks/twilio/*`;
+5. execute uma chamada controlada e confirme primeiro o status `ANSWERED/COMPLETED`,
+   depois o callback de gravação antes de divulgar o recurso.
+
+O validador de callbacks aceita o domínio público configurado e o alias público
+recebido pela Vercel, mas continua exigindo a assinatura `X-Twilio-Signature`.
 
 Enquanto essas condições não forem satisfeitas, a interface mostra o recurso como em configuração e o backend mantém a recusa como defesa em profundidade.
 

@@ -20,8 +20,8 @@ export async function approvePaymentByInternalId(
     if (payment.providerPaymentId && providerPaymentId && payment.providerPaymentId !== providerPaymentId) {
       throw new AppError(409, 'PAYMENT_PROVIDER_ID_MISMATCH', 'Identificador do pagamento divergente.');
     }
-    if (payment.status === PaymentStatus.REFUNDED || payment.status === PaymentStatus.CHARGEBACK) {
-      throw new AppError(409, 'PAYMENT_REVOKED', 'Pagamento já revogado e não pode ser creditado.');
+    if (payment.status !== PaymentStatus.PENDING && payment.status !== PaymentStatus.APPROVED) {
+      throw new AppError(409, 'PAYMENT_NOT_SETTLEABLE', 'Pagamento já encerrado e não pode ser aprovado novamente.');
     }
     if (payment.amountCents !== settlement.amountCents || payment.currency.toUpperCase() !== settlement.currency.toUpperCase()) {
       throw new AppError(409, 'PAYMENT_AMOUNT_MISMATCH', 'Valor ou moeda divergente no pagamento confirmado.');
@@ -110,8 +110,21 @@ export async function updatePaymentFromMercadoPago(
   const current = await prisma.payment.findUnique({ where: { id: internalId } });
   if (!current) throw new AppError(404, 'PAYMENT_NOT_FOUND', 'Pagamento não encontrado.');
   if (current.provider !== PaymentProvider.MERCADOPAGO) throw new AppError(409, 'PAYMENT_PROVIDER_MISMATCH', 'Pagamento não pertence ao Mercado Pago.');
+  if (current.providerPaymentId && providerId && current.providerPaymentId !== providerId) {
+    throw new AppError(409, 'PAYMENT_PROVIDER_ID_MISMATCH', 'Identificador do pagamento divergente na conciliação.');
+  }
   if ((status === 'refunded' || status === 'charged_back') && current.providerPaymentId) {
     return revokePaymentCredits(current.providerPaymentId, status === 'refunded' ? 'REFUND' : 'CHARGEBACK');
+  }
+  if (
+    current.status === PaymentStatus.APPROVED
+    || current.status === PaymentStatus.REFUNDED
+    || current.status === PaymentStatus.CHARGEBACK
+    || ((current.status === PaymentStatus.REJECTED || current.status === PaymentStatus.CANCELED) && status !== 'approved')
+  ) {
+    // Provider notifications can arrive out of order. Never downgrade a
+    // settled or terminal payment because of an older pending/rejected event.
+    return current;
   }
   const mapped = status === 'rejected' ? PaymentStatus.REJECTED : status === 'cancelled' ? PaymentStatus.CANCELED : PaymentStatus.PENDING;
   return prisma.payment.update({ where: { id: internalId }, data: { status: mapped, providerPaymentId: providerId || current.providerPaymentId, rawStatus: status } });

@@ -1,15 +1,20 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { CreditPackSummary, WalletSummary } from '@trotebox/contracts';
 import { AppShell } from '@/components/AppShell';
+import { useAuth } from '@/components/AuthProvider';
 import { api, isPreviewMode } from '@/lib/api';
 
 const commerceMode = process.env.NEXT_PUBLIC_COMMERCE_MODE ?? 'web';
 
 const RECONCILE_INTERVAL_MS = 10_000;
 const MAX_RECONCILE_ATTEMPTS = 90;
+const brlFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL'
+});
 
 const failedPaymentStatuses = [
   'REJECTED',
@@ -27,27 +32,143 @@ type PixState = {
   status: string;
 };
 
+type PixIntent = {
+  code: string;
+  key: string;
+};
+
+function qrCodeImageSource(value?: string) {
+  const trimmed = value?.trim() ?? '';
+  if (!trimmed || trimmed.length > 2_000_000) return '';
+
+  if (/^data:image\/(?:png|jpeg|webp);base64,[a-z0-9+/]+={0,2}$/i.test(trimmed)) {
+    return trimmed;
+  }
+
+  return /^[a-z0-9+/]+={0,2}$/i.test(trimmed)
+    ? `data:image/png;base64,${trimmed}`
+    : '';
+}
+
+function safePaymentUrl(value?: string) {
+  if (!value) return '';
+
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' ? url.toString() : '';
+  } catch {
+    return '';
+  }
+}
+
+function readPixIntent(storageKey: string): PixIntent | null {
+  try {
+    const stored = sessionStorage.getItem(storageKey);
+    if (!stored) return null;
+
+    const parsed: unknown = JSON.parse(stored);
+    if (
+      !parsed ||
+      typeof parsed !== 'object' ||
+      !('code' in parsed) ||
+      !('key' in parsed) ||
+      typeof parsed.code !== 'string' ||
+      typeof parsed.key !== 'string'
+    ) {
+      sessionStorage.removeItem(storageKey);
+      return null;
+    }
+
+    return { code: parsed.code, key: parsed.key };
+  } catch {
+    return null;
+  }
+}
+
+function toPixState(result: {
+  internalPaymentId: string;
+  qrCode: string;
+  qrCodeBase64?: string;
+  ticketUrl?: string;
+  expiresAt?: string;
+}): PixState {
+  return {
+    internalPaymentId: result.internalPaymentId,
+    qrCode: result.qrCode,
+    status: 'PENDING',
+    ...(result.qrCodeBase64 ? { qrCodeBase64: result.qrCodeBase64 } : {}),
+    ...(result.ticketUrl ? { ticketUrl: result.ticketUrl } : {}),
+    ...(result.expiresAt ? { expiresAt: result.expiresAt } : {})
+  };
+}
+
 export default function WalletPage() {
+  const { user } = useAuth();
+  const intentStorageKey = user ? `trotebox:pix-intent:v1:${user.id}` : null;
   const [wallet, setWallet] = useState<WalletSummary | null>(null);
   const [packs, setPacks] = useState<CreditPackSummary[]>([]);
   const [pix, setPix] = useState<PixState | null>(null);
   const [pixAvailable, setPixAvailable] = useState(isPreviewMode);
   const [creatingPix, setCreatingPix] = useState(false);
+  const [recoveringPix, setRecoveringPix] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState('');
   const [error, setError] = useState('');
+  const pendingRequest = useRef<{ code: string; key: string } | null>(null);
+  const createLock = useRef(false);
+  const [reconcilePaused, setReconcilePaused] = useState(false);
+  const [reconcileRevision, setReconcileRevision] = useState(0);
 
   useEffect(() => {
     api.wallet()
       .then(setWallet)
-      .catch(() => undefined);
+      .catch(() => setError('Não foi possível carregar seu saldo. Atualize a página para tentar novamente.'));
 
     api.catalog()
       .then((data) => {
         setPacks(data.packs);
         setPixAvailable(data.capabilities.pixPayments);
       })
-      .catch(() => undefined);
+      .catch(() => setError('Não foi possível carregar os pacotes. Atualize a página para tentar novamente.'));
   }, []);
+
+  useEffect(() => {
+    if (!intentStorageKey || pix || createLock.current) return;
+
+    const intent = readPixIntent(intentStorageKey);
+    if (!intent) return;
+
+    let active = true;
+    pendingRequest.current = intent;
+
+    Promise.resolve()
+      .then(() => {
+        if (active) {
+          setRecoveringPix(true);
+          setError('');
+        }
+        return api.pix(intent.code, intent.key);
+      })
+      .then((result) => {
+        if (!active) return;
+        setPix(toPixState(result));
+        setReconcilePaused(false);
+      })
+      .catch((cause) => {
+        if (!active) return;
+        setError(
+          cause instanceof Error
+            ? `Não foi possível recuperar o Pix anterior. ${cause.message}`
+            : 'Não foi possível recuperar o Pix anterior. Tente novamente usando o mesmo pacote.'
+        );
+      })
+      .finally(() => {
+        if (active) setRecoveringPix(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [intentStorageKey, pix]);
 
   const pixPaymentId = pix?.internalPaymentId;
   const pixStatus = pix?.status;
@@ -69,6 +190,21 @@ export default function WalletPage() {
 
         if (!active) return;
 
+        if (result.status === 'APPROVED' || failedPaymentStatuses.includes(result.status)) {
+          if (intentStorageKey) {
+            try { sessionStorage.removeItem(intentStorageKey); } catch { /* O estado confirmado continua visível. */ }
+          }
+          pendingRequest.current = null;
+        }
+
+        if (result.status === 'APPROVED') {
+          const updatedWallet = await api.wallet().catch(() => null);
+          if (!active) return;
+          if (updatedWallet) setWallet(updatedWallet);
+          else setError('Pagamento confirmado. Não foi possível atualizar o saldo; atualize a página para consultar seus créditos.');
+          window.dispatchEvent(new Event('trotebox:wallet-updated'));
+        }
+
         setPix((current) => {
           if (
             !current ||
@@ -85,12 +221,6 @@ export default function WalletPage() {
         });
 
         if (result.status === 'APPROVED') {
-          const updatedWallet = await api.wallet().catch(() => null);
-
-          if (active && updatedWallet) {
-            setWallet(updatedWallet);
-          }
-
           return;
         }
 
@@ -107,6 +237,8 @@ export default function WalletPage() {
           () => void reconcile(),
           RECONCILE_INTERVAL_MS
         );
+      } else if (active) {
+        setReconcilePaused(true);
       }
     };
 
@@ -119,7 +251,7 @@ export default function WalletPage() {
         window.clearTimeout(timer);
       }
     };
-  }, [pixPaymentId, pixStatus]);
+  }, [pixPaymentId, pixStatus, reconcileRevision, intentStorageKey]);
 
   async function copyText(value: string, message: string) {
     setError('');
@@ -139,37 +271,32 @@ export default function WalletPage() {
   }
 
   async function mercadoPago(code: string) {
-    if (creatingPix || pix?.status === 'PENDING') return;
+    if (createLock.current || pix?.status === 'PENDING') return;
+    if (!intentStorageKey) return;
+    try {
+      const intent = readPixIntent(intentStorageKey);
+      if (intent) pendingRequest.current = intent;
+    } catch {
+      setError('Não foi possível acessar a recuperação de pagamento neste navegador. Habilite o armazenamento da sessão antes de continuar.');
+      return;
+    }
+    if (pendingRequest.current && pendingRequest.current.code !== code) {
+      setError('Existe uma solicitação sem confirmação. Tente novamente o mesmo pacote para recuperar o Pix antes de escolher outro.');
+      return;
+    }
+    createLock.current = true;
 
     setError('');
     setCopyFeedback('');
     setCreatingPix(true);
 
     try {
-      const result = await api.pix(code);
+      pendingRequest.current ??= { code, key: crypto.randomUUID() };
+      sessionStorage.setItem(intentStorageKey, JSON.stringify(pendingRequest.current));
+      const result = await api.pix(code, pendingRequest.current.key);
 
-      const nextPix: PixState = {
-        internalPaymentId: result.internalPaymentId,
-        qrCode: result.qrCode,
-        status: 'PENDING',
-        ...(
-          'qrCodeBase64' in result && result.qrCodeBase64
-            ? { qrCodeBase64: result.qrCodeBase64 }
-            : {}
-        ),
-        ...(
-          'ticketUrl' in result && result.ticketUrl
-            ? { ticketUrl: result.ticketUrl }
-            : {}
-        ),
-        ...(
-          result.expiresAt
-            ? { expiresAt: result.expiresAt }
-            : {}
-        )
-      };
-
-      setPix(nextPix);
+      setPix(toPixState(result));
+      setReconcilePaused(false);
     } catch (cause) {
       setError(
         cause instanceof Error
@@ -177,6 +304,7 @@ export default function WalletPage() {
           : 'Falha ao criar o Pix.'
       );
     } finally {
+      createLock.current = false;
       setCreatingPix(false);
     }
   }
@@ -189,11 +317,8 @@ export default function WalletPage() {
 
   const pixPending = pix?.status === 'PENDING';
 
-  const qrImageSrc = pix?.qrCodeBase64
-    ? pix.qrCodeBase64.startsWith('data:')
-      ? pix.qrCodeBase64
-      : `data:image/png;base64,${pix.qrCodeBase64}`
-    : '';
+  const qrImageSrc = qrCodeImageSource(pix?.qrCodeBase64);
+  const paymentUrl = safePaymentUrl(pix?.ticketUrl);
 
   return (
     <AppShell title="Créditos">
@@ -231,6 +356,12 @@ export default function WalletPage() {
         </div>
       )}
 
+      {recoveringPix && !pix && (
+        <div className="notice" role="status" style={{ marginBottom: 18 }}>
+          <strong>Recuperando seu Pix:</strong> encontramos uma solicitação pendente nesta sessão e estamos restaurando o mesmo pagamento com segurança.
+        </div>
+      )}
+
       {commerceMode === 'web' ? (
         <>
           {!pixAvailable && !isPreviewMode && (
@@ -247,6 +378,7 @@ export default function WalletPage() {
           {error && (
             <div
               className="error-box"
+              role="alert"
               style={{ marginBottom: 18 }}
             >
               {error}
@@ -343,6 +475,7 @@ export default function WalletPage() {
                     </span>
 
                     <textarea
+                      aria-label="Código Pix Copia e Cola"
                       className="input"
                       style={{
                         minHeight: 120,
@@ -375,14 +508,14 @@ export default function WalletPage() {
                         Copiar código Pix
                       </button>
 
-                      {pix.ticketUrl && (
+                      {paymentUrl && (
                         <>
                           <button
                             type="button"
                             className="button"
                             onClick={() =>
                               copyText(
-                                pix.ticketUrl!,
+                                paymentUrl,
                                 'Link de pagamento copiado!'
                               )
                             }
@@ -395,7 +528,7 @@ export default function WalletPage() {
                             className="button"
                             onClick={() =>
                               window.open(
-                                pix.ticketUrl,
+                                paymentUrl,
                                 '_blank',
                                 'noopener,noreferrer'
                               )
@@ -421,10 +554,21 @@ export default function WalletPage() {
                       <div
                         className="status-pill warn"
                         style={{ marginTop: 16 }}
+                        role="status"
+                        aria-live="polite"
                       >
-                        Confirmação automática ativada · verificando
-                        pagamento
+                        {reconcilePaused
+                          ? 'Consulta automática pausada. Se já pagou, consulte o status antes de fazer outro pagamento.'
+                          : 'Confirmação automática ativada · verificando pagamento'}
                       </div>
+                    )}
+                    {reconcilePaused && (
+                      <button className="button" type="button" onClick={() => { setReconcilePaused(false); setReconcileRevision((value) => value + 1); }}>
+                        Consultar pagamento novamente
+                      </button>
+                    )}
+                    {pix.expiresAt && Number.isFinite(Date.parse(pix.expiresAt)) && (
+                      <p className="muted">Validade informada pelo provedor: {new Date(pix.expiresAt).toLocaleString('pt-BR')}.</p>
                     )}
                   </div>
                 </div>
@@ -434,6 +578,8 @@ export default function WalletPage() {
                 <div
                   className="status-pill ok"
                   style={{ marginTop: 12 }}
+                  role="status"
+                  aria-live="polite"
                 >
                   Pagamento confirmado · créditos liberados
                 </div>
@@ -443,6 +589,8 @@ export default function WalletPage() {
                 <div
                   className="status-pill fail"
                   style={{ marginTop: 12 }}
+                  role="status"
+                  aria-live="polite"
                 >
                   Pagamento encerrado sem liberação de créditos
                 </div>
@@ -451,10 +599,11 @@ export default function WalletPage() {
           )}
 
           <div className="pack-grid">
-            {packs.map((pack, index) => {
+            {packs.map((pack) => {
               const blocked =
                 !pixAvailable ||
                 creatingPix ||
+                recoveringPix ||
                 pixPending;
 
               let buttonText =
@@ -465,6 +614,8 @@ export default function WalletPage() {
                   'Pix temporariamente indisponível';
               } else if (creatingPix) {
                 buttonText = 'Gerando Pix...';
+              } else if (recoveringPix) {
+                buttonText = 'Recuperando Pix...';
               } else if (pixPending) {
                 buttonText = 'Pagamento em andamento';
               }
@@ -472,13 +623,13 @@ export default function WalletPage() {
               return (
                 <article
                   className={`card pack-card ${
-                    index === 1 ? 'highlight' : ''
+                    pack.highlight ? 'highlight' : ''
                   }`}
                   key={pack.code}
                 >
-                  {index === 1 && (
+                  {pack.highlight && (
                     <span className="popular-tag">
-                      Mais escolhido
+                      Em destaque
                     </span>
                   )}
 
@@ -492,10 +643,7 @@ export default function WalletPage() {
 
                   <div className="pack-price">
                     créditos ·{' '}
-                    {new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL'
-                    }).format(pack.priceCents / 100)}
+                    {brlFormatter.format(pack.priceCents / 100)}
                   </div>
 
                   <div className="payment-options payment-options-single">

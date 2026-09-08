@@ -15,6 +15,14 @@ async function request(path, init = {}) {
   return payload;
 }
 
+async function expectError(path, expectedStatus, init, expectedCode) {
+  const response = await fetch(`${apiBase}${path}`, init);
+  const payload = await response.json().catch(() => null);
+  assert(response.status === expectedStatus, `Esperava HTTP ${expectedStatus} em ${path}, recebi ${response.status}: ${JSON.stringify(payload)}`);
+  assert(payload?.error?.code === expectedCode, `Esperava erro ${expectedCode}, recebi ${JSON.stringify(payload)}`);
+  return payload;
+}
+
 const timestamp = Date.now();
 const email = `smoke+${timestamp}@trotebox.local`;
 const phoneSuffix = String(timestamp).slice(-8).replace(/^0/, '8');
@@ -41,19 +49,35 @@ const walletBefore = await request('/wallet', { headers });
 assert(Number.isInteger(walletBefore.balanceCredits), 'Saldo inicial inválido.');
 
 const script = catalog.scripts[0];
+const idempotencyKey = randomUUID();
+const callBody = {
+  scriptId: script.id,
+  recipientPhone: phone,
+  recipientLabel: 'Teste automatizado local',
+  consentConfirmed: true,
+  recordingConsentConfirmed: false,
+  idempotencyKey
+};
+
 const created = await request('/calls', {
   method: 'POST',
   headers,
-  body: JSON.stringify({
-    scriptId: script.id,
-    recipientPhone: phone,
-    recipientLabel: 'Teste automatizado local',
-    consentConfirmed: true,
-    recordingConsentConfirmed: false,
-    idempotencyKey: randomUUID()
-  })
+  body: JSON.stringify(callBody)
 });
 assert(created.call?.id, 'Chamada simulada sem identificador.');
+
+const duplicate = await request('/calls', {
+  method: 'POST',
+  headers,
+  body: JSON.stringify(callBody)
+});
+assert(duplicate.call?.id === created.call.id, 'Idempotência não retornou a mesma chamada.');
+
+await expectError('/calls', 409, {
+  method: 'POST',
+  headers,
+  body: JSON.stringify({ ...callBody, recipientPhone: '+5511987654321' })
+}, 'IDEMPOTENCY_CONFLICT');
 
 const calls = await request('/calls', { headers });
 assert(calls.calls.some((call) => call.id === created.call.id), 'Chamada criada não apareceu no histórico.');
@@ -67,6 +91,7 @@ console.log(JSON.stringify({
   health: health.status,
   user: email,
   callId: created.call.id,
+  duplicateCallId: duplicate.call.id,
   callStatus: created.call.status,
   balanceBefore: walletBefore.balanceCredits,
   balanceAfter: walletAfter.balanceCredits

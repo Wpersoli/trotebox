@@ -1,5 +1,5 @@
 import { WebhookProvider, prisma } from '@trotebox/db';
-import { AppError, handleError, ok } from '@/server/http';
+import { AppError, handleError, ok, urlEncodedWebhookBody } from '@/server/http';
 import { validateTwilioRequest } from '@/server/provider-signatures';
 import { saveProviderRecording } from '@/server/recordings';
 import { markWebhookProcessed, registerWebhook } from '@/server/webhook-events';
@@ -9,8 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
   try {
-    const form = await request.formData();
-    const params = Object.fromEntries([...form.entries()].map(([key, value]) => [key, String(value)]));
+    const { rawBody, params } = await urlEncodedWebhookBody(request);
     if (!await validateTwilioRequest(request, params)) throw new AppError(401, 'INVALID_SIGNATURE', 'Assinatura Twilio inválida.');
 
     const callSid = params.CallSid ?? '';
@@ -19,8 +18,7 @@ export async function POST(request: Request) {
     if (!callSid || !recordingSid) throw new AppError(400, 'MISSING_RECORDING_ID', 'Identificador de gravação ausente.');
 
     const externalId = `${recordingSid}:${recordingStatus || 'unknown'}`;
-    const rawBody = new URLSearchParams(params).toString();
-    const registered = await registerWebhook({ provider: WebhookProvider.TWILIO, externalEventId: externalId, signatureValid: true, rawBody, payload: params });
+    const registered = await registerWebhook({ provider: WebhookProvider.TWILIO, externalEventId: externalId, signatureValid: true, rawBody });
     if (registered.duplicate && registered.event.processedAt) return ok({ received: true, duplicate: true });
 
     try {
@@ -39,8 +37,6 @@ export async function POST(request: Request) {
       await markWebhookProcessed(registered.event.id);
       return ok({ received: true });
     } catch (cause) {
-      // Keep processedAt null on failure so Twilio can retry safely.
-      // The error is persisted for observability without acknowledging the event as complete.
       await markWebhookProcessed(registered.event.id, cause instanceof Error ? cause.message : 'unknown');
       throw cause;
     }

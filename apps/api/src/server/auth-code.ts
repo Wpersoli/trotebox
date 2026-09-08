@@ -4,8 +4,9 @@ import type { RequestAuthCodeInput, VerifyAuthCodeInput } from '@trotebox/contra
 import { env } from './env';
 import { hashSubject, safeEqualHex } from './crypto';
 import { AppError } from './http';
-import { enforceRateLimit } from './rate-limit';
+import { enforceRateLimits } from './rate-limit';
 import { deliverAuthCode } from './email-delivery';
+import { requestIp } from './request-ip';
 
 const DEFAULT_DISPLAY_NAME = 'Cliente TroteBox';
 
@@ -13,21 +14,18 @@ function codeHash(email: string, code: string) {
   return createHmac('sha256', env().AUTH_CODE_PEPPER).update(`${email}:${code}`).digest('hex');
 }
 
-function requestIp(request: Request) {
-  return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-    ?? request.headers.get('x-real-ip')?.trim()
-    ?? 'unknown';
-}
-
 export async function requestAuthCode(input: RequestAuthCodeInput, request: Request) {
   const email = input.email.toLowerCase();
-  const ip = requestIp(request);
+  const ip = requestIp(request) ?? 'unknown';
 
-  // Anti-spam e anti-enumeração: um novo challenge por minuto por e-mail,
-  // além de limites agregados por e-mail e IP.
-  await enforceRateLimit('auth:request:email:60s', hashSubject(email), 1, 60 * 1000);
-  await enforceRateLimit('auth:request:email:15m', hashSubject(email), 5, 15 * 60 * 1000);
-  await enforceRateLimit('auth:request:ip:15m', hashSubject(ip), 20, 15 * 60 * 1000);
+  // Anti-spam e anti-enumeração. As três cotas são avaliadas e registradas na
+  // mesma transação serializável para evitar consumo parcial de quota quando
+  // uma regra mais ampla (por exemplo, IP compartilhado) já está saturada.
+  await enforceRateLimits([
+    { bucket: 'auth:request:email:60s', subjectHash: hashSubject(email), limit: 1, windowMs: 60 * 1000 },
+    { bucket: 'auth:request:email:15m', subjectHash: hashSubject(email), limit: 5, windowMs: 15 * 60 * 1000 },
+    { bucket: 'auth:request:ip:15m', subjectHash: hashSubject(ip), limit: 20, windowMs: 15 * 60 * 1000 }
+  ]);
 
   const code = String(randomInt(100000, 1_000_000));
   const now = new Date();
@@ -58,10 +56,12 @@ export async function requestAuthCode(input: RequestAuthCodeInput, request: Requ
 
 export async function verifyAuthCode(input: VerifyAuthCodeInput, request: Request) {
   const email = input.email.toLowerCase();
-  const ip = requestIp(request);
+  const ip = requestIp(request) ?? 'unknown';
 
-  await enforceRateLimit('auth:verify:email:15m', hashSubject(email), 10, 15 * 60 * 1000);
-  await enforceRateLimit('auth:verify:ip:15m', hashSubject(ip), 50, 15 * 60 * 1000);
+  await enforceRateLimits([
+    { bucket: 'auth:verify:email:15m', subjectHash: hashSubject(email), limit: 10, windowMs: 15 * 60 * 1000 },
+    { bucket: 'auth:verify:ip:15m', subjectHash: hashSubject(ip), limit: 50, windowMs: 15 * 60 * 1000 }
+  ]);
 
   const authCode = await prisma.authCode.findFirst({
     where: { email, consumedAt: null },

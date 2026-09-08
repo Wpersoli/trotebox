@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process';
 
 const processes = [];
 let shuttingDown = false;
+const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
 function shutdown(code = 0) {
   if (shuttingDown) return;
@@ -13,10 +14,10 @@ function shutdown(code = 0) {
 }
 
 function start(name, args) {
-  const child = spawn('npm', args, {
+  const child = spawn(npmCommand, args, {
     cwd: process.cwd(),
     stdio: 'inherit',
-    shell: process.platform === 'win32',
+    shell: false,
     env: process.env
   });
   processes.push(child);
@@ -24,8 +25,8 @@ function start(name, args) {
     console.error(`[${name}] falha ao iniciar: ${error.message}`);
     shutdown(1);
   });
-  child.on('exit', (code) => {
-    if (!shuttingDown && code && code !== 0) shutdown(code);
+  child.on('exit', (code, signal) => {
+    if (!shuttingDown && (code !== 0 || signal)) shutdown(code ?? 1);
   });
 }
 

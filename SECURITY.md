@@ -29,7 +29,7 @@
 
 ## Preview
 
-`NEXT_PUBLIC_PREVIEW_MODE=true` utiliza somente dados simulados no frontend. `localStorage` é usado apenas para persistir o usuário **fictício de preview**, nunca um JWT real de produção.
+`NEXT_PUBLIC_PREVIEW_MODE=true` utiliza somente dados simulados no frontend durante desenvolvimento local. A flag é ignorada em builds de produção, evitando que um erro de configuração substitua autenticação, pagamentos ou chamadas reais por uma demonstração. `localStorage` é usado apenas para persistir o usuário **fictício de preview**, nunca um JWT real de produção.
 
 ## Antes de produção
 

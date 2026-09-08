@@ -1,14 +1,14 @@
 import { prisma } from '@trotebox/db';
 import { env } from '@/server/env';
-import { AppError, handleError, ok } from '@/server/http';
+import { AppError, handleError, ok, webhookBody } from '@/server/http';
 import { validateVonageRequest } from '@/server/provider-signatures';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
-  const rawBody = await request.text();
   try {
+    const rawBody = await webhookBody(request);
     if (!await validateVonageRequest(request, rawBody)) throw new AppError(401, 'INVALID_SIGNATURE', 'Assinatura Vonage inválida.');
     const payload = rawBody ? JSON.parse(rawBody) as Record<string, unknown> : {};
     const { id } = await context.params;

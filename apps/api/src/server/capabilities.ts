@@ -3,10 +3,14 @@ import { env } from './env';
 export type PlatformCapabilities = {
   pixPayments: boolean;
   outboundCalls: boolean;
+  twilioTrial: boolean;
+  recordingAvailable: boolean;
 };
 
 export function platformCapabilities(config = env()): PlatformCapabilities {
   const pixPayments = Boolean(config.MERCADOPAGO_ACCESS_TOKEN && config.MERCADOPAGO_WEBHOOK_SECRET);
+  const twilioTrial = config.TELEPHONY_PROVIDER === 'twilio' && config.TWILIO_TRIAL_MODE;
+  const recordingAvailable = config.RECORDING_ENABLED && !twilioTrial;
 
   const outboundCalls = config.TELEPHONY_PROVIDER === 'twilio'
     ? Boolean(config.TWILIO_ACCOUNT_SID && config.TWILIO_AUTH_TOKEN && config.TWILIO_FROM_NUMBER)
@@ -20,5 +24,5 @@ export function platformCapabilities(config = env()): PlatformCapabilities {
       )
       : config.NODE_ENV !== 'production';
 
-  return { pixPayments, outboundCalls };
+  return { pixPayments, outboundCalls, twilioTrial, recordingAvailable };
 }
