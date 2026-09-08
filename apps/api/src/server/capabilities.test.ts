@@ -46,6 +46,24 @@ describe('platform capabilities', () => {
     })).pixPayments).toBe(true);
   });
 
+  it('marks Twilio Trial as sample-only and disables recording capability', () => {
+    const trial = platformCapabilities(parseEnv({
+      ...base,
+      TELEPHONY_PROVIDER: 'twilio',
+      TWILIO_ACCOUNT_SID: 'ACtest',
+      TWILIO_AUTH_TOKEN: 'auth-test',
+      TWILIO_FROM_NUMBER: '+5511000000000',
+      TWILIO_TRIAL_MODE: 'true',
+      RECORDING_ENABLED: 'true'
+    }));
+
+    expect(trial).toMatchObject({
+      outboundCalls: true,
+      twilioTrial: true,
+      recordingAvailable: false
+    });
+  });
+
   it('requires complete Vonage production configuration', () => {
     const productionBase = {
       ...base,

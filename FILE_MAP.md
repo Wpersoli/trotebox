@@ -45,8 +45,8 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `apps/api/src/server/auth-code.ts` | 4229 | `1c6bef3c1151fba54ff2de6f87ec4deed2a51c16ac6643c92dfc172ba8f1a5b2` |
 | `apps/api/src/server/auth.ts` | 4618 | `456f47252e9ef3ce2f92d377d61c56b04df555cac6d54c558e7f470757fd7ab6` |
 | `apps/api/src/server/calls.ts` | 11144 | `51f900a96d377e251d2de2bcd2a08b3eac21b9485ea6a9e770a077b51bb2961d` |
-| `apps/api/src/server/capabilities.test.ts` | 2661 | `5c2d13a0f6dcb776d61d711f431fc904bc355f9c67fb3f9b5a240e96d60aa45d` |
-| `apps/api/src/server/capabilities.ts` | 803 | `d827a9c6517d00cc3c99f7c428998c6c3c7093785ead41b85eb1e0416f3cbca9` |
+| `apps/api/src/server/capabilities.test.ts` | 3172 | `2d2e2de6109654275300f94773fe0ddd4cdbf858293087644c208a65e5ee4597` |
+| `apps/api/src/server/capabilities.ts` | 1052 | `c70cc10d3590987f07a3612ec19614f04e71d7a9e52517bf4b53b4fb37c9eb3f` |
 | `apps/api/src/server/crypto.test.ts` | 632 | `efd9a77a781bb57a574d000d48880465e33c8b306818eac618f25d0768bb90fc` |
 | `apps/api/src/server/crypto.ts` | 1526 | `bf1b48c5d2bc0868bc4790f1725d5eb9f38c8f21f1049d50f92089ba8a04ef93` |
 | `apps/api/src/server/email-delivery.test.ts` | 911 | `afeec84dc966ba0af0066d360d2d3e09be1e07f032829520b69c9544ed815558` |
@@ -66,7 +66,8 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `apps/api/src/server/phone-policy-core.ts` | 1608 | `a79a959b32d9bc6ce21fd990781eb2a5e4448bb080e6244eaef268a49fb1baa1` |
 | `apps/api/src/server/phone-policy.test.ts` | 1741 | `d470775290a316deaec12dfd9491c58d9bf693e020dce82c9d3431a797dc5f21` |
 | `apps/api/src/server/phone-policy.ts` | 1164 | `7242a55645fa6bda695be9c7ba703966af0cf71f245a4fb16f3ee1b1bac721ae` |
-| `apps/api/src/server/provider-signatures.ts` | 1633 | `94828217a2598ef982466b4911577ec5e4bd674805e801b0a95a024c700e5c1b` |
+| `apps/api/src/server/provider-signatures.test.ts` | 1847 | `e780081e535c4938d78c3fc6cbd79582cc4f694de29c8b9b3cc024c9ad494d54` |
+| `apps/api/src/server/provider-signatures.ts` | 2845 | `430fc2477ee6f21f89ba12e26404c21c6604b980284f15f4de42528296846356` |
 | `apps/api/src/server/provider-status.ts` | 1050 | `2aa434eb737119261b97168b0629bf184d7ff17a17ffc51140444f79150fe8f5` |
 | `apps/api/src/server/rate-limit.ts` | 2305 | `f05aa1bf38a559629e22bcc0331e5d8d119db43f8f0efd567ce7447ca253637b` |
 | `apps/api/src/server/recordings.test.ts` | 616 | `1ed78c480bf1496e30240d296985fe20407762b59b16d5ffcbe86b32c18bb2a8` |
@@ -108,7 +109,7 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `apps/web/public/favicon.png` | 2578 | `7f67454758c00872dfc7647a16a1d10d406372bc77b38c0b602d968b7e2d1ebe` |
 | `apps/web/public/icon.svg` | 1047 | `b1fcec0b642051bda96f4fb2b1339f361b4c665719ba1771422a409da67c5ab5` |
 | `apps/web/public/manifest.webmanifest` | 536 | `abce5feee517096bbe2edddda01630d6cd897d36f8850b18af9c0e97750c4707` |
-| `apps/web/src/app/calls/new/page.tsx` | 7632 | `cb8b98595cbf495baf931d394591aaa851e1db733356e76cfe6f9b329fc65d6d` |
+| `apps/web/src/app/calls/new/page.tsx` | 8466 | `2bc8095796587f79bedeca6ea05b430d5efeb511bbe1ba4c412c485141311b1b` |
 | `apps/web/src/app/calls/page.tsx` | 2646 | `1dab95f626f51cdccccba6a1acf7370d6e7f0582b3ca4a726a41bc0c65114518` |
 | `apps/web/src/app/catalog/page.tsx` | 3141 | `151fe2f242ccefae188b88e2306ba19f858e871a8420971d1fb5311364418d40` |
 | `apps/web/src/app/dashboard/page.tsx` | 4024 | `7824ba91fc1d398b62e0cdc328d2936b41aa8eb85e1c81e1c7a29630679cbf94` |
@@ -128,7 +129,7 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `apps/web/src/components/HomeAccess.tsx` | 7185 | `aacb74bffd8dc2709bd07833bc04cd14f3c183ce0cc331f0b8940eb3d1562db5` |
 | `apps/web/src/components/SkipLink.tsx` | 579 | `84ec2ca8c500d4c4326e4e1aa7846837933b0a6435ac11aafb89aaa4790a8449` |
 | `apps/web/src/lib/api.test.ts` | 2512 | `66ff31618a281a76f1204171427d75542915b6a6f3bf5fe29e9d76e5b2dff18d` |
-| `apps/web/src/lib/api.ts` | 11340 | `1ebbdd676d2cd0481a59a82a9b52e60f88e0822204dfba81837cbb2b08f73331` |
+| `apps/web/src/lib/api.ts` | 11394 | `623484429585af4b16711c397fa03453e556d0f7db1e084a4f9d03537470b0cd` |
 | `apps/web/tsconfig.json` | 380 | `1a564353bec19c7296e901979f5f38cea3476e588043813d58de185b5472c6e4` |
 | `apps/web/vercel.json` | 1523 | `6e3823f5613706f038f1be3b91b3feee75df5ec7b4384eb85fdc4b4607052a9c` |
 | `ARCHITECTURE.md` | 3156 | `2e8867ee28d1676ad0f663c778f3b255268045d655351248a5babfedcc11fbe0` |
@@ -137,7 +138,7 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `COMMERCE_CHANNELS.md` | 1674 | `6bc95fa688253fe6612bbfe69bbcb0d644424db90fd3ee3fb256b71f450f0984` |
 | `CUSTOM_TTS.md` | 1206 | `9d2d22bbb193b016c2733fe21356fd4b3af1cb00b0f70ae21411f2be00a212d4` |
 | `DEPENDENCY_POLICY.md` | 1311 | `0561c0f80277a43490ecb96e236b1bb2ce59cce7f22e0772d4d58091781a30ec` |
-| `DEPLOY.md` | 5625 | `02fce26119fe274b9917092fb9ff4e700d241e699f75a35bd9114f4fe7bbad53` |
+| `DEPLOY.md` | 6736 | `c1e30d84a6bdc5bcfb0f6b3e4657a86d54ca9f1d3bb2c5788d4dd9239bc54ccf` |
 | `DEV_PREVIEW.md` | 859 | `e0514ab9ee0a63af51d18ed24d7a34fea241913d8da70cf6074df893e0d549ea` |
 | `docker-compose.yml` | 451 | `bbc902725e85eeb501846be95eda1e4a7425f666981f44e3dd8806de7ba39032` |
 | `eslint.config.mjs` | 800 | `84d0b0f27febd713986df760069b9dc935bfbf0ee666ab2f87279a34e0dfd405` |
@@ -154,7 +155,7 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `package.json` | 3068 | `d9b2c53397460f781cd5c05ba59444cf2a60184ad899e96f2f92b5831a98d61a` |
 | `packages/contracts/package.json` | 478 | `d710e003264bc972e22b39d64b186cd7f5763c692c380d8103b0771689c559c9` |
 | `packages/contracts/src/index.test.ts` | 1632 | `9e447ccaf432938e6134cd8cfc796199b0deb374ec40080db00e92bf98dc0235` |
-| `packages/contracts/src/index.ts` | 2725 | `0e446c635b130f0a06835bf079082607b382d47a5e8df421e01cbc842f7b0097` |
+| `packages/contracts/src/index.ts` | 2936 | `039f76e1eb0a129ccdeb79cbc1e036b8992fa774f058d72cd3d3722cc6bd83b8` |
 | `packages/contracts/tsconfig.json` | 121 | `9e388ea60852028037c4fd8a6e0311c02d4ff1703d66e5f9b22276b07dcb82d2` |
 | `packages/db/.env.example` | 162 | `fc670fb787ac285ca3e44660673b7eedb135570ea3b40902696f153fe695d6aa` |
 | `packages/db/package.json` | 878 | `1a336429b833714b20f30a67a41a530cbe625cd026a83a194449a8e1790a9628` |
@@ -165,7 +166,7 @@ Gerado por `npm run inventory`. Arquivos `.env*` reais, `next-env.d.ts`, caches 
 | `packages/db/src/client.ts` | 540 | `3974bdecdbe6694600e26ba9adc2fd32da95e0529d014fd9f3fb3ea31121b9c4` |
 | `packages/db/src/seed.ts` | 4264 | `25341cdeef00d56f31df36e4d2929f58d38a8d9d515fadb6e24dcefe1c67d442` |
 | `packages/db/tsconfig.json` | 121 | `9e388ea60852028037c4fd8a6e0311c02d4ff1703d66e5f9b22276b07dcb82d2` |
-| `QUALITY_PROGRESS.md` | 9376 | `87217b72dc34cb6087168852331e8ac029d6c54506562471161de23236f8e813` |
+| `QUALITY_PROGRESS.md` | 9715 | `44d794eb583ca8da75b35bb7bd5a49fc11b5daf786d75b42d3cd44aba0f4dc47` |
 | `README.md` | 4806 | `7ed7795ae11686383194774bb43623ee5a0fac610d262c604d954e1ad014a992` |
 | `REBRAND_0.3.1.md` | 955 | `6b3ed821a4728b042385a18b2782fa22f47cf2f9578b20204e71d7d40bf66c9f` |
 | `RELEASE_NOTES_0.3.4.md` | 639 | `1768bf5455ad80873d59a3a79e7055cf249e880c15be3fbb74d7597bd186ac76` |

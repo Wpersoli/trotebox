@@ -93,6 +93,10 @@ export type CreditPackSummary = {
 export type PlatformCapabilities = {
   pixPayments: boolean;
   outboundCalls: boolean;
+  /** Twilio Trial only accepts provider-owned sample call instructions. */
+  twilioTrial: boolean;
+  /** True only when the configured provider can actually create recordings. */
+  recordingAvailable: boolean;
 };
 
 export type WalletSummary = {

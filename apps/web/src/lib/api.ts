@@ -34,7 +34,12 @@ const previewPacks: CreditPackSummary[] = [
   { code: 'pro', name: 'Gargalhada', credits: 35, priceCents: 5990, currency: 'BRL' }
 ];
 
-const previewCapabilities: PlatformCapabilities = { pixPayments: true, outboundCalls: true };
+const previewCapabilities: PlatformCapabilities = {
+  pixPayments: true,
+  outboundCalls: true,
+  twilioTrial: false,
+  recordingAvailable: true
+};
 
 const previewWallet: WalletSummary = {
   balanceCredits: 11,

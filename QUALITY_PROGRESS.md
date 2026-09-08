@@ -25,12 +25,13 @@ Quatro referências fornecidas pelo usuário: roxo/laranja, mascote, catálogo c
 - O modo de preview do Web agora é ignorado em builds de produção; dados simulados, autenticação demonstrativa e comércio fictício ficam restritos ao desenvolvimento local.
 - O formulário de novo trote valida telefone em formato E.164 e apelido opcional antes da requisição, reduzindo chamadas inválidas e deixando a orientação de erro clara para o usuário.
 - Callbacks Vonage passaram a usar o mesmo limite de corpo de 256 KiB dos demais webhooks; o proxy de reprodução Twilio ganhou timeout de 15 segundos e erro de dependência explícito para evitar espera indefinida.
+- A capacidade agora identifica explicitamente o Twilio Trial e desabilita a opção de gravação na interface quando o provedor não a suporta; o deploy também documenta que o Trial usa somente a saudação/template da Twilio. A validação de assinatura Twilio aceita aliases públicos legítimos da Vercel sem abrir mão do `X-Twilio-Signature`.
 
 ## Evidência e limites
 
 Testes adicionados: recuperação de chave após falha de rede, conservação de preço/créditos, concorrência de inserção, rejeição de chave pertencente a outra conta, transições de liquidação Mercado Pago (aprovação tardia, evento fora de ordem e identificador divergente), recuperação/idempotência Stripe, comparação segura de hashes hexadecimais, seleção segura do IP de origem e bloqueio do modo preview em produção. Testes do banco/provedor usam mocks; não demonstram concorrência real em PostgreSQL nem pagamento real.
 
-Execução local: 14 testes de domínio; 71 testes unitários (6 contratos, 60 API, 5 Web); lint, tipos e build Web aprovados na revisão. npm audit --omit=dev --audit-level=high retornou zero vulnerabilidades reportadas em 06/09/2026. Runtime local Node 24; projeto exige Node 22, portanto a execução no CI Node 22 continua sendo gate.
+Execução local: 14 testes de domínio; 74 testes unitários (6 contratos, 63 API, 5 Web); lint, tipos e build Web/API aprovados nesta revisão. `npm audit --omit=dev --audit-level=high` retornou zero vulnerabilidades. Runtime local Node 24; projeto exige Node 22, portanto a execução no CI Node 22 continua sendo gate.
 
 ## Gates ainda abertos
 
@@ -59,4 +60,4 @@ Históricos de conversa ainda inacessíveis não bloqueiam estas correções de 
 - Web e API não apresentaram clusters de erro em runtime nas últimas 24 horas; os logs de erro/fatal de produção também não retornaram eventos.
 - A API agora envia CSP mínima (`default-src 'none'`), `X-Frame-Options`, `Permissions-Policy` e COOP além de `nosniff`, referrer restrito e `no-store`.
 - O preview não falha quando localStorage é bloqueado ou corrompido: o usuário armazenado é validado antes da restauração e a sessão corrente continua utilizável. QR Codes só aceitam base64 de imagem permitido; links de pagamento só são expostos quando usam HTTPS.
-- `npm audit --omit=dev --audit-level=high` continuou retornando zero vulnerabilidades após as alterações. A validação integral local permaneceu verde: 14 testes de domínio, 64 testes unitários, lint, tipos e build Web.
+- `npm audit --omit=dev --audit-level=high` continuou retornando zero vulnerabilidades após as alterações. A validação integral local permaneceu verde: 14 testes de domínio, 74 testes unitários, lint, tipos e build Web/API.
