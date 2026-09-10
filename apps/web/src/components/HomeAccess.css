@@ -347,3 +347,145 @@
   .home-nav .nav-links { display: none; }
   .home-showcase-actions .button.secondary { color: #efe9fc; }
 }
+
+/* v0.4.1 — responsive hero composition and mascot identity.
+   The access flow remains unchanged; only the visual hierarchy is adapted to
+   the approved dark, compact TroteBox direction. */
+.home-hero-image-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(250px, .95fr);
+  min-height: clamp(320px, 31vw, 430px);
+  border-radius: 26px;
+  background: linear-gradient(132deg, #24104e 0%, #40127d 56%, #180d31 100%);
+}
+.home-hero-image {
+  grid-column: 2;
+  grid-row: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-left: 1px solid rgba(214, 178, 255, .16);
+}
+.home-hero-copy-overlay {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  position: relative;
+  z-index: 2;
+  width: auto;
+  padding: clamp(27px, 4vw, 48px);
+  border: 0;
+  background: linear-gradient(90deg, rgba(38, 14, 84, .98), rgba(50, 17, 103, .80) 78%, transparent);
+  color: #f7f3ff;
+  box-shadow: none;
+  font-size: .94rem;
+  line-height: 1.58;
+}
+.home-hero-kicker {
+  display: block;
+  margin-bottom: 13px;
+  color: #c9a4ff;
+  font-size: .66rem;
+  font-weight: 950;
+  letter-spacing: .14em;
+}
+.home-hero-copy-overlay h1 {
+  max-width: 480px;
+  margin: 0 0 15px;
+  color: #fff;
+  font-size: clamp(2.15rem, 4.2vw, 4.05rem);
+  line-height: .94;
+  letter-spacing: -.065em;
+}
+.home-hero-copy-overlay p {
+  max-width: 430px;
+  margin: 0;
+  color: #ddd0f3;
+  font-size: clamp(.86rem, 1.2vw, 1rem);
+  line-height: 1.62;
+}
+.home-hero-copy-overlay .button {
+  margin-top: 22px;
+  min-height: 47px;
+  padding-inline: 18px;
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(135deg, #ff9a36, #f45a23);
+  box-shadow: 0 12px 28px rgba(244, 90, 35, .24);
+}
+.home-hero-copy-overlay .button:hover {
+  border-color: rgba(255, 205, 137, .75);
+  box-shadow: 0 16px 32px rgba(244, 90, 35, .34);
+}
+.home-access-column > .access-card {
+  color: #f7f3ff;
+  border-color: rgba(188, 147, 255, .20);
+  background: linear-gradient(145deg, rgba(29, 22, 55, .97), rgba(16, 12, 31, .98));
+  box-shadow: 0 26px 68px rgba(0, 0, 0, .32), inset 0 1px 0 rgba(255,255,255,.045);
+}
+.home-access-column > .access-card h1,
+.home-access-column > .access-card h2 { color: #fff; }
+.home-access-column > .access-card > p { color: #bcb0cf; }
+.home-access-column > .access-card .field label { color: #ddd4ec; }
+.home-access-column > .access-card .field-help { color: #9185a8; }
+.home-access-column > .access-card .input {
+  color: #f7f3ff;
+  border-color: rgba(188, 147, 255, .22);
+  background: rgba(8, 6, 17, .56);
+}
+.home-access-column > .access-card .input::placeholder { color: #756a89; }
+.home-access-column > .access-card .access-card-kicker {
+  color: #d0b3ff;
+  border-color: rgba(188, 147, 255, .22);
+  background: rgba(126, 74, 229, .15);
+}
+.home-access-column > .access-card .access-security-note {
+  color: #b6d5bf;
+  border-color: rgba(102, 203, 123, .23);
+  background: rgba(44, 132, 64, .12);
+}
+.home-access-column > .access-card .text-button { color: #c5a4ff; }
+
+@media (max-width: 980px) {
+  .home-access-column { order: 2; }
+  .home-showcase { order: 1; }
+  .home-hero-image-wrap { min-height: clamp(300px, 49vw, 410px); }
+}
+
+@media (max-width: 680px) {
+  .home-hero-image-wrap {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    border-radius: 22px;
+  }
+  .home-hero-copy-overlay {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    padding: 25px 20px 22px;
+    background: linear-gradient(180deg, rgba(44, 15, 96, .98), rgba(55, 18, 111, .90));
+  }
+  .home-hero-copy-overlay h1 { font-size: clamp(2.35rem, 12vw, 3.25rem); }
+  .home-hero-copy-overlay p { font-size: .88rem; }
+  .home-hero-copy-overlay .button { width: 100%; margin-top: 18px; }
+  .home-hero-image {
+    grid-column: 1;
+    grid-row: 2;
+    height: auto;
+    min-height: 0;
+    max-height: 360px;
+    border-top: 1px solid rgba(214, 178, 255, .16);
+    border-left: 0;
+    object-fit: contain;
+  }
+  .home-showcase-actions { padding-top: 15px; }
+  .home-access-column > .access-card { max-width: none; }
+}
+
+@media (max-width: 420px) {
+  .home-hero-copy-overlay { padding: 22px 17px 19px; }
+  .home-hero-kicker { font-size: .59rem; letter-spacing: .11em; }
+  .home-hero-copy-overlay h1 { font-size: clamp(2.1rem, 12.5vw, 2.8rem); }
+}

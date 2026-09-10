@@ -55,15 +55,20 @@ export default function HomePage() {
             <div className="home-showcase">
               <div className="home-hero-image-wrap">
                 <Image
-                  src="/brand/trotebox-hero.webp"
-                  alt="TroteBox — mascote rindo ao telefone, saindo de uma caixa"
-                  width={1500}
-                  height={844}
+                  src="/brand/mascot-box.webp"
+                  alt="Mascote laranja do TroteBox rindo ao telefone dentro de uma caixa roxa"
+                  width={573}
+                  height={535}
                   className="home-hero-image"
-                  sizes="(max-width: 980px) 94vw, 57vw"
+                  sizes="(max-width: 680px) 94vw, (max-width: 980px) 70vw, 42vw"
                   priority
                 />
-                <div className="home-hero-copy-overlay">Escolha um trote, prepare a surpresa e acompanhe tudo em uma experiência simples, responsável e criada para funcionar na web, Android e iPhone.</div>
+                <div className="home-hero-copy-overlay">
+                  <span className="home-hero-kicker">TROTES QUE FAZEM O DIA MAIS LEVE</span>
+                  <h1>Riso na linha.<br />Surpresa na caixa.</h1>
+                  <p>Escolha um roteiro, prepare a surpresa e acompanhe tudo em uma experiência simples, responsável e criada para funcionar em qualquer tela.</p>
+                  <a href="#experiencias" className="button primary compact-button">Ver catálogo / Escolher trote <span aria-hidden="true">→</span></a>
+                </div>
               </div>
 
               <div className="home-showcase-actions">

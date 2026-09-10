@@ -943,3 +943,51 @@ tr:last-child td { border-bottom: 0; }
   .app-layout .sidebar-link, .app-layout .script-card, .app-layout .credit-chip { transition: none; }
   .app-layout .script-card:hover, .app-layout .credit-chip:hover { transform: none; }
 }
+
+/* v0.4.1 — workspace responsive guardrails */
+.app-layout .topbar > div { min-width: 0; }
+.app-layout .topbar h1 { overflow-wrap: anywhere; }
+.app-layout .credit-chip { flex: 0 1 auto; white-space: nowrap; }
+.app-layout .script-card,
+.app-layout .hero-panel,
+.app-layout .activity-panel,
+.app-layout .stat-card,
+.app-layout .form-panel,
+.app-layout .summary-card,
+.app-layout .pack-card { min-width: 0; }
+
+@media (max-width: 860px) {
+  .app-layout .topbar { flex-wrap: wrap; }
+  .app-layout .topbar > div { flex: 1 1 240px; }
+  .app-layout .credit-chip { margin-left: auto; }
+  .app-layout .catalog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 560px) {
+  .app-layout { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+  .app-layout .main { padding: 20px 14px calc(36px + env(safe-area-inset-bottom)); }
+  .app-layout .topbar { align-items: center; gap: 10px; margin-bottom: 22px; padding-bottom: 16px; }
+  .app-layout .topbar > div { flex-basis: 165px; }
+  .app-layout .topbar h1 { font-size: clamp(1.72rem, 8vw, 2.15rem); }
+  .app-layout .credit-chip { min-height: 42px; padding-inline: 10px; }
+  .app-layout .hero-panel { min-height: 390px; padding: 23px 20px 166px; }
+  .app-layout .hero-panel-actions { flex-direction: column; }
+  .app-layout .hero-panel-actions .button { width: 100%; flex-basis: auto; }
+  .app-layout .dashboard-mascot { width: 224px; right: -9px; bottom: -72px; border-radius: 28px 28px 0 0; mix-blend-mode: normal; }
+  .app-layout .catalog-grid { grid-template-columns: 1fr; gap: 13px; }
+  .app-layout .script-art { height: 166px; }
+  .app-layout .script-content { padding: 18px; }
+  .app-layout .script-content p { min-height: 0; }
+  .app-layout .script-meta { align-items: flex-start; flex-direction: column; gap: 6px; }
+  .app-layout .script-duration { text-align: left; }
+  .app-layout .form-panel, .app-layout .summary-card, .app-layout .pack-card { padding: 20px 17px; }
+  .app-layout .mobile-nav { left: 8px; right: 8px; min-height: 62px; border-radius: 18px; }
+  .app-layout .mobile-nav a { min-width: 0; overflow: hidden; padding-inline: 2px; font-size: .61rem; }
+  .app-layout .mobile-nav a span:last-child { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+
+@media (max-width: 360px) {
+  .app-layout .main { padding-inline: 11px; }
+  .app-layout .credit-chip strong { font-size: .95rem; }
+  .app-layout .mobile-nav a { font-size: .56rem; }
+}

@@ -93,10 +93,10 @@ export function HomeAccess() {
   const accessChrome = (
     <>
       <div className="access-hero-mascot" aria-hidden="true">
-        <Image src="/brand/trotebox-mascot.webp" alt="" width={160} height={160} sizes="(max-width: 680px) 68px, 92px" />
+        <Image src="/brand/mascot-box.webp" alt="" width={573} height={535} sizes="(max-width: 680px) 68px, 92px" />
       </div>
       <span className="access-card-kicker">ACESSO SEGURO · SEM SENHA</span>
-      <Brand />
+      <Brand dark />
     </>
   );
 

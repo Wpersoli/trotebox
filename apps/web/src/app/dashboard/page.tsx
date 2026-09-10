@@ -63,7 +63,7 @@ export default function DashboardPage() {
               <Link href="/wallet/" className="button secondary">Recarregar créditos</Link>
             </div>
           </div>
-          <Image className="dashboard-mascot" src="/brand/trotebox-mascot.webp" alt="" width={715} height={895} sizes="(max-width: 700px) 215px, (max-width: 980px) 39vw, 330px" aria-hidden="true" />
+          <Image className="dashboard-mascot" src="/brand/mascot-box.webp" alt="" width={573} height={535} sizes="(max-width: 700px) 215px, (max-width: 980px) 39vw, 330px" aria-hidden="true" />
         </article>
         <aside className="card activity-panel">
           <div className="activity-heading"><span className="eyebrow">Últimos trotes</span><Link href="/calls/">Ver tudo</Link></div>
