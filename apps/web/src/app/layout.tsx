@@ -1,2 +1,15 @@
-zö¥Öšèqë,²×hºÜ+Š×«z«¢­çì­æ)^K)Üjšlÿ›şÊÜıªişV²¢ëm³hJÚâÚ±î¸EçŞ­éÜxJë¢¶©¦È¬‹]yø§yÖ­zö¥×Z¶»§IÊâ¦Ò'N¬
-‰í{g¡×¢×«©¾mµ÷]¶zz)íz¹Ú—úk¡Ç¬³÷±yË­Š‰øç]vj×¯j\+jš^¯­¸jÚî'+Š›Hœ*'µìm‡^Š{^®v¥şšèqë,ıì^rëb¢~8÷­µëÚ”[§rØ¨zz)íz¹Ú—úk¡Ç¬³÷±yË­Š‰öó}ôj×¯jTò¥äœ®*m‡^Š{^®v¥şšèqë,ıì^rëb¢}½çv­‡^Š{^®v¥şf¢Ÿ÷¯j[-®)àï]Í¡×£²ı¸×İ
+[eval]:1
+process.stdout.write(require('fs').readFileSync(apps/web/src/app/layout.tsx,'utf8'))
+                                                ^
+
+ReferenceError: apps is not defined
+    at [eval]:1:49
+    at runScriptInThisContext (node:internal/vm:219:10)
+    at node:internal/process/execution:451:12
+    at [eval]-wrapper:6:24
+    at runScriptInContext (node:internal/process/execution:449:60)
+    at evalFunction (node:internal/process/execution:283:30)
+    at evalTypeScript (node:internal/process/execution:295:3)
+    at node:internal/main/eval_string:71:3
+
+Node.js v24.19.0
