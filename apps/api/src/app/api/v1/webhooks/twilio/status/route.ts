@@ -1,4 +1,4 @@
-import { WebhookProvider } from '@trotebox/db';
+import { WebhookProvider, prisma } from '@trotebox/db';
 import { applyCallStatus } from '@/server/calls';
 import { AppError, handleError, ok, urlEncodedWebhookBody } from '@/server/http';
 import { validateTwilioRequest } from '@/server/provider-signatures';
@@ -16,6 +16,14 @@ export async function POST(request: Request) {
     const status = params.CallStatus ?? '';
     const sequence = params.SequenceNumber ?? params.Timestamp ?? '0';
     if (!callSid) throw new AppError(400, 'MISSING_CALL_SID', 'CallSid ausente.');
+    const internalCallId = new URL(request.url).searchParams.get('callId');
+    if (internalCallId) {
+      const changed = await prisma.callOrder.updateMany({
+        where: { id: internalCallId, telephonyProvider: 'twilio', OR: [{ providerCallId: null }, { providerCallId: callSid }] },
+        data: { providerCallId: callSid }
+      });
+      if (changed.count !== 1) throw new AppError(409, 'PROVIDER_CALL_CONFLICT', 'Callback não corresponde à chamada.');
+    }
     const externalId = `${callSid}:${status}:${sequence}`;
     const registered = await registerWebhook({ provider: WebhookProvider.TWILIO, externalEventId: externalId, signatureValid: true, rawBody });
     if (registered.duplicate && registered.event.processedAt) return ok({ received: true, duplicate: true });

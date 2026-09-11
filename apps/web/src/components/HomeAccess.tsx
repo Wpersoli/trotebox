@@ -104,7 +104,7 @@ export function HomeAccess() {
     <section className="card access-card access-card-authenticated" aria-labelledby="access-title">
       {accessChrome}
       <span className="access-kicker">Área exclusiva</span>
-      <h1 id="access-title">Seu acesso está ativo</h1>
+      <h2 id="access-title">Seu acesso está ativo</h2>
       <p>Você já confirmou este e-mail nesta sessão.</p>
       <button className="button access-primary" onClick={() => router.push('/dashboard/')}>Entrar no meu espaço</button>
     </section>
@@ -112,7 +112,7 @@ export function HomeAccess() {
     <section className="card access-card" aria-labelledby="access-title">
       {accessChrome}
       {isPreviewMode && <div className="preview-badge inline">Preview local</div>}
-      <h1 id="access-title">{step === 'identity' ? 'Entre na TroteBox' : 'Confirme seu acesso'}</h1>
+      <h2 id="access-title">{step === 'identity' ? 'Entre na TroteBox' : 'Confirme seu acesso'}</h2>
       <p>
         {step === 'identity'
           ? 'Informe o e-mail que identifica o seu espaço exclusivo. A cada nova sessão, enviaremos um código temporário de seis dígitos. Nenhuma senha é armazenada.'

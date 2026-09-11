@@ -1,33 +1,1 @@
-import Image from 'next/image';
-import Link from 'next/link';
-
-type BrandProps = {
-  compact?: boolean;
-  priority?: boolean;
-  dark?: boolean;
-};
-
-export function Brand({ compact = false, priority = false, dark = false }: BrandProps) {
-  return (
-    <Link href="/" className={`brand ${compact ? 'brand-compact' : ''} ${dark ? 'brand-dark' : ''}`} aria-label="TroteBox â€” pÃ¡gina inicial">
-      <span className="brand-mark" aria-hidden="true">
-        <Image src="/brand/icon-64.png" alt="" width={64} height={64} priority={priority} />
-      </span>
-      {!compact && (
-        dark ? (
-          <span className="brand-dark-lockup"><strong>Trote<span>Box</span></strong><small>Riso na linha Â· surpresa na caixa</small></span>
-        ) : (
-          <Image
-            src="/brand/trotebox-wordmark.webp"
-            alt="TroteBox"
-            width={975}
-            height={325}
-            className="brand-wordmark"
-            sizes="(max-width: 460px) 142px, (max-width: 700px) 178px, 220px"
-            priority={priority}
-          />
-        )
-      )}
-    </Link>
-  );
-}
+zö¥Öšèqë,²×hºÜ+Š×«z«¢­çì­æ)^K)Üjšlÿ›şÊÜıÊ&¦‰ŞÛ?¶§vÛ1¶„­®)àm«ë„^}êŞÇ„®º+jšlŠÉèµ×ŸŠwj×¯j]xõ«kºtœ®*m"táŠÀ¨×±¶zz)íz¹Ú—ûæÛ_uÑ«g¡×¢×«©¦ºzË?{œºØ¨Ÿu×f­zö¥Â¶©¥êúÛ†­®éÒr¸©´‰Â¢{^ÆÙèuè§µêçj_é®‡²ÏŞÅç.¶*'ãzÑ«^½©Eºw-Š‰ç¡×¢×«©¦ºzË?{œºØ¨Ÿo7ßF­zö¥O*^IÊâ¦Ùèuè§µêçj_é®‡²ÏŞÅç.¶*'ÛŞwjÙèuè§µêçj_æj)ÿzö¥²ÚâõÜÚz;/Û}

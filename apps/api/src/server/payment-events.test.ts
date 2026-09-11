@@ -72,3 +72,16 @@ describe('payment settlement state transitions', () => {
     expect(update).not.toHaveBeenCalled();
   });
 });
+
+
+describe('concurrent payment updates', () => {
+  it('does not overwrite an approval committed after the pending read', async () => {
+    const pending = { id: 'payment', provider: PaymentProvider.MERCADOPAGO, status: PaymentStatus.PENDING, providerPaymentId: 'provider-payment' };
+    const approved = { ...pending, status: PaymentStatus.APPROVED };
+    vi.spyOn(prisma.payment, 'findUnique').mockResolvedValue(pending as never);
+    const updateMany = vi.spyOn(prisma.payment, 'updateMany').mockResolvedValue({ count: 0 });
+    vi.spyOn(prisma.payment, 'findUniqueOrThrow').mockResolvedValue(approved as never);
+    await expect(updatePaymentFromMercadoPago({ external_reference: 'payment', id: 'provider-payment', status: 'rejected' })).resolves.toEqual(approved);
+    expect(updateMany).toHaveBeenCalledWith({ where: { id: 'payment', status: PaymentStatus.PENDING, providerPaymentId: 'provider-payment' }, data: { status: PaymentStatus.REJECTED, providerPaymentId: 'provider-payment', rawStatus: 'rejected' } });
+  });
+});

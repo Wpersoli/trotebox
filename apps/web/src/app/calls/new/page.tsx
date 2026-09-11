@@ -3,9 +3,21 @@
 import { FormEvent, useEffect, useMemo, useState, useRef } from 'react';
 import type { ScriptSummary } from '@trotebox/contracts';
 import { AppShell } from '@/components/AppShell';
+import Link from 'next/link';
+import { useAuth } from '@/components/AuthProvider';
 import { ApiError, api, isPreviewMode } from '@/lib/api';
 
 export default function NewCallPage() {
+  const { user } = useAuth();
+  const [pendingKey, setPendingKey] = useState('');
+  const storageKey = user ? `trotebox:call-intent:${user.id}` : '';
+  useEffect(() => {
+    if (!storageKey || isPreviewMode) return;
+    const timer = window.setTimeout(() => {
+      try { setPendingKey(sessionStorage.getItem(storageKey) ?? ''); } catch { /* Current page remains usable. */ }
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [storageKey]);
   const [scripts, setScripts] = useState<ScriptSummary[]>([]);
   const [scriptId, setScriptId] = useState('');
   const [phone, setPhone] = useState('+55');
@@ -43,10 +55,39 @@ export default function NewCallPage() {
   const submitLockRef = useRef(false);
   const idempotencyRef = useRef<{ fingerprint: string; key: string } | null>(null);
 
+  function clearIntent() {
+    setPendingKey('');
+    idempotencyRef.current = null;
+    try { if (storageKey) sessionStorage.removeItem(storageKey); } catch { /* Best effort. */ }
+  }
+
+  async function recoverIntent() {
+    if (submitLockRef.current || !pendingKey) return;
+    submitLockRef.current = true;
+    setBusy(true);
+    setError('');
+    try {
+      const data = await api.recoverCall(pendingKey);
+      if (data.recoveryKey !== pendingKey) throw new Error('A consulta segura ainda não está disponível. Mantenha esta solicitação e tente novamente mais tarde.');
+      const call = data.calls[0];
+      if (!call) {
+        setError('A solicitação ainda não foi localizada. Aguarde e consulte novamente; não inicie outra ligação enquanto a confirmação estiver pendente.');
+        return;
+      }
+      clearIntent();
+      setPhone('+55');
+      setConsent(false);
+      setSuccess('Solicitação localizada. Acompanhe o andamento no histórico.');
+      window.dispatchEvent(new Event('trotebox:wallet-updated'));
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Não foi possível consultar a chamada.');
+    } finally { submitLockRef.current = false; setBusy(false); }
+  }
+
   async function submit(event: FormEvent) {
     event.preventDefault();
 
-    if (submitLockRef.current) return;
+    if (submitLockRef.current || pendingKey) return;
 
     setError('');
     setSuccess('');
@@ -84,6 +125,10 @@ export default function NewCallPage() {
           };
 
     idempotencyRef.current = attempt;
+    if (!isPreviewMode) {
+      setPendingKey(attempt.key);
+      try { if (storageKey) sessionStorage.setItem(storageKey, attempt.key); } catch { /* Never store the recipient number. */ }
+    }
 
     try {
       const result = await api.createCall({
@@ -91,7 +136,10 @@ export default function NewCallPage() {
         idempotencyKey: attempt.key
       });
 
-      idempotencyRef.current = null;
+      clearIntent();
+      setPhone('+55');
+      setConsent(false);
+      window.dispatchEvent(new Event('trotebox:wallet-updated'));
 
       setSuccess(
         isPreviewMode
@@ -103,11 +151,11 @@ export default function NewCallPage() {
         cause instanceof ApiError &&
         (
           cause.code === 'REQUEST_TIMEOUT' ||
-          cause.code === 'NETWORK_ERROR'
+          cause.code === 'NETWORK_ERROR' || cause.code === 'CALL_RECONCILIATION_PENDING' || cause.status >= 500
         );
 
       if (!uncertainResult) {
-        idempotencyRef.current = null;
+        clearIntent();
       }
 
       setError(
@@ -125,6 +173,7 @@ export default function NewCallPage() {
     <AppShell title="Novo trote">
       <form className="form-grid" onSubmit={submit} aria-busy={busy || loadingScripts}>
         <section className="card form-panel form-stack">
+          {pendingKey && <div className="notice" role="status"><strong>Uma chamada aguarda confirmação.</strong><p>Consulte a solicitação antes de iniciar outra. O número do destinatário não é salvo neste navegador.</p><button type="button" className="button secondary" disabled={busy} onClick={() => void recoverIntent()}>Consultar solicitação</button></div>}
           {catalogError && <div className="error-box" role="alert">{catalogError}</div>}
           {loadingScripts && <div className="notice" role="status">Carregando roteiros…</div>}
           {isPreviewMode && <div className="notice"><strong>Modo preview:</strong> este formulário é apenas visual. Nenhuma chamada será feita.</div>}
@@ -136,8 +185,8 @@ export default function NewCallPage() {
           <label className="checkbox-row"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} /><span>Confirmo que tenho autorização legítima para contatar este destinatário e não usarei o serviço para ameaça, perseguição, fraude ou assédio.</span></label>
           <label className="checkbox-row"><input type="checkbox" checked={recording} onChange={(e) => setRecording(e.target.checked)} disabled={busy || !recordingAvailable} /><span>Confirmo que eventual gravação foi previamente autorizada pelas pessoas envolvidas. A gravação também precisa estar habilitada no servidor.{!recordingAvailable && ' Indisponível no ambiente atual.'}</span></label>
           <div className="notice">Números de emergência, destinos bloqueados e padrões de abuso são recusados automaticamente.</div>
-          {error && <div className="error-box" role="alert">{error}</div>}{success && <div className="success-box" role="status">{success}</div>}
-          <button className="button" disabled={busy || loadingScripts || !scripts.length || !consent || !scriptId || !outboundCallsAvailable}>{busy ? 'Preparando…' : isPreviewMode ? 'Simular trote' : twilioTrialMode ? 'Iniciar teste Twilio' : outboundCallsAvailable ? 'Confirmar e iniciar' : 'Telefonia indisponível'}</button>
+          {error && <div className="error-box" role="alert">{error}</div>}{success && <div className="success-box" role="status">{success} <Link href="/calls/">Abrir histórico</Link></div>}
+          <button className="button" disabled={busy || Boolean(pendingKey) || loadingScripts || !scripts.length || !consent || !scriptId || !outboundCallsAvailable}>{busy ? 'Preparando…' : isPreviewMode ? 'Simular trote' : twilioTrialMode ? 'Iniciar teste Twilio' : outboundCallsAvailable ? 'Confirmar e iniciar' : 'Telefonia indisponível'}</button>
         </section>
 
         <aside className="card summary-card">

@@ -5,7 +5,7 @@ import { encrypt, hashSubject } from './crypto';
 import { AppError } from './http';
 import { validateRecipient } from './phone-policy';
 import { enforceRateLimits } from './rate-limit';
-import { reserveCredits, releaseCredits, releaseCreditsInTransaction, captureCreditsInTransaction } from './wallet';
+import { reserveCredits, releaseCreditsInTransaction, captureCreditsInTransaction } from './wallet';
 import { telephonyProvider } from './telephony';
 import { audit } from './audit';
 import { platformCapabilities } from './capabilities';
@@ -23,25 +23,29 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function assertIdempotentMatch(existing: { userId: string; scriptId: string; recipientPhoneHash: string }, userId: string, scriptId: string, phoneHash: string) {
-  if (existing.userId !== userId || existing.scriptId !== scriptId || existing.recipientPhoneHash !== phoneHash) {
+function assertIdempotentMatch(existing: { userId: string; scriptId: string; recipientPhoneHash: string; recordingConsentAt: Date | null }, userId: string, scriptId: string, phoneHash: string, recordingConsent: boolean) {
+  if (existing.userId !== userId || existing.scriptId !== scriptId || existing.recipientPhoneHash !== phoneHash || Boolean(existing.recordingConsentAt) !== recordingConsent) {
     throw new AppError(409, 'IDEMPOTENCY_CONFLICT', 'Chave idempotente já usada com dados diferentes.');
   }
 }
 
-async function persistProviderStart(callId: string, providerCallId: string) {
+export async function persistProviderStart(callId: string, providerCallId: string) {
   let lastError: unknown;
 
   for (let attempt = 0; attempt < PROVIDER_PERSIST_RETRY_DELAYS_MS.length; attempt += 1) {
     try {
       return await prisma.$transaction(async (tx) => {
+        const current = await tx.callOrder.findUniqueOrThrow({ where: { id: callId } });
+        if (current.providerCallId && current.providerCallId !== providerCallId) {
+          throw new AppError(409, 'PROVIDER_CALL_CONFLICT', 'A chamada já está vinculada a outro identificador.');
+        }
+        const mayAdvance = [CallStatus.VALIDATING, CallStatus.CREDIT_RESERVED, CallStatus.QUEUED].some((status) => status === current.status);
         const updated = await tx.callOrder.update({
           where: { id: callId },
           data: {
             providerCallId,
-            status: CallStatus.DIALING,
-            failureCode: null,
-            failureMessage: null
+            ...(mayAdvance ? { status: CallStatus.DIALING } : {}),
+            ...(terminalStatus.has(current.status) ? {} : { failureCode: null, failureMessage: null })
           }
         });
         await tx.callEvent.upsert({
@@ -84,7 +88,7 @@ export async function createCall(userId: string, input: CreateCallInput, request
   const phoneHash = hashSubject(phone);
   const existing = await prisma.callOrder.findUnique({ where: { idempotencyKey: input.idempotencyKey }, include: { script: true } });
   if (existing) {
-    assertIdempotentMatch(existing, userId, input.scriptId, phoneHash);
+    assertIdempotentMatch(existing, userId, input.scriptId, phoneHash, Boolean(input.recordingConsentConfirmed));
     return existing;
   }
 
@@ -157,26 +161,29 @@ export async function createCall(userId: string, input: CreateCallInput, request
         ? lastTransactionError
         : new AppError(503, 'CALL_CREATION_RETRY_EXHAUSTED', 'Não foi possível confirmar a criação da chamada.');
     }
-    assertIdempotentMatch(winner, userId, input.scriptId, phoneHash);
-    call = winner;
+    assertIdempotentMatch(winner, userId, input.scriptId, phoneHash, Boolean(input.recordingConsentConfirmed));
+    return winner;
   }
 
-  let providerAccepted = false;
+  let providerInvoked = false;
 
   try {
     const voiceAssetUrl = await prepareVoiceAsset(script);
     if (voiceAssetUrl) await prisma.callOrder.update({ where: { id: call.id }, data: { voiceAssetUrl } });
     const base = config.PUBLIC_API_URL.replace(/\/$/, '');
     const provider = await telephonyProvider();
+    // Persist the dispatch boundary before the external side effect. A crash or
+    // timeout after this point must never be treated as a confirmed rejection.
+    await prisma.callOrder.update({ where: { id: call.id }, data: { status: CallStatus.QUEUED, failureCode: 'PROVIDER_CONFIRMATION_PENDING' } });
+    providerInvoked = true;
     const started = await provider.startCall({
       callId: call.id,
       to: phone,
       answerUrl: `${base}/api/v1/telephony/${config.TELEPHONY_PROVIDER}/answer/${call.id}`,
-      statusUrl: `${base}/api/v1/webhooks/${config.TELEPHONY_PROVIDER}/status`,
+      statusUrl: `${base}/api/v1/webhooks/${config.TELEPHONY_PROVIDER}/status?callId=${encodeURIComponent(call.id)}`,
       recordingStatusUrl: `${base}/api/v1/webhooks/${config.TELEPHONY_PROVIDER}/recording`,
       recordingAllowed: config.RECORDING_ENABLED && Boolean(input.recordingConsentConfirmed)
     });
-    providerAccepted = true;
 
     const updated = await persistProviderStart(call.id, started.providerCallId);
     await audit({ request, userId, action: 'CALL_CREATED', targetType: 'CALL', targetId: call.id, metadata: { scriptId: script.id, provider: started.provider } });
@@ -191,11 +198,15 @@ export async function createCall(userId: string, input: CreateCallInput, request
     }
     return { ...updated, script };
   } catch (cause) {
-    if (!providerAccepted) {
-      await prisma.callOrder.update({ where: { id: call.id }, data: { status: CallStatus.FAILED, failureCode: 'PROVIDER_START_FAILED', failureMessage: cause instanceof Error ? cause.message.slice(0, 300) : 'unknown' } });
-      await releaseCredits(userId, script.creditCost, call.id, 'Liberação por falha ao iniciar chamada');
+    if (!providerInvoked) {
+      await prisma.$transaction(async (tx) => {
+        await releaseCreditsInTransaction(tx, userId, script.creditCost, call.id, 'Liberação antes de enviar à operadora');
+        await tx.callOrder.update({ where: { id: call.id }, data: { status: CallStatus.FAILED, failureCode: 'PREPARATION_FAILED', failureMessage: null } });
+      }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+      throw cause;
     }
-    throw cause;
+    // Do not overwrite callback state, and do not refund an uncertain dispatch.
+    throw new AppError(503, 'CALL_RECONCILIATION_PENDING', 'Estamos confirmando a chamada. Consulte o histórico antes de tentar novamente.');
   }
 }
 

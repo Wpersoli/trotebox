@@ -6,18 +6,7 @@ import { useEffect, useState } from 'react';
 import { AppShell } from '@/components/AppShell';
 import { api } from '@/lib/api';
 
-function statusLabel(status: unknown) {
-  const labels: Record<string, string> = {
-    COMPLETED: 'Concluído',
-    FAILED: 'Falhou',
-    QUEUED: 'Na fila',
-    DIALING: 'Chamando',
-    RINGING: 'Tocando',
-    ANSWERED: 'Atendido',
-    CREDIT_RESERVED: 'Crédito reservado'
-  };
-  return labels[String(status ?? '')] ?? 'Processando';
-}
+import { callStatusLabel } from '@/lib/call-status';
 
 export default function DashboardPage() {
   const [wallet, setWallet] = useState<{ balanceCredits: number; reservedCredits: number } | null>(null);
@@ -68,7 +57,7 @@ export default function DashboardPage() {
         <aside className="card activity-panel">
           <div className="activity-heading"><span className="eyebrow">Últimos trotes</span><Link href="/calls/">Ver tudo</Link></div>
           <div className="activity-list">
-            {calls.slice(0, 4).map((call, index) => <div className="activity-item" key={String(call.id ?? index)}><div className="activity-dot" aria-hidden="true">☎</div><div><strong>{String(call.scriptTitle ?? 'Trote')}</strong><span>{statusLabel(call.status)}</span></div></div>)}
+            {calls.slice(0, 4).map((call, index) => <div className="activity-item" key={String(call.id ?? index)}><div className="activity-dot" aria-hidden="true">☎</div><div><strong>{String(call.scriptTitle ?? 'Trote')}</strong><span>{callStatusLabel(call.status)}</span></div></div>)}
             {loading && <p className="muted" role="status">Carregando histórico…</p>}
             {!loading && !calls.length && !error && <p className="muted">Nenhum trote criado ainda.</p>}
           </div>

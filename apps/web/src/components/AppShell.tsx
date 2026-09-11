@@ -19,7 +19,7 @@ const links = [
 export function AppShell({ title, children }: { title: string; children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, ready, logout } = useAuth();
+  const { user, ready, logout, logoutError } = useAuth();
   const [balance, setBalance] = useState<number | null>(null);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export function AppShell({ title, children }: { title: string; children: React.R
 
   if (!user) return null;
 
-  const nav = links.map((item) => ({ ...item, active: pathname === item.href || pathname.startsWith(item.href.replace(/\/$/, '') + '/') }));
+  const nav = links.map((item) => ({ ...item, active: pathname.replace(/\/$/, '') === item.href.replace(/\/$/, '') }));
 
   return (
     <div className="app-layout">
@@ -76,6 +76,7 @@ export function AppShell({ title, children }: { title: string; children: React.R
             <small>créditos</small>
           </Link>
         </header>
+        {logoutError && <div className="error-box" role="alert">{logoutError}</div>}
         {children}
       </main>
 

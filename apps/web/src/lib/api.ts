@@ -98,6 +98,14 @@ function friendlyMessageForCode(code: string, retryAfterSeconds?: number) {
     case 'TELEPHONY_NOT_CONFIGURED': return 'Telefonia temporariamente indisponível. Nenhum crédito foi consumido.';
     case 'TWILIO_NOT_CONFIGURED':
     case 'VONAGE_NOT_CONFIGURED': return 'Telefonia ainda não configurada. Nenhum crédito foi consumido.';
+    case 'INSUFFICIENT_CREDITS': return 'Seu saldo é insuficiente. Recarregue os créditos para continuar.';
+    case 'INVALID_AUTH_CODE': return 'Código inválido ou expirado. Confira os seis dígitos ou solicite outro código.';
+    case 'AUTH_CODE_ALREADY_USED': return 'Este código já foi usado. Solicite um novo código.';
+    case 'CALL_RECONCILIATION_PENDING': return 'Estamos confirmando a chamada. Consulte a solicitação antes de tentar novamente.';
+    case 'RECIPIENT_SUPPRESSED': return 'Este destinatário não pode receber chamadas pelo TroteBox.';
+    case 'AUTH_REQUIRED':
+    case 'SESSION_REVOKED':
+    case 'INVALID_TOKEN': return 'Sua sessão expirou. Entre novamente para continuar.';
     case 'RATE_LIMITED': return rateLimitMessage(retryAfterSeconds);
     default: return 'Não foi possível completar a solicitação.';
   }
@@ -148,6 +156,7 @@ function previewUser(email: string, displayName: string) {
 }
 
 export const api = {
+  recordingUrl: (id: string) => `${baseUrl}/calls/${encodeURIComponent(id)}/recording`,
   requestAuthCode: async (email: string) => isPreviewMode
     ? { accepted: true, devCode: '123456' }
     : request<{ accepted: boolean; devCode?: string }>('/auth/request-code', { method: 'POST', body: JSON.stringify({ email }) }),
@@ -172,6 +181,7 @@ export const api = {
 
   catalog: async () => isPreviewMode ? { scripts: previewScripts, packs: previewPacks, capabilities: previewCapabilities } : request<{ scripts: ScriptSummary[]; packs: CreditPackSummary[]; capabilities: PlatformCapabilities }>('/catalog'),
   wallet: async () => isPreviewMode ? previewWallet : request<WalletSummary>('/wallet'),
+  recoverCall: (key: string) => request<{ recoveryKey?: string; calls: Array<Record<string, unknown>> }>(`/calls?idempotencyKey=${encodeURIComponent(key)}`),
   calls: async () => isPreviewMode ? { calls: previewCalls } : request<{ calls: Array<Record<string, unknown>> }>('/calls'),
 
   createCall: async (input: Record<string, unknown>) => {

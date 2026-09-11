@@ -20,12 +20,12 @@ const publicPacks = [
 
 const faq = [
   ['Quem paga a ligação?', 'A chamada é iniciada pela infraestrutura do TroteBox. O usuário não precisa fazer a ligação pelo próprio celular.'],
-  ['Quando meu crédito é consumido?', 'O crédito é primeiro reservado no servidor. A liquidação acontece de acordo com o resultado da chamada; em falhas terminais a reserva pode ser liberada.'],
+  ['Quando meu crédito é consumido?', 'Seus créditos ficam reservados enquanto confirmamos a chamada. Quando ela termina, o histórico mostra o resultado e o destino dos créditos.'],
   ['Preciso de uma senha?', 'Não. O acesso usa um código temporário enviado ao e-mail, com sessão protegida e revogável.'],
   ['Posso gravar a chamada?', 'Somente quando a gravação estiver habilitada e houver consentimento específico. O acesso às gravações é protegido e temporário.'],
   ['Por que uma chamada pode demorar?', 'Linhas ocupadas, tentativas do provedor e estados de telefonia podem fazer uma chamada levar mais tempo para chegar a um estado final.'],
-  ['O que acontece quando a telefonia está indisponível?', 'O backend bloqueia a operação antes da reserva de crédito e informa que a telefonia está temporariamente indisponível.'],
-  ['Como funciona o Pix?', 'O pagamento é criado no backend e confirmado por eventos do provedor, com vínculo ao usuário, pacote e transação.'],
+  ['O que acontece quando a telefonia está indisponível?', 'Você verá um aviso antes de iniciar. Enquanto a telefonia estiver indisponível, a chamada não será enviada.'],
+  ['Como funciona o Pix?', 'Escolha um pacote, copie o código Pix ou use o QR Code. Após a confirmação do pagamento, os créditos aparecem na sua conta.'],
   ['O que o TroteBox bloqueia?', 'Destinos de emergência, padrões especiais, números em supressão e outras situações de risco são rejeitados antes do processamento.'],
   ['Onde vejo minhas chamadas?', 'No espaço autenticado do TroteBox, com histórico, status e créditos organizados por chamada.'],
   ['Existe exemplo em áudio?', 'A vitrine pública já apresenta os roteiros e suas características. Exemplos em áudio serão publicados somente depois da revisão e aprovação final dos arquivos de demonstração.']
@@ -67,13 +67,13 @@ export default function HomePage() {
                   <span className="home-hero-kicker">TROTES QUE FAZEM O DIA MAIS LEVE</span>
                   <h1>Riso na linha.<br />Surpresa na caixa.</h1>
                   <p>Escolha um roteiro, prepare a surpresa e acompanhe tudo em uma experiência simples, responsável e criada para funcionar em qualquer tela.</p>
-                  <a href="#experiencias" className="button primary compact-button">Ver catálogo / Escolher trote <span aria-hidden="true">→</span></a>
+                  <a href="#experiencias" className="button primary compact-button">Escolher trote <span aria-hidden="true">→</span></a>
                 </div>
               </div>
 
               <div className="home-showcase-actions">
                 <a href="#como-funciona" className="button secondary compact-button">Ver como funciona</a>
-                <a href="#experiencias" className="button primary compact-button">Conhecer os trotes</a>
+
                 <div className="home-trust-row" aria-label="Destaques da plataforma">
                   <span>✓ Roteiros originais</span>
                   <span>✓ Créditos transparentes</span>
@@ -104,7 +104,7 @@ export default function HomePage() {
             <div>
               <span className="eyebrow">Conheça antes de começar</span>
               <h2>Roteiros com personalidade, duração e custo claros.</h2>
-              <p>O catálogo público mostra o que cada experiência entrega. Os exemplos em áudio entram depois da revisão final dos arquivos de demonstração, sem criar expectativa falsa sobre um recurso ainda não publicado.</p>
+              <p>Confira o tema, a duração estimada e o custo de cada roteiro antes de escolher. Prévias em áudio ainda não estão disponíveis.</p>
             </div>
             <div className="home-step-grid">
               {publicScripts.map((script) => (
@@ -150,7 +150,7 @@ export default function HomePage() {
             <div className="home-info-points">
               <span><b>01</b> Saldo nunca é alterado diretamente pelo cliente</span>
               <span><b>02</b> Login sem senha, com código temporário por e-mail</span>
-              <span><b>03</b> Idempotência, auditoria e controles antiabuso</span>
+              <span><b>03</b> Proteções contra repetições e uso abusivo</span>
               <span><b>04</b> Destinos de emergência e números suprimidos são bloqueados</span>
             </div>
           </div>
@@ -160,9 +160,9 @@ export default function HomePage() {
           <div className="container home-platform-row">
             <div>
               <span className="eyebrow">Não quer receber?</span>
-              <h2>O bloqueio de número faz parte do nosso modelo de segurança.</h2>
+              <h2>Bloqueio de números</h2>
             </div>
-            <p>O fluxo automatizado deve confirmar que a pessoa realmente controla o número antes de colocá-lo em supressão. Não criamos um formulário aberto que permita a terceiros bloquear telefones de outras pessoas.</p>
+            <p>O pedido de bloqueio pelo site ainda não está disponível. O TroteBox permite somente contatos previamente autorizados e recusa números já bloqueados. O canal de solicitação será informado aqui quando estiver disponível.</p>
           </div>
         </section>
 
@@ -196,7 +196,7 @@ export default function HomePage() {
           <nav aria-label="Links de confiança">
             <a href="#precos">Preços</a>{' · '}
             <a href="#faq">FAQ</a>{' · '}
-            <a href="#bloquear-numero">Bloquear meu número</a>{' · '}
+            <a href="#bloquear-numero">Sobre bloqueio de números</a>{' · '}
             <a href="#seguranca">Segurança</a>
           </nav>
           <small>Projeto autoral. Uso sujeito a consentimento, termos e regras locais aplicáveis. Não use o serviço para ameaça, perseguição, fraude ou assédio.</small>

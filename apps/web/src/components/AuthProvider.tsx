@@ -7,6 +7,7 @@ type User = { id: string; email: string; displayName: string };
 type AuthContextValue = {
   user: User | null;
   ready: boolean;
+  logoutError: string;
   loginDemo: (email: string, displayName: string) => Promise<void>;
   loginWithCode: (email: string, code: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -63,6 +64,7 @@ function clearPreviewUser() {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
+  const [logoutError, setLogoutError] = useState('');
 
   useEffect(() => {
     let active = true;
@@ -99,12 +101,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [acceptSession]);
 
   const logout = useCallback(async () => {
-    try { await api.logout(); } catch { /* sessão local será encerrada de qualquer forma */ }
+    setLogoutError('');
+    try { await api.logout(); } catch { setLogoutError('Não foi possível confirmar a saída. Verifique a conexão e tente encerrar a sessão novamente.'); return; }
     if (isPreviewMode) clearPreviewUser();
     setUser(null);
   }, []);
 
-  const value = useMemo(() => ({ user, ready, loginDemo, loginWithCode, logout }), [user, ready, loginDemo, loginWithCode, logout]);
+  const value = useMemo(() => ({ user, ready, logoutError, loginDemo, loginWithCode, logout }), [user, ready, logoutError, loginDemo, loginWithCode, logout]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

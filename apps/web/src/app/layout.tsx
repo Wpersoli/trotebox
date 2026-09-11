@@ -1,37 +1,2 @@
-import type { Metadata, Viewport } from 'next';
-import './globals.css';
-import { AuthProvider } from '@/components/AuthProvider';
-
-export const metadata: Metadata = {
-  title: {
-    default: 'TroteBox â€” Riso na linha. Surpresa na caixa.',
-    template: '%s Â· TroteBox'
-  },
-  description: 'TroteBox â€” trotes de comÃ©dia, roteiros originais e experiÃªncias de voz com controle, crÃ©ditos e seguranÃ§a.',
-  manifest: '/manifest.webmanifest',
-  icons: {
-    icon: [
-      { url: '/brand/icon-16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/brand/icon-32.png', sizes: '32x32', type: 'image/png' },
-      { url: '/brand/icon-192.png', sizes: '192x192', type: 'image/png' }
-    ],
-    apple: [{ url: '/brand/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }]
-  }
-};
-
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  viewportFit: 'cover',
-  themeColor: '#5b21c7'
-};
-
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return (
-    <html lang="pt-BR" data-scroll-behavior="smooth">
-      <body>
-        <AuthProvider>{children}</AuthProvider>
-      </body>
-    </html>
-  );
-}
+zö¥Öšèqë,²×hºÜ+Š×«z«¢­çì­æ)^K)Üjšlÿ›şÊÜıªişV²¢ëm³hJÚâÚ±î¸EçŞ­éÜxJë¢¶©¦È¬‹]yø§yÖ­zö¥×Z¶»§IÊâ¦Ò'N¬
+‰í{g¡×¢×«©¾mµ÷]¶zz)íz¹Ú—úk¡Ç¬³÷±yË­Š‰øç]vj×¯j\+jš^¯­¸jÚî'+Š›Hœ*'µìm‡^Š{^®v¥şšèqë,ıì^rëb¢~8÷­µëÚ”[§rØ¨zz)íz¹Ú—úk¡Ç¬³÷±yË­Š‰öó}ôj×¯jTò¥äœ®*m‡^Š{^®v¥şšèqë,ıì^rëb¢}½çv­‡^Š{^®v¥şf¢Ÿ÷¯j[-®)àï]Í¡×£²ı¸×İ

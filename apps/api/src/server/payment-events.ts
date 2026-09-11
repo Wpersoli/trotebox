@@ -127,5 +127,9 @@ export async function updatePaymentFromMercadoPago(
     return current;
   }
   const mapped = status === 'rejected' ? PaymentStatus.REJECTED : status === 'cancelled' ? PaymentStatus.CANCELED : PaymentStatus.PENDING;
-  return prisma.payment.update({ where: { id: internalId }, data: { status: mapped, providerPaymentId: providerId || current.providerPaymentId, rawStatus: status } });
+  await prisma.payment.updateMany({
+    where: { id: internalId, status: PaymentStatus.PENDING, providerPaymentId: current.providerPaymentId },
+    data: { status: mapped, providerPaymentId: providerId || current.providerPaymentId, rawStatus: status }
+  });
+  return prisma.payment.findUniqueOrThrow({ where: { id: internalId } });
 }
