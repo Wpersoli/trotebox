@@ -1,15 +1,33 @@
-[eval]:1
-process.stdout.write(require('fs').readFileSync(apps/web/src/components/Brand.tsx,'utf8'))
-                                                ^
+import Image from 'next/image';
+import Link from 'next/link';
 
-ReferenceError: apps is not defined
-    at [eval]:1:49
-    at runScriptInThisContext (node:internal/vm:219:10)
-    at node:internal/process/execution:451:12
-    at [eval]-wrapper:6:24
-    at runScriptInContext (node:internal/process/execution:449:60)
-    at evalFunction (node:internal/process/execution:283:30)
-    at evalTypeScript (node:internal/process/execution:295:3)
-    at node:internal/main/eval_string:71:3
+type BrandProps = {
+  compact?: boolean;
+  priority?: boolean;
+  dark?: boolean;
+};
 
-Node.js v24.19.0
+export function Brand({ compact = false, priority = false, dark = false }: BrandProps) {
+  return (
+    <Link href="/" className={`brand ${compact ? 'brand-compact' : ''} ${dark ? 'brand-dark' : ''}`} aria-label="TroteBox — página inicial">
+      <span className="brand-mark" aria-hidden="true">
+        <Image src="/brand/icon-64-mascote-telefone.png" alt="" width={64} height={64} priority={priority} />
+      </span>
+      {!compact && (
+        dark ? (
+          <span className="brand-dark-lockup"><strong>Trote<span>Box</span></strong><small>Riso na linha · surpresa na caixa</small></span>
+        ) : (
+          <Image
+            src="/brand/trotebox-wordmark.webp"
+            alt="TroteBox"
+            width={975}
+            height={325}
+            className="brand-wordmark"
+            sizes="(max-width: 460px) 142px, (max-width: 700px) 178px, 220px"
+            priority={priority}
+          />
+        )
+      )}
+    </Link>
+  );
+}

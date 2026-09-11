@@ -1,15 +1,37 @@
-[eval]:1
-process.stdout.write(require('fs').readFileSync(apps/web/src/app/layout.tsx,'utf8'))
-                                                ^
+import type { Metadata, Viewport } from 'next';
+import './globals.css';
+import { AuthProvider } from '@/components/AuthProvider';
 
-ReferenceError: apps is not defined
-    at [eval]:1:49
-    at runScriptInThisContext (node:internal/vm:219:10)
-    at node:internal/process/execution:451:12
-    at [eval]-wrapper:6:24
-    at runScriptInContext (node:internal/process/execution:449:60)
-    at evalFunction (node:internal/process/execution:283:30)
-    at evalTypeScript (node:internal/process/execution:295:3)
-    at node:internal/main/eval_string:71:3
+export const metadata: Metadata = {
+  title: {
+    default: 'TroteBox — Riso na linha. Surpresa na caixa.',
+    template: '%s · TroteBox'
+  },
+  description: 'TroteBox — trotes de comédia, roteiros originais e experiências de voz com controle, créditos e segurança.',
+  manifest: '/manifest.webmanifest',
+  icons: {
+    icon: [
+      { url: '/brand/icon-16.png?v=mascote-telefone-20260911', sizes: '16x16', type: 'image/png' },
+      { url: '/brand/icon-32.png?v=mascote-telefone-20260911', sizes: '32x32', type: 'image/png' },
+      { url: '/brand/icon-192.png?v=mascote-telefone-20260911', sizes: '192x192', type: 'image/png' }
+    ],
+    apple: [{ url: '/brand/apple-touch-icon.png?v=mascote-telefone-20260911', sizes: '180x180', type: 'image/png' }]
+  }
+};
 
-Node.js v24.19.0
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#5b21c7'
+};
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html lang="pt-BR" data-scroll-behavior="smooth">
+      <body>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
+    </html>
+  );
+}
