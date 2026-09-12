@@ -11,7 +11,7 @@ export function Brand({ compact = false, priority = false, dark = false }: Brand
   return (
     <Link href="/" className={`brand ${compact ? 'brand-compact' : ''} ${dark ? 'brand-dark' : ''}`} aria-label="TroteBox — página inicial">
       <span className="brand-mark" aria-hidden="true">
-        <Image src="/brand/icon-64.png" alt="" width={64} height={64} priority={priority} />
+        <Image src="/brand/icon-telefone-3d.png" alt="" width={64} height={64} priority={priority} />
       </span>
       {!compact && (
         dark ? (

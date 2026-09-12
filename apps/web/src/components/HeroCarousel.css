@@ -1,0 +1,26 @@
+.tb-carousel { overflow: hidden; border: 1px solid #623598; border-radius: 26px; background: #25104d; color: white; }
+.tb-carousel-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.tb-carousel-slide { display: grid; grid-template-columns: 1fr 1fr; min-height: 500px; background: linear-gradient(130deg,#211039,#42167e); }
+.tb-carousel-slide[hidden] { display: none; }
+.tb-carousel-copy { padding: clamp(24px,3vw,42px); align-self: center; position: relative; z-index: 1; }
+.tb-carousel-kicker { color: #c9a5ff; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; font-size: 11px; }
+.tb-carousel-copy h2 { font-size: clamp(32px,3.4vw,54px); line-height: 1.05; letter-spacing: -.04em; margin: 22px 0 18px; color: white; }
+.tb-carousel-copy p { color: #ded0f4; font-size: 16px; line-height: 1.6; margin: 0 0 26px; }
+.tb-carousel-copy .button { width: 100%; gap: 12px; justify-content: space-between; white-space: normal; }
+.tb-carousel-art { overflow: hidden; min-width: 0; position: relative; }
+.tb-carousel-art img { position: absolute; height: 100%; width: auto; max-width: none; right: 0; top: 0; }
+.tb-carousel-controls { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 10px 12px; background: #1a0e30; }
+.tb-carousel-controls button { min-width: 44px; min-height: 44px; border: 0; border-radius: 12px; color: #fff; background: transparent; cursor: pointer; }
+.tb-carousel-controls button:hover { background: #44226a; }
+.tb-carousel button:focus-visible,.tb-carousel a:focus-visible { outline: 3px solid #ffad66; outline-offset: -3px; }
+.tb-carousel-dots { display: flex; }
+.tb-carousel-dots span { display: block; width: 8px; height: 8px; margin: auto; border-radius: 99px; background: #a48cb9; }
+.tb-carousel-dots [aria-current] span { width: 22px; background: #ff852d; }
+.tb-carousel-controls .tb-carousel-play { padding: 0 10px; font-size: 12px; }
+@media (max-width: 600px) {
+  .tb-carousel-slide { grid-template-columns: 1fr; min-height: 0; }
+  .tb-carousel-copy { padding: 28px 24px; min-height: 310px; }
+  .tb-carousel-copy h2 { font-size: clamp(32px,8vw,44px); max-width: 360px; }
+  .tb-carousel-art { height: 330px; }
+  .tb-carousel-art img { height: auto; width: 200%; top: -12%; }
+}

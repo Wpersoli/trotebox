@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { HeroCarousel } from '@/components/HeroCarousel';
 import { Brand } from '@/components/Brand';
 import { HomeAccess } from '@/components/HomeAccess';
 import { SkipLink } from '@/components/SkipLink';
@@ -53,23 +53,7 @@ export default function HomePage() {
         <section className="home-access-hero" aria-label="Apresentação e acesso TroteBox">
           <div className="container home-access-grid">
             <div className="home-showcase">
-              <div className="home-hero-image-wrap">
-                <Image
-                  src="/brand/mascot-box.webp"
-                  alt="Mascote laranja do TroteBox rindo ao telefone dentro de uma caixa roxa"
-                  width={573}
-                  height={535}
-                  className="home-hero-image"
-                  sizes="(max-width: 680px) 94vw, (max-width: 980px) 70vw, 42vw"
-                  priority
-                />
-                <div className="home-hero-copy-overlay">
-                  <span className="home-hero-kicker">TROTES QUE FAZEM O DIA MAIS LEVE</span>
-                  <h1>Riso na linha.<br />Surpresa na caixa.</h1>
-                  <p>Escolha um roteiro, prepare a surpresa e acompanhe tudo em uma experiência simples, responsável e criada para funcionar em qualquer tela.</p>
-                  <a href="#experiencias" className="button primary compact-button">Ver catálogo / Escolher trote <span aria-hidden="true">→</span></a>
-                </div>
-              </div>
+              <HeroCarousel />
 
               <div className="home-showcase-actions">
                 <a href="#como-funciona" className="button secondary compact-button">Ver como funciona</a>
