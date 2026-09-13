@@ -206,10 +206,10 @@
   mix-blend-mode: lighten;
 }
 .xp-hero-art-wide img {
-  width: 210%;
+  width: 200%;
   height: 100%;
-  object-fit: cover;
-  transform: translateX(-51%);
+  object-fit: fill;
+  transform: translateX(-50%);
 }
 .xp-carousel-controls {
   position: absolute;
@@ -337,7 +337,7 @@
   letter-spacing: -0.04em;
   margin: 0 0 8px;
   font-weight: 800;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 .xp-card p {
   font-size: 14px;
@@ -805,7 +805,7 @@
     object-fit: contain;
   }
   .xp-hero-art-wide img {
-    object-fit: cover;
+    object-fit: fill;
     width: 200%;
     transform: translateX(-50%);
   }
@@ -1001,3 +1001,41 @@
 
 .xp-hero-copy h1>span{display:block;}
 @media(max-width:700px){.xp-hero-art{height:290px;mask-image:radial-gradient(ellipse at 52% 53%,#000 49%,transparent 81%);}.xp-hero-art-wide{mask-image:linear-gradient(90deg,transparent,#000 15%,#000 94%,transparent);}}
+
+/* Preserve the right-hand artwork at its source aspect ratio. */
+.xp-hero-art-wide {
+  width: min(100%, 427.5px);
+  height: auto;
+  aspect-ratio: 3 / 4;
+  margin-inline: auto;
+  mask-image: linear-gradient(90deg, transparent, #000 5%, #000 98%, transparent);
+}
+.xp-card-art {
+  width: 46%;
+  height: auto;
+  aspect-ratio: 1;
+  right: 0;
+  bottom: 8px;
+  mask-image: none;
+}
+.xp-card p { max-width: 54%; }
+.xp-card button { min-height: 44px; }
+.xp-dialog { max-height: calc(100dvh - 32px); overflow-y: auto; }
+@media (min-width: 1600px) {
+  .xp-hero-art-wide { width: min(100%, 480px); }
+}
+@media (min-width: 701px) and (max-width: 1150px) {
+  .xp-hero-art-wide { width: min(100%, 375px); }
+  .xp-discovery-grid { grid-template-columns: 1fr; }
+  .xp-access { grid-row: 3; max-width: 500px; width: 100%; margin-inline: auto; }
+  .xp-steps { grid-row: 2; }
+}
+@media (max-width: 700px) {
+  .xp-hero-art { margin: 16px 0 0; }
+  .xp-hero-art-wide { width: min(100%, 255px); height: auto; }
+  .xp-carousel-controls { position: static; padding: 12px 0 20px; }
+  .xp-carousel-controls > button { width: 44px; height: 44px; }
+  .xp-card-art { width: min(42%, 160px); }
+  .xp-card p { max-width: 56%; }
+  .xp-card-copy { min-height: 164px; }
+}
