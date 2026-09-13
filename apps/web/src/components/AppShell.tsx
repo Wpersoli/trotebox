@@ -69,12 +69,15 @@ export function AppShell({ title, children }: { title: string; children: React.R
       <main id="app-content" className="main" tabIndex={-1}>
         <header className="topbar">
           <div><span className="eyebrow">TroteBox</span><h1>{title}</h1></div>
+          <div className="account-actions">
           <Link href="/wallet/" className="credit-chip" aria-label={`Abrir créditos. Saldo atual: ${balance ?? 'indisponível'}`}>
             <span className="credit-chip-icon" aria-hidden="true">◈</span>
             <span className="credit-chip-label">Saldo</span>
             <strong>{balance ?? '—'}</strong>
             <small>créditos</small>
           </Link>
+          <Link href="/settings/" className="account-settings-link" aria-label="Minha conta e configurações">⚙<span className="sr-only">Minha conta e configurações</span></Link>
+          </div>
         </header>
         {children}
       </main>

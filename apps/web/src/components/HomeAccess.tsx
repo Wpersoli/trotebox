@@ -18,7 +18,7 @@ function maskEmail(value: string) {
   return `${visible}${'*'.repeat(Math.max(3, local.length - visible.length))}@${domain}`;
 }
 
-export function HomeAccess() {
+export function HomeAccess({ compact = false }: { compact?: boolean }) {
   const router = useRouter();
   const { user, ready, loginDemo, loginWithCode } = useAuth();
   const [email, setEmail] = useState(isPreviewMode ? 'demo@trotebox.local' : '');
@@ -102,20 +102,20 @@ export function HomeAccess() {
 
   const accessContent = ready && user ? (
     <section className="card access-card access-card-authenticated" aria-labelledby="access-title">
-      {accessChrome}
+      {!compact && accessChrome}
       <span className="access-kicker">Área exclusiva</span>
-      <h1 id="access-title">Seu acesso está ativo</h1>
+      <h2 id="access-title">Seu acesso está ativo</h2>
       <p>Você já confirmou este e-mail nesta sessão.</p>
       <button className="button access-primary" onClick={() => router.push('/dashboard/')}>Entrar no meu espaço</button>
     </section>
   ) : (
     <section className="card access-card" aria-labelledby="access-title">
-      {accessChrome}
+      {!compact && accessChrome}
       {isPreviewMode && <div className="preview-badge inline">Preview local</div>}
-      <h1 id="access-title">{step === 'identity' ? 'Entre na TroteBox' : 'Confirme seu acesso'}</h1>
+      <h2 id="access-title">{step === 'identity' ? (compact ? 'Sua próxima risada' : 'Entre na TroteBox') : 'Confirme seu acesso'}</h2>
       <p>
         {step === 'identity'
-          ? 'Informe o e-mail que identifica o seu espaço exclusivo. A cada nova sessão, enviaremos um código temporário de seis dígitos. Nenhuma senha é armazenada.'
+          ? (compact ? 'Entre com seu e-mail para começar.' : 'Informe o e-mail que identifica o seu espaço exclusivo. A cada nova sessão, enviaremos um código temporário de seis dígitos. Nenhuma senha é armazenada.')
           : <>Enviamos um código para <strong>{maskedEmail}</strong>. Ele é de uso único e expira em poucos minutos.</>}
       </p>
 
@@ -137,13 +137,13 @@ export function HomeAccess() {
               required
               aria-describedby="access-email-help"
             />
-            <small id="access-email-help" className="field-help">Seus créditos e histórico ficam vinculados a este e-mail.</small>
+            <small id="access-email-help" className={compact ? "sr-only" : "field-help"}>Seus créditos e histórico ficam vinculados a este e-mail.</small>
           </div>
           {error && <div className="error-box" role="alert">{error}</div>}
           <button className="button access-primary" disabled={busy || !email.includes('@')}>
-            {busy ? 'Enviando…' : authMode === 'dev' && !isPreviewMode ? 'Abrir demonstração' : 'Enviar código'}
+            {busy ? 'Enviando…' : authMode === 'dev' && !isPreviewMode ? 'Abrir demonstração' : (compact ? 'Receber código →' : 'Enviar código')}
           </button>
-          <div className="access-security-note"><span aria-hidden="true">✓</span> Código de uso único · sessão protegida · sem senha</div>
+          <div className="access-security-note">{compact ? "Acesso sem senha" : <><span aria-hidden="true">✓</span> Código de uso único · sessão protegida · sem senha</>}</div>
         </form>
       ) : (
         <form className="form-stack access-form" onSubmit={submitCode} aria-busy={busy}>

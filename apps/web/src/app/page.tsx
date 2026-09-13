@@ -1,6 +1,5 @@
-import Image from 'next/image';
+import { HomeExperience } from '@/components/HomeExperience';
 import { Brand } from '@/components/Brand';
-import { HomeAccess } from '@/components/HomeAccess';
 import { SkipLink } from '@/components/SkipLink';
 
 const publicScripts = [
@@ -28,83 +27,22 @@ const faq = [
   ['Como funciona o Pix?', 'O pagamento é criado no backend e confirmado por eventos do provedor, com vínculo ao usuário, pacote e transação.'],
   ['O que o TroteBox bloqueia?', 'Destinos de emergência, padrões especiais, números em supressão e outras situações de risco são rejeitados antes do processamento.'],
   ['Onde vejo minhas chamadas?', 'No espaço autenticado do TroteBox, com histórico, status e créditos organizados por chamada.'],
-  ['Existe exemplo em áudio?', 'A vitrine pública já apresenta os roteiros e suas características. Exemplos em áudio serão publicados somente depois da revisão e aprovação final dos arquivos de demonstração.']
+  ['Existe exemplo em áudio?', 'Sim. Os cartões de experiências oferecem uma demonstração narrada pela voz do seu dispositivo, com transcrição. Essa amostra ilustra o estilo de humor; o áudio da chamada pode ser diferente.']
 ];
 
 export default function HomePage() {
   return (
     <>
       <SkipLink targetId="home-content">Pular para o conteúdo principal</SkipLink>
-      <header className="hero-nav home-nav">
-        <div className="container hero-nav-inner">
-          <Brand priority dark />
-          <nav className="nav-links" aria-label="Navegação da página inicial">
-            <a href="#como-funciona">Como funciona</a>
-            <a href="#experiencias">Experiências</a>
-            <a href="#precos">Preços</a>
-            <a href="#seguranca">Segurança</a>
-            <a href="#faq">FAQ</a>
-          </nav>
-          <a href="#acesso" className="button secondary home-login-button">Entrar</a>
-        </div>
-      </header>
-
       <main id="home-content" tabIndex={-1}>
-        <section className="home-access-hero" aria-label="Apresentação e acesso TroteBox">
-          <div className="container home-access-grid">
-            <div className="home-showcase">
-              <div className="home-hero-image-wrap">
-                <Image
-                  src="/brand/mascot-box.webp"
-                  alt="Mascote laranja do TroteBox rindo ao telefone dentro de uma caixa roxa"
-                  width={573}
-                  height={535}
-                  className="home-hero-image"
-                  sizes="(max-width: 680px) 94vw, (max-width: 980px) 70vw, 42vw"
-                  priority
-                />
-                <div className="home-hero-copy-overlay">
-                  <span className="home-hero-kicker">TROTES QUE FAZEM O DIA MAIS LEVE</span>
-                  <h1>Riso na linha.<br />Surpresa na caixa.</h1>
-                  <p>Escolha um roteiro, prepare a surpresa e acompanhe tudo em uma experiência simples, responsável e criada para funcionar em qualquer tela.</p>
-                  <a href="#experiencias" className="button primary compact-button">Ver catálogo / Escolher trote <span aria-hidden="true">→</span></a>
-                </div>
-              </div>
+        <HomeExperience />
 
-              <div className="home-showcase-actions">
-                <a href="#como-funciona" className="button secondary compact-button">Ver como funciona</a>
-                <a href="#experiencias" className="button primary compact-button">Conhecer os trotes</a>
-                <div className="home-trust-row" aria-label="Destaques da plataforma">
-                  <span>✓ Roteiros originais</span>
-                  <span>✓ Créditos transparentes</span>
-                  <span>✓ Proteções antiabuso</span>
-                </div>
-              </div>
-
-              <div id="como-funciona" className="home-step-grid">
-                <article className="home-step-card orange-step"><b>01</b><h2>Escolha o trote</h2><p>Navegue por roteiros autorais com categoria, duração e custo em créditos claramente indicados.</p></article>
-                <article className="home-step-card purple-step"><b>02</b><h2>Prepare a surpresa</h2><p>Revise as regras, confirme o contato autorizado e valide os detalhes antes de iniciar.</p></article>
-                <article className="home-step-card green-step"><b>03</b><h2>Acompanhe o resultado</h2><p>Status, histórico e créditos ficam organizados no seu espaço exclusivo, em qualquer dispositivo.</p></article>
-              </div>
-            </div>
-
-            <div id="acesso" className="home-access-column">
-              <HomeAccess />
-              <div className="home-access-assurance" aria-label="Informações de segurança do acesso">
-                <span><b>OTP</b> de uso único</span>
-                <span>Sessão protegida</span>
-                <span>Saldo controlado no servidor</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="experiencias" className="home-info-section">
+        <section id="catalogo" className="home-info-section">
           <div className="container">
             <div>
               <span className="eyebrow">Conheça antes de começar</span>
               <h2>Roteiros com personalidade, duração e custo claros.</h2>
-              <p>O catálogo público mostra o que cada experiência entrega. Os exemplos em áudio entram depois da revisão final dos arquivos de demonstração, sem criar expectativa falsa sobre um recurso ainda não publicado.</p>
+              <p>Explore as histórias e confira a duração e o custo em créditos antes de escolher.</p>
             </div>
             <div className="home-step-grid">
               {publicScripts.map((script) => (
@@ -113,6 +51,7 @@ export default function HomePage() {
                   <h3>{script.title}</h3>
                   <p>{script.description}</p>
                   <small>{script.duration} · {script.credits} créditos</small>
+                  <a className="button secondary" href="/catalog/">Escolher roteiro →</a>
                 </article>
               ))}
             </div>
@@ -134,6 +73,7 @@ export default function HomePage() {
                   <p><strong>{pack.credits} créditos</strong></p>
                   <p><strong>{pack.price}</strong></p>
                   <small>{pack.unit}</small>
+                  <a className="button secondary" href="/wallet/">Ver créditos →</a>
                 </article>
               ))}
             </div>
