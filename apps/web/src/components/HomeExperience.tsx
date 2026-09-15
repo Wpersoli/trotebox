@@ -22,7 +22,7 @@ const experiences = [
     description: "Personagens hilários e roteiros imprevisíveis.",
     headline: "Uma ligação. Muitas risadas.",
     subtitle: "Roteiros com personalidade para surpreender com bom humor.",
-    image: "/brand/hero-palco.webp",
+    image: "/brand/hero-stage-v3.webp",
     alt: "Mascote de comédia com telefone em um palco iluminado",
     script: "Pesquisa muito séria",
     text: "Boa tarde! Estamos fazendo uma pesquisa muito séria: quando você procura uma coisa e encontra outra, isso conta como promoção? E se esquecer a resposta, podemos entrevistar a sua memória?",
@@ -32,7 +32,7 @@ const experiences = [
     description: "Boas histórias para aproximar e divertir.",
     headline: "Conecte a chamada. Solte a risada.",
     subtitle: "Escolha seu roteiro e acompanhe cada surpresa.",
-    image: "/brand/hero-conexao.webp",
+    image: "/brand/hero-connection-v3.webp",
     alt: "Mascote ao telefone cercado de balões de conversa",
     script: "Mensagem do futuro",
     text: "Alô, aqui é do futuro! Estou ligando para avisar que amanhã você vai lembrar de uma coisa importante. Infelizmente, eu também esqueci o que era. Mas pode anotar: sorrir continua funcionando!",
@@ -341,13 +341,13 @@ export function HomeExperience() {
             </div>
           </div>
           <div
-            className={`xp-hero-art ${slide > 0 ? "xp-hero-art-wide" : ""}`}
+            className="xp-hero-art"
             key={current.image}
           >
             <Image
               src={current.image}
-              width={slide === 0 ? 1254 : 1536}
-              height={slide === 0 ? 1254 : 1024}
+              width={1254}
+              height={1254}
               sizes="(max-width: 700px) 100vw, 55vw"
               alt={current.alt}
               priority={slide === 0}

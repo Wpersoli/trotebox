@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from './AuthProvider';
 import { useEffect, useState } from 'react';
@@ -50,7 +51,7 @@ export function AppShell({ title, children }: { title: string; children: React.R
       <SkipLink targetId="app-content">Pular para o conteúdo principal</SkipLink>
       <aside className="sidebar">
         <Link href="/" className="app-brand" aria-label="TroteBox — página inicial">
-          <span className="app-brand-mark" aria-hidden="true">TB</span>
+          <Image className="app-brand-icon" src="/brand/icon-64.png" width={40} height={40} alt="" />
           <span className="app-brand-copy"><strong>Trote<span>Box</span></strong><small>Central de trotes</small></span>
         </Link>
         {isPreviewMode && <div className="preview-badge">Preview local</div>}
