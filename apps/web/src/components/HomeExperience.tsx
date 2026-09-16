@@ -22,7 +22,7 @@ const experiences = [
     description: "Personagens hilários e roteiros imprevisíveis.",
     headline: "Uma ligação. Muitas risadas.",
     subtitle: "Roteiros com personalidade para surpreender com bom humor.",
-    image: "/brand/hero-stage-v3.webp",
+    image: "/brand/hero-stage-v4.webp",
     alt: "Mascote de comédia com telefone em um palco iluminado",
     script: "Pesquisa muito séria",
     text: "Boa tarde! Estamos fazendo uma pesquisa muito séria: quando você procura uma coisa e encontra outra, isso conta como promoção? E se esquecer a resposta, podemos entrevistar a sua memória?",

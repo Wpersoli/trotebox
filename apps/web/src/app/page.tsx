@@ -67,11 +67,11 @@ export default function HomePage() {
             </div>
             <div className="home-step-grid">
               {publicPacks.map((pack) => (
-                <article className="home-step-card" key={pack.name}>
+                <article className={`home-step-card home-price-card${pack.highlight ? ' home-price-featured' : ''}`} key={pack.name}>
                   <b>{pack.highlight ? 'EM DESTAQUE' : 'PACOTE'}</b>
                   <h3>{pack.name}</h3>
                   <p><strong>{pack.credits} créditos</strong></p>
-                  <p><strong>{pack.price}</strong></p>
+                  <p className="home-price-value"><strong>{pack.price}</strong></p>
                   <small>{pack.unit}</small>
                   <a className="button secondary" href="/wallet/">Ver créditos →</a>
                 </article>
